@@ -348,11 +348,39 @@ def seed_extra_prompts():
     print("Extra Writing and Speaking prompts added.")
 
 
+def seed_admin_user():
+    import security
+    from datetime import datetime, timezone
+    from models import User
+    email = "fayzalinishonov103@gmail.com"
+    u = User.query.filter_by(email=email).first()
+    now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+    if not u:
+        u = User(
+            name="Fayzali",
+            email=email,
+            is_admin=True,
+            email_canon=security.canonical_email(email),
+            email_verified_at=now_utc
+        )
+        u.set_password("3299254Fayz")
+        db.session.add(u)
+        db.session.commit()
+        print(f"Admin {email} created successfully!")
+    else:
+        u.is_admin = True
+        u.set_password("3299254Fayz")
+        u.email_verified_at = now_utc
+        db.session.commit()
+        print(f"Admin {email} updated with password and admin rights!")
+
+
 if __name__ == "__main__":
     with create_app().app_context():
         seed()
         seed_mock_test_2()
         seed_extra_prompts()
+        seed_admin_user()
         seed_writing()
         seed_listening()
         seed_speaking()
