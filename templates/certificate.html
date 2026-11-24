@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CEFR Score Report — {{ user_name }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0b1329;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #0f172a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+}
+.no-print {
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #38bdf8;
+  color: #040814;
+  font-weight: 700;
+  font-size: 13px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: 2px solid #000;
+  box-shadow: 3px 3px 0 #000;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-action:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #000;
+}
+.btn-back {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+/* Certificate Layout (A4 Landscape aspect ratio) */
+.cert-page {
+  width: 100%;
+  max-width: 880px;
+  background: #ffffff;
+  position: relative;
+  padding: 28px;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border: 8px double #1e3a8a;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(240, 249, 255, 0.6) 0%, rgba(255, 255, 255, 0.95) 100%),
+    repeating-linear-gradient(45deg, rgba(30, 58, 138, 0.015) 0, rgba(30, 58, 138, 0.015) 2px, transparent 0, transparent 8px);
+}
+.cert-border {
+  border: 2px solid #38bdf8;
+  padding: 24px 32px;
+  position: relative;
+  border-radius: 6px;
+}
+.cert-header {
+  text-align: center;
+  position: relative;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+.cert-emblem {
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+.cert-org {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.18em;
+  color: #1e3a8a;
+  text-transform: uppercase;
+}
+.cert-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: 26px;
+  letter-spacing: 0.08em;
+  color: #0f172a;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+.cert-subtitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.cert-body {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.cert-granted {
+  font-size: 12px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+.cert-name {
+  font-family: 'Cinzel', serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: #1e3a8a;
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+}
+.cert-desc {
+  font-size: 13px;
+  color: #334155;
+  max-width: 620px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Scores Grid */
+.cert-scores {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  align-items: center;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+.skills-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.skills-table th {
+  text-align: left;
+  padding: 6px 8px;
+  color: #64748b;
+  font-size: 10px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #cbd5e1;
+}
+.skills-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #e2e8f0;
+  font-weight: 600;
+  color: #1e293b;
+}
+.skills-table tr:last-child td { border-bottom: none; }
+
+.overall-box {
+  text-align: center;
+  border-left: 2px solid #cbd5e1;
+  padding-left: 16px;
+}
+.overall-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #64748b;
+}
+.overall-level {
+  font-family: 'Cinzel', serif;
+  font-size: 42px;
+  font-weight: 900;
+  color: #2563eb;
+  line-height: 1.1;
+  margin: 2px 0;
+}
+.overall-score {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
+.overall-band {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  background: #dcfce7;
+  color: #15803d;
+}
+
+/* Footer / QR / Signatures */
+.cert-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-top: 1.5px solid #e2e8f0;
+  padding-top: 14px;
+}
+.cert-meta {
+  font-size: 11px;
+  color: #64748b;
+  line-height: 1.6;
+}
+.cert-meta b { color: #0f172a; }
+.cert-qr {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cert-stamp {
+  width: 72px;
+  height: 72px;
+  border: 2px dashed #1e3a8a;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #1e3a8a;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  transform: rotate(-12deg);
+}
+
+@media print {
+  body { background: transparent; padding: 0; }
+  .no-print { display: none !important; }
+  .cert-page {
+    box-shadow: none;
+    border: 6px double #1e3a8a;
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="no-print">
+  <a href="{{ url_for('main.dashboard') }}" class="btn-action btn-back">← Dashboardga qaytish</a>
+  <div style="display: flex; gap: 8px;">
+    <button onclick="window.print()" class="btn-action">🖨️ Chop etish / PDF sifatida saqlash</button>
+  </div>
+</div>
+
+<div class="cert-page">
+  <div class="cert-border">
+    <!-- Header -->
+    <div class="cert-header">
+      <div class="cert-emblem">🏛️</div>
+      <div class="cert-org">LEVI CEFR EXAMINATION BOARD · RECOGNISED STANDARD</div>
+      <h1 class="cert-title">RASMIY CEFR SCORE REPORT</h1>
+      <div class="cert-subtitle">{{ cert_type }} · NATIONAL MULTILEVEL PROFICIENCY SCALE</div>
+    </div>
+
+    <!-- Body -->
+    <div class="cert-body">
+      <p class="cert-granted">Ushbu sertifikat topshirilgan natijaga muvofiq berildi:</p>
+      <h2 class="cert-name">{{ user_name }}</h2>
+      <p class="cert-desc">
+        Nomzod milliy CEFR standarti boʻyicha belgilangan topshiriqlarni mustaqil topshirdi hamda 0–75 ballik rasmiy shkalada quyidagi natijani qayd etdi:
+      </p>
+    </div>
+
+    <!-- Scores Breakdown -->
+    <div class="cert-scores">
+      <div>
+        <table class="skills-table">
+          <thead>
+            <tr>
+              <th>Imtihon Boʻlimi</th>
+              <th>Toʻplangan Ball</th>
+              <th>CEFR Darajasi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in breakdown %}
+            <tr>
+              <td>{{ item.skill }}</td>
+              <td style="font-family:'Space Mono', monospace">{{ item.score }} / 75</td>
+              <td><span style="display:inline-block;padding:1px 6px;border-radius:4px;background:#e0f2fe;color:#0369a1;font-weight:700">{{ item.level }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="overall-box">
+        <p class="overall-label">Umumiy Daraja</p>
+        <div class="overall-level">{{ overall_level }}</div>
+        <p class="overall-score">{{ overall_score }} / 75 Ball</p>
+        <span class="overall-band">Sertifikatlandi ✓</span>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="cert-footer">
+      <div class="cert-meta">
+        <p>Sertifikat ID: <b style="font-family:'Space Mono', monospace">{{ cert_id }}</b></p>
+        <p>Berilgan sana: <b>{{ date_str }}</b></p>
+        <p>Holat: <b style="color:#16a34a">Rasmiy Tasdiqlangan (Online Verified)</b></p>
+      </div>
+
+      <div class="cert-qr">
+        <div class="cert-stamp">
+          <span>LEVI CEFR</span>
+          <span>OFFICIAL</span>
+          <span>VERIFIED</span>
+        </div>
+        <div>
+          {{ qr_svg|safe }}
+          <div style="font-size: 8px; text-align: center; color: #64748b; margin-top: 2px;">QR Tekshiruv</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

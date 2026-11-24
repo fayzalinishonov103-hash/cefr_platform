@@ -209,7 +209,8 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
       <span>LEVI</span></a>
     {% set ep = request.endpoint or '' %}{% set bp_ = nav_skill|default(request.blueprint or '') %}
     {% set nav_links = [('ASOSIY', url_for('main.index'), ep == 'main.index'),
-        ('READING', url_for('reading.tests'), bp_ == 'reading'), ('LISTENING', url_for('listening.tests'), bp_ == 'listening'),
+        ('READING', url_for('reading.tests'), bp_ == 'reading'), ('LISTENING', url_for('listening.tests'), bp_ == 'listening' and ep != 'listening.dictation'),
+        ('🎧 DIKTANT', url_for('listening.dictation'), ep == 'listening.dictation'),
         ('WRITING', url_for('writing.tasks'), bp_ == 'writing'), ('SPEAKING', url_for('speaking.tasks'), bp_ == 'speaking'),
         ('⚔️ BATTLE', url_for('battle.lobby'), bp_ == 'battle'),
         ('SHADOWING', url_for('shadowing.videos'), bp_ == 'shadowing')] %}
@@ -231,6 +232,7 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
       </summary>
       <div class="pm win">
         <p class="px-3 pt-3 pb-2 text-[11px] border-b-2 border-black" style="color:var(--mut)">{{ current_user.name }}</p>
+        <a href="{{ url_for('listening.dictation') }}" class="text-emerald-400 font-bold">🎧 SMART DIKTANT</a>
         <a href="{{ url_for('writing.c1_transform_view') }}" class="text-sky-500 font-bold">✨ C1 TRANSFORMATOR</a>
         <a href="{{ url_for('battle.lobby') }}" class="text-rose-500 font-bold">⚔️ 1v1 BATTLE DUEL</a>
         <a href="{{ url_for('skills.profile') }}">SKILLAR PROFILI</a>

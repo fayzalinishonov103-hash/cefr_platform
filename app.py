@@ -161,8 +161,9 @@ def create_app(config=None):
     from onboarding import bp as onboarding_bp
     from verify import bp as verify_bp
     from battle import bp as battle_bp
+    from certificate import bp as certificate_bp
     for bp in (main_bp, auth_bp, reading_bp, ai_bp, admin_bp, writing_bp, skills_bp, vocab_bp, listening_bp, speaking_bp, account_bp,
-               shadowing_bp, shadow_admin_bp, placement_bp, exam_bp, admin_ai_bp, mistakes_bp, smart_bp, onboarding_bp, verify_bp, battle_bp):
+               shadowing_bp, shadow_admin_bp, placement_bp, exam_bp, admin_ai_bp, mistakes_bp, smart_bp, onboarding_bp, verify_bp, battle_bp, certificate_bp):
         app.register_blueprint(bp)
 
     with app.app_context():

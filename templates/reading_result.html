@@ -12,6 +12,7 @@
       <p class="text-sm"><b>{{ attempt.scaled_score }} / 75</b> ball</p>
       <p class="text-[11px] mt-4" style="color:var(--mut)">Hisob soddalashtirilgan, rasmiy imtihon natijasidan farq qilishi mumkin.</p>
       <div class="mt-5 flex gap-3 flex-wrap">
+        <a class="btn" style="background:linear-gradient(135deg, #0ea5e9, #2563eb);color:#fff;border-color:#0284c7;font-weight:700;" href="{{ url_for('certificate.attempt_certificate', attempt_id=attempt.id) }}" target="_blank">📜 SERTIFIKAT OLISH</a>
         <a class="btn" href="{{ url_for('main.dashboard') }}">DASHBOARD</a>
         <a class="btn w" href="{{ url_for(attempt.test.skill ~ '.tests') }}">YANA TEST</a>
       </div>

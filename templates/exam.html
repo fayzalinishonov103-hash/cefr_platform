@@ -50,7 +50,10 @@
   <div class="flex gap-3 flex-wrap">
     {% if not exam.finished_at %}
     <form method="post" action="{{ url_for('exam.cancel', session_id=exam.id) }}" onsubmit="return confirm('Imtihon bekor qilinadi. Davom etasizmi?')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn w" type="submit">BEKOR QILISH</button></form>
-    {% else %}<form method="post" action="{{ url_for('exam.start') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn" type="submit">YANA IMTIHON</button></form>{% endif %}
+    {% else %}
+    <a class="btn" style="background:linear-gradient(135deg, #0ea5e9, #2563eb);color:#fff;border-color:#0284c7;font-weight:700;" href="{{ url_for('certificate.exam_certificate', session_id=exam.id) }}" target="_blank">📜 RASMIY SERTIFIKAT</a>
+    <form method="post" action="{{ url_for('exam.start') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn" type="submit">YANA IMTIHON</button></form>
+    {% endif %}
     <a class="btn w" href="{{ url_for('main.dashboard') }}">DASHBOARD</a>
   </div>
 {% endif %}

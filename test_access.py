@@ -12,7 +12,8 @@ from models import (User, Test as TestModel, Part, QuestionGroup, Question, Atte
 
 # Pages anybody may open without signing in (GET only). Everything else must redirect to login or refuse.
 PUBLIC_GET = {"/", "/login", "/register", "/forgot", "/health", "/reading", "/listening", "/writing", "/speaking",
-              "/shadowing", "/practice", "/placement", "/maxfiylik", "/shartlar"}
+              "/shadowing", "/practice", "/placement", "/maxfiylik", "/shartlar",
+              "/listening/dictation", "/certificate/verify/<string:cert_id>"}
 PUBLIC_ANY_METHOD = {"/login", "/register", "/forgot", "/auth/telegram", "/reset/<token>"}   # auth endpoints themselves
 
 
