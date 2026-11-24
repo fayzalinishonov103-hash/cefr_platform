@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ prompt.title }} — Writing{% endblock %}
+{% block ticker %}{% endblock %}
+{% block content %}
+<div class="grid lg:grid-cols-12 gap-5">
+  <section class="lg:col-span-5 win lg:sticky lg:top-4 self-start">
+    <div class="wh"><span class="dot"></span><span class="dot"></span><span>{{ label|upper }}</span></div>
+    <div class="p-4 space-y-3 read">
+      <p class="font-bold">{{ prompt.title }}</p>
+      <div class="whitespace-pre-line leading-relaxed">{{ prompt.prompt }}</div>
+      <p class="text-xs" style="color:var(--mut)">Tavsiya: {{ prompt.min_words }}–{{ prompt.max_words }} soʻz, taxminan {{ prompt.minutes }} daqiqa.</p>
+    </div>
+  </section>
+  <section class="lg:col-span-7 win">
+    <div class="wh"><span class="dot"></span><span>SIZNING JAVOBINGIZ</span></div>
+    <form method="post" action="{{ url_for('writing.submit', prompt_id=prompt.id) }}" id="wForm" class="p-4 space-y-3 read">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <textarea class="inp" id="wText" name="text" rows="16" spellcheck="true" placeholder="Write your answer here...">{{ text }}</textarea>
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <p class="font-bold">Soʻzlar: <span id="wc" class="px-1">0</span> <span class="font-normal text-xs">/ {{ prompt.min_words }}–{{ prompt.max_words }}</span></p>
+        <button class="btn" id="wGo" type="submit">AI BILAN TEKSHIRISH</button>
+      </div>
+      <p id="wWait" class="hidden font-bold">AI tekshirmoqda, 10–30 soniya kuting. Sahifani yopmang…</p>
+    </form>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function () {
+  const ta = document.getElementById("wText"), wc = document.getElementById("wc");
+  const LO = {{ prompt.min_words|int }}, HI = {{ prompt.max_words|int }}, KEY = "cefr-writing-{{ prompt.id }}";
+  function count() {
+    const n = ta.value.trim() ? ta.value.trim().split(/\s+/).length : 0;
+    wc.textContent = n;
+    wc.className = "px-1 " + (n >= LO && n <= HI * 1.2 ? "warn" : "");
+    try { localStorage.setItem(KEY, ta.value); } catch (e) {}
+  }
+  try { if (!ta.value) ta.value = localStorage.getItem(KEY) || ""; } catch (e) {}   // draft survives a refresh
+  ta.addEventListener("input", count); count();
+  document.getElementById("wForm").addEventListener("submit", function () {
+    document.getElementById("wGo").disabled = true;
+    document.getElementById("wWait").classList.remove("hidden");
+    try { localStorage.removeItem(KEY); } catch (e) {}
+  });
+})();
+</script>
+{% endblock %}

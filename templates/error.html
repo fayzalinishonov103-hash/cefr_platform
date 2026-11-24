@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} — Levi{% endblock %}
+{% block ticker %}{% endblock %}
+{% block content %}
+<section class="win max-w-xl mx-auto text-center">
+  <div class="wh"><span class="dot"></span><span class="dot"></span><span>XATO {{ code }}</span></div>
+  <div class="p-8 space-y-3">
+    <p class="hd text-6xl">{{ code }}</p>
+    <p class="font-bold">{{ title }}</p>
+    <p class="text-sm" style="color:var(--mut)">{{ message }}</p>
+    <div class="pt-3 flex gap-3 justify-center flex-wrap"><a class="btn" href="{{ url_for('main.index') }}">BOSH SAHIFA</a><a class="btn w" href="javascript:history.back()">ORQAGA</a></div>
+  </div>
+</section>
+{% endblock %}

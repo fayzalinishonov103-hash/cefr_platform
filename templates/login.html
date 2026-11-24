@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Kirish — Levi{% endblock %}
+{% block content %}
+<section class="win max-w-md mx-auto">
+  <div class="wh"><span class="dot"></span><span class="dot"></span><span>KIRISH</span></div>
+  <div class="p-5 space-y-4 text-sm">
+    {% if telegram_bot %}
+    <div class="text-center">
+      <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="{{ telegram_bot }}"
+              data-size="large" data-auth-url="{{ url_for('auth.telegram', _external=True) }}" data-request-access="write"></script>
+      <p class="text-xs mt-3 pt-3 border-t-2 border-black" style="color:var(--mut)">yoki email bilan</p>
+    </div>
+    {% endif %}
+    <form method="post" class="space-y-4">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label class="block">Email<input class="inp mt-1" type="email" name="email" value="{{ email or '' }}" maxlength="120" autocomplete="username" required {{ '' if telegram_bot else 'autofocus' }}></label>
+      <label class="block">Parol<input class="inp mt-1" type="password" name="password" maxlength="1024" autocomplete="current-password" data-reveal required></label>
+      <label class="flex gap-2 items-start text-xs"><input type="hidden" name="remember_shown" value="1"><input type="checkbox" name="remember" value="1" class="mt-0.5 shrink-0" checked>
+        <span>Bu qurilmada eslab qolish <span style="color:var(--mut)">(umumiy kompyuterda belgilamang)</span></span></label>
+      <button class="btn w-full" type="submit">KIRISH</button>
+      <p class="text-xs"><a class="underline" href="{{ url_for('auth.forgot') }}">Parolni unutdingizmi?</a></p>
+      <p class="text-xs">Hisobingiz yoʻqmi? <a class="underline font-bold" href="{{ url_for('auth.register') }}">Roʻyxatdan oʻting</a></p>
+    </form>
+  </div>
+</section>
+{% endblock %}

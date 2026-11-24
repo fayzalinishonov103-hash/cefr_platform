@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Levi{% endblock %}
+{% block content %}
+<div class="grid lg:grid-cols-12 gap-5">
+  <section class="lg:col-span-12 win warn">
+    <div class="p-4 flex items-center justify-between gap-3 flex-wrap text-sm">
+      {% if placement %}
+      <p>Daraja testi natijasi: <b>{{ placement.cefr_level }}</b>. <a class="underline" href="{{ url_for('placement.result', result_id=placement.id) }}">Mos mashqlar</a></p>
+      <a class="btn w !py-2 !text-xs" href="{{ url_for('placement.intro') }}">QAYTA TOPSHIRISH</a>
+      {% else %}
+      <p><b>Darajangizni biling.</b> 8 daqiqalik test sizga mos mashqlarni tanlaydi.</p>
+      <a class="btn w !py-2 !text-xs" href="{{ url_for('placement.intro') }}">DARAJANI ANIQLASH</a>
+      {% endif %}
+    </div>
+  </section>
+  {% if ob_line %}
+  <section class="lg:col-span-12 win"><div class="p-4 flex items-center justify-between gap-3 flex-wrap text-sm">
+    <p><b>Sizning rejangiz:</b> {{ ob_line }}</p>
+    <a class="btn w !py-2 !text-xs" href="{{ url_for('onboarding.edit') }}">OʻZGARTIRISH</a></div></section>
+  {% elif not ob_profile or (not ob_profile.completed_at and not ob_profile.skipped_at) %}
+  <section class="lg:col-span-12 win"><div class="p-4 flex items-center justify-between gap-3 flex-wrap text-sm">
+    <p><b>Rejani oʻzingizga moslang.</b> 3 ta qisqa savol, oʻtkazib yuborish mumkin.</p>
+    <a class="btn w !py-2 !text-xs" href="{{ url_for('onboarding.edit') }}">SAVOLLARGA JAVOB BERISH</a></div></section>
+  {% endif %}
+  <section class="lg:col-span-12 win">
+    <div class="wh"><span class="dot"></span><span class="dot"></span><span>BUGUNGI REJA</span></div>
+    <div class="p-5 grid md:grid-cols-12 gap-5 text-sm items-center">
+      <div class="md:col-span-3"><p class="text-[11px]" style="color:var(--mut)">KETMA-KET KUNLAR</p>
+        <p class="hd text-5xl">{{ prog.streak }}</p><p class="text-xs" style="color:var(--mut)">eng yaxshi: {{ prog.best }} · bugun: {{ prog.today }} ta mashq</p></div>
+      <div class="md:col-span-4"><p class="text-[11px] mb-2" style="color:var(--mut)">SOʻNGGI 7 KUN</p>
+        <div class="flex gap-2">{% for d in prog.week %}<div class="text-center text-[10px]"><span class="block w-8 h-8 border-2 border-black {{ 'ring-2 ring-offset-1' if d.today }}" style="background:{{ 'var(--lime)' if d.done else 'transparent' }}" aria-label="{{ d.label }}: {{ 'mashq bor' if d.done else 'mashq yoʻq' }}"></span>{{ d.label }}</div>{% endfor %}</div></div>
+      <div class="md:col-span-5"><p class="text-[11px]" style="color:var(--mut)">KEYINGI QADAM</p>
+        <p class="font-bold mt-1">{{ prog.next.text }}</p>
+        <div class="mt-3 flex gap-2 flex-wrap"><a class="btn !py-2 !text-xs" href="{{ url_for(prog.next.endpoint) }}">{{ prog.next.button }}</a>
+          {% if prog.vocab_due %}<a class="btn w !py-2 !text-xs" href="{{ url_for('vocab.review') }}">{{ prog.vocab_due }} TA SOʻZNI TAKRORLASH</a>{% endif %}</div></div>
+    </div>
+  </section>
+  <section class="lg:col-span-12 win">
+    <div class="wh"><span class="dot"></span><span>KUNLIK CHALLENGE VA XP</span><a class="btn !py-1 !text-[11px] ml-auto" href="{{ url_for('smart.home') }}">AQLLI MASHQ</a></div>
+    <div class="p-5 grid md:grid-cols-12 gap-5 text-sm items-center">
+      <div class="md:col-span-3"><p class="text-[11px]" style="color:var(--mut)">XP DARAJASI</p><p class="hd text-5xl">{{ gam.level }}</p>
+        <div class="bar mt-1"><i style="width:{{ gam.pct }}%"></i></div><p class="text-xs mt-1" style="color:var(--mut)">{{ gam.xp }} XP · keyingisiga {{ gam.to_next }}</p></div>
+      <div class="md:col-span-6">
+        {% if gam.daily and gam.daily.finished_at %}<p class="font-bold">Bugungi challenge tugadi: {{ gam.daily.correct }}/{{ gam.daily.total }}</p><p class="text-xs" style="color:var(--mut)">Ertaga yangi savollar. Seriyangizni uzmang.</p>
+        {% else %}<p class="font-bold">Bugungi 5 daqiqalik challenge sizni kutmoqda.</p><p class="text-xs" style="color:var(--mut)">Savollar zaif joylaringizga qarab tanlanadi.</p>{% endif %}
+      </div>
+      <div class="md:col-span-3 flex gap-2 flex-wrap">
+        {% if not (gam.daily and gam.daily.finished_at) %}<form method="post" action="{{ url_for('smart.daily') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn !py-2 !text-xs" type="submit">{{ 'DAVOM ETISH' if gam.daily else 'BOSHLASH' }}</button></form>{% endif %}
+        <span class="chip">{{ gam.badges|length }} ta nishon</span>
+      </div>
+    </div>
+  </section>
+  <section class="lg:col-span-4 win">
+    <div class="wh"><span class="dot"></span><span class="dot"></span><span>PROFIL</span></div>
+    <div class="p-4">
+      <p class="hd text-3xl">{{ current_user.name }}</p>
+      <p class="text-[11px] mt-4" style="color:var(--mut)">JORIY DARAJA</p>
+      <p class="hd text-5xl">{{ current_user.current_level or "—" }}</p>
+      <div class="mt-4 flex gap-2 flex-wrap"><a class="btn !py-2 !text-xs" href="{{ url_for('skills.profile') }}">SKILLAR PROFILI</a><a class="btn w !py-2 !text-xs" href="{{ url_for('vocab.index') }}">LUGʻAT</a><a class="btn w !py-2 !text-xs" href="{{ url_for('mistakes.index') }}">XATOLAR DAFTARI</a></div>
+      {% if not current_user.current_level %}<p class="text-xs mt-2" style="color:var(--mut)">Darajangiz birinchi testdan keyin chiqadi.</p>{% endif %}
+    </div>
+  </section>
+  <section class="lg:col-span-8 win">
+    <div class="wh"><span class="dot"></span><span>OXIRGI NATIJALAR</span></div>
+    {% if attempts %}
+    <div class="overflow-x-auto"><table class="w-full text-xs">
+      <thead><tr class="text-left border-b-2 border-black"><th class="p-3">Sana</th><th class="p-3">Test</th><th class="p-3">Skill</th><th class="p-3">Ball</th><th class="p-3">Daraja</th><th class="p-3"></th></tr></thead>
+      <tbody>{% for a in attempts %}
+        <tr class="border-b border-black/20"><td class="p-3">{{ a.finished_at.strftime('%d.%m.%Y') if a.finished_at else '—' }}</td><td class="p-3">{{ a.test.title }}</td><td class="p-3">{{ a.test.skill|upper }}</td><td class="p-3">{{ a.raw_score }}/{{ a.max_score }}</td><td class="p-3 font-bold">{{ a.cefr_level }}</td><td class="p-3"><a class="underline" href="{{ url_for('reading.result', attempt_id=a.id) }}">Koʻrish</a></td></tr>
+      {% endfor %}</tbody>
+    </table></div>
+    {% else %}
+    <div class="p-6 text-sm">
+      <p class="font-bold">Hali test topshirmagansiz.</p>
+      <p class="mt-1" style="color:var(--mut)">Birinchi Reading testini boshlang, natija shu yerda koʻrinadi.</p>
+      <a href="{{ url_for('reading.tests') }}" class="btn mt-4">READING TESTI</a> <a href="{{ url_for('listening.tests') }}" class="btn w mt-4">LISTENING TESTI</a>
+    </div>
+    {% endif %}
+  </section>
+  <section class="lg:col-span-12 win">
+    <div class="wh"><span class="dot"></span><span>WRITING NATIJALARI</span>
+      <a href="{{ url_for('writing.tasks') }}" class="btn !py-1 !text-[11px] ml-auto">YANGI INSHO</a></div>
+    {% if writing %}
+    <div class="overflow-x-auto"><table class="w-full text-xs">
+      <thead><tr class="text-left border-b-2 border-black"><th class="p-3">Sana</th><th class="p-3">Topshiriq</th><th class="p-3">Ball</th><th class="p-3">Daraja</th><th class="p-3"></th></tr></thead>
+      <tbody>{% for w in writing %}<tr class="border-b border-black/20">
+        <td class="p-3">{{ w.created_at.strftime('%d.%m.%Y') }}</td><td class="p-3">{{ w.feedback.title }}</td>
+        <td class="p-3">{{ w.scaled_score }}/75</td><td class="p-3 font-bold">{{ w.cefr_level }}</td>
+        <td class="p-3"><a class="underline" href="{{ url_for('writing.result', result_id=w.id) }}">Koʻrish</a></td></tr>{% endfor %}</tbody>
+    </table></div>
+    {% else %}<div class="p-6 text-sm"><p class="font-bold">Hali insho yozmagansiz.</p>
+      <p class="mt-1" style="color:var(--mut)">Birinchi topshiriqni bajaring, AI baho va tavsiya beradi.</p></div>{% endif %}
+  </section>
+  <section class="lg:col-span-12 win">
+    <div class="wh"><span class="dot"></span><span>SPEAKING NATIJALARI</span>
+      <a href="{{ url_for('speaking.tasks') }}" class="btn !py-1 !text-[11px] ml-auto">YANGI JAVOB</a></div>
+    {% if speaking %}
+    <div class="overflow-x-auto"><table class="w-full text-xs">
+      <thead><tr class="text-left border-b-2 border-black"><th class="p-3">Sana</th><th class="p-3">Topshiriq</th><th class="p-3">Ball</th><th class="p-3">Daraja</th><th class="p-3"></th></tr></thead>
+      <tbody>{% for w in speaking %}<tr class="border-b border-black/20">
+        <td class="p-3">{{ w.created_at.strftime('%d.%m.%Y') }}</td><td class="p-3">{{ w.feedback.title }}</td>
+        <td class="p-3">{{ w.scaled_score }}/75</td><td class="p-3 font-bold">{{ w.cefr_level }}</td>
+        <td class="p-3"><a class="underline" href="{{ url_for('speaking.result', result_id=w.id) }}">Koʻrish</a></td></tr>{% endfor %}</tbody>
+    </table></div>
+    {% else %}<div class="p-6 text-sm"><p class="font-bold">Hali Speaking topshirmagansiz.</p>
+      <p class="mt-1" style="color:var(--mut)">Mikrofonga javob bering, AI baho va tavsiya beradi.</p></div>{% endif %}
+  </section>
+</div>
+{% endblock %}

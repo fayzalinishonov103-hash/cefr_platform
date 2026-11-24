@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% block title %}Test muharriri — Levi{% endblock %}
+{% block ticker %}{% endblock %}
+{% block content %}
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<script type="application/json" id="initial">{{ data|tojson }}</script>
+
+<div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+  <h1 class="hd text-3xl">{{ ('TESTNI TAHRIRLASH' if data.id else 'YANGI TEST') ~ (' · LISTENING' if data.skill == 'listening' else '') }}</h1>
+  <a href="{{ url_for('admin.index') }}" class="btn w !py-2 !text-xs">ORQAGA</a>
+</div>
+
+{% if finished %}
+<div class="win mb-5 px-4 py-3 text-sm" style="background:#fff7cc;color:#0a0a0a">
+  Bu testni <b>{{ finished }}</b> ta urinish topshirgan. Ballar saqlanib qoladi, lekin javob kalitini oʻzgartirsangiz,
+  eski natijalarning <b>javoblar tahlili</b> yangi kalit boʻyicha koʻrinadi.
+</div>
+{% endif %}
+
+{% if notice %}
+<div class="win mb-5 px-4 py-3 text-sm" style="background:var(--lime);color:#0a0a0a">
+  <b>Bu AI tayyorlagan qoralama, hali saqlanmagan.</b> Matn, savol turi va ayniqsa <b>toʻgʻri javoblarni</b> manba bilan solishtirib chiqing, soʻng SAQLASH ni bosing.
+  {% if problems %}<p class="mt-2 font-bold">Avtomatik topilgan muammolar ({{ problems|length }}):</p>
+  <ul class="list-disc ml-5">{% for p in problems %}<li>{{ p }}</li>{% endfor %}</ul>{% endif %}
+</div>
+{% endif %}
+<div class="win mb-6"><div class="wh"><span class="dot"></span><span>UMUMIY</span></div>
+  <div class="p-4 grid sm:grid-cols-12 gap-3 text-sm" id="meta"></div></div>
+
+<div id="parts"></div>
+
+<div class="flex flex-wrap gap-3 mb-4">
+  <button type="button" class="btn w" id="addPart">+ PART</button>
+  <button type="button" class="btn w" id="renumber">SAVOLLARNI RAQAMLASH (1, 2, 3...)</button>
+  <button type="button" class="btn" id="save">SAQLASH</button>
+</div>
+<div id="errors" class="win p-4 text-sm hidden" role="alert" style="background:#fff0f0;color:#0a0a0a"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const init = JSON.parse(document.getElementById("initial").textContent);
+  const TYPES = [["gap_fill", "Gap fill (matndagi boʻsh joy)"], ["match", "Matching (A, B, C...)"],
+                 ["heading", "Matching headings"], ["mcq", "Multiple choice"], ["tfng", "True / False / Not Given"],
+                 ["map", "Map labelling (xarita: A, B, C...)"]];
+  const LEVELS = ["", "A1", "A2", "B1", "B2", "C1", "C2"];
+  const csrf = document.querySelector("[name=csrf_token]").value;
+  let dirty = {{ 'true' if notice else 'false' }};
+
+  // options <-> text ("A | label" per line)
+  const optText = o => (o || []).map(([v, l]) => v + " | " + l).join("\n");
+  const textOpt = t => t.split("\n").map(s => s.trim()).filter(Boolean).map(s => {
+    const i = s.indexOf("|"); return i < 0 ? ["", s] : [s.slice(0, i).trim(), s.slice(i + 1).trim()];
+  });
+  const isOpt = t => t === "match" || t === "heading" || t === "map";
+  // Map labelling: the admin only types the letters ("A-H" or "A, B, C, D"); "A | text" is accepted too.
+  const mapOpt = t => {
+    if (t.includes("|")) return textOpt(t);
+    const out = [], seen = new Set();
+    t.split(/[\s,;]+/).filter(Boolean).forEach(tok => {
+      const m = /^([A-Za-z])\s*[-–]\s*([A-Za-z])$/.exec(tok);
+      const letters = m ? range(m[1], m[2]) : [tok];
+      letters.forEach(l => { if (!seen.has(l.toLowerCase())) { seen.add(l.toLowerCase()); out.push([l, l]); } });
+    });
+    return out;
+  };
+  const range = (a, b) => { const out = []; let x = a.charCodeAt(0); const y = b.charCodeAt(0);
+    if (x > y || y - x > 25) return [a]; for (; x <= y; x++) out.push(String.fromCharCode(x)); return out; };
+  const sharedText = (type, options) => type === "map" && (options || []).length && options.every(o => o[0] === o[1])
+    ? options.map(o => o[0]).join(", ") : optText(options);
+  const optsOf = g => g.qtype === "map" ? mapOpt(g.shared) : textOpt(g.shared);
+
+  const state = {
+    id: init.id, skill: init.skill || "reading", title: init.title, duration_min: init.duration_min, is_active: init.is_active,
+    parts: init.parts.map(p => ({ title: p.title, passage: p.passage, audio_url: p.audio_url || "", image_url: p.image_url || "", groups: p.groups.map(g => ({
+      qtype: g.qtype, instruction: g.instruction,
+      shared: isOpt(g.qtype) ? sharedText(g.qtype, (g.questions[0] || {}).options) : "",
+      questions: g.questions.map(q => ({ number: q.number, text: q.text, answer: q.answer,
+        cefr_level: q.cefr_level || "", opts: g.qtype === "mcq" ? optText(q.options) : "" }))
+    })) }))
+  };
+
+  // ---- tiny DOM helpers ----
+  function h(tag, props, ...kids) {
+    const n = document.createElement(tag);
+    Object.entries(props || {}).forEach(([k, v]) => {
+      if (k === "class") n.className = v;
+      else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v);
+    });
+    kids.flat().forEach(c => n.append(c));
+    return n;
+  }
+  function input(obj, key, props, tag) {
+    const n = h(tag || "input", Object.assign({ class: "inp" }, props));
+    n.value = obj[key] == null ? "" : obj[key];
+    n.addEventListener("input", () => { obj[key] = n.value; dirty = true; });
+    return n;
+  }
+  function select(obj, key, pairs, after) {
+    const n = h("select", { class: "inp" }, pairs.map(([v, l]) => h("option", { value: v }, l)));
+    n.value = obj[key];
+    n.addEventListener("change", () => { obj[key] = n.value; dirty = true; if (after) after(); });
+    return n;
+  }
+  const field = (label, node) => h("label", { class: "block text-xs" }, h("span", { class: "block mb-1 font-bold" }, label), node);
+  const button = (text, fn, cls) => h("button", { type: "button", class: cls || "btn w !py-1 !text-[11px]", onclick: fn }, text);
+  const allQuestions = () => state.parts.flatMap(p => p.groups.flatMap(g => g.questions));
+  const LISTENING = state.skill === "listening";
+  const nextNumber = () => Math.max(0, ...allQuestions().map(q => +q.number || 0)) + 1;
+
+  // ---- general fields ----
+  const meta = document.getElementById("meta");
+  const active = h("input", { type: "checkbox" }); active.checked = state.is_active;
+  active.addEventListener("change", () => { state.is_active = active.checked; dirty = true; });
+  meta.append(
+    h("div", { class: "sm:col-span-7" }, field("Test nomi", input(state, "title", { maxlength: 150 }))),
+    h("div", { class: "sm:col-span-2" }, field("Daqiqa", input(state, "duration_min", { type: "number", min: 1, max: 240 }))),
+    h("label", { class: "sm:col-span-3 flex items-end gap-2 text-xs font-bold pb-2" }, active, "Foydalanuvchilarga koʻrinsin"));
+
+  // ---- editor tree ----
+  function onTypeChange(g) {
+    if (g.qtype === "map") {                                    // sensible defaults for a map group
+      if (!g.shared) g.shared = "A-H";
+      if (!g.instruction) g.instruction = "Look at the map. Which place is each building? Choose the correct letter, A-H.";
+    }
+    const tf = g.qtype === "tfng", ok = ["true", "false", "ng"];
+    g.questions.forEach(q => { if (tf && !ok.includes(q.answer)) q.answer = "true"; if (!tf && ok.includes(q.answer)) q.answer = ""; });
+  }
+  function questionRow(g, q, qi) {
+    const answerNode = g.qtype === "tfng"
+      ? select(q, "answer", [["true", "True"], ["false", "False"], ["ng", "Not Given"]])
+      : input(q, "answer", { placeholder: g.qtype === "gap_fill" ? "seven|7 (bir nechta variant | bilan)" : "masalan: C" });
+    return h("div", { class: "border-2 border-black p-3 space-y-2" },
+      h("div", { class: "grid grid-cols-12 gap-2" },
+        h("div", { class: "col-span-3 sm:col-span-1" }, field("№", input(q, "number", { type: "number", min: 1 }))),
+        h("div", { class: "col-span-9 sm:col-span-5" }, field(g.qtype === "gap_fill" ? "Gap matni (___ bilan)" : g.qtype === "map" ? "Qaysi joy? (masalan: the library)" : "Savol / bayonot",
+          input(q, "text", { placeholder: g.qtype === "gap_fill" ? "They crossed the water in a small ___." : "" }))),
+        h("div", { class: "col-span-8 sm:col-span-4" }, field("Toʻgʻri javob", answerNode)),
+        h("div", { class: "col-span-4 sm:col-span-2" }, field("Daraja", select(q, "cefr_level", LEVELS.map(l => [l, l || "—"]))))),
+      g.qtype === "mcq" ? field("Variantlar (har qatorda: a | matn)", input(q, "opts", { rows: 3, placeholder: "a | First option\nb | Second option\nc | Third option" }, "textarea")) : "",
+      button("Savolni oʻchirish", () => { g.questions.splice(qi, 1); dirty = true; render(); }));
+  }
+  function groupCard(p, g, gi) {
+    return h("div", { class: "border-2 border-black p-3 space-y-3" },
+      h("div", { class: "grid sm:grid-cols-12 gap-3" },
+        h("div", { class: "sm:col-span-4" }, field("Savol turi", select(g, "qtype", TYPES, () => { onTypeChange(g); render(); }))),
+        h("div", { class: "sm:col-span-8" }, field("Koʻrsatma (talabaga koʻrinadi)", input(g, "instruction")))),
+      g.qtype === "map"
+        ? field("Xaritadagi harflar (masalan: A-H yoki A, B, C, D, E)", input(g, "shared", { rows: 1, placeholder: "A-H" }, "textarea"))
+        : isOpt(g.qtype) ? field("Umumiy variantlar (har qatorda: A | matn)", input(g, "shared", { rows: 4, placeholder: "A | Benefits for mental health\nB | Obstacles that gardeners face" }, "textarea")) : "",
+      h("div", { class: "space-y-3" }, g.questions.map((q, qi) => questionRow(g, q, qi))),
+      h("div", { class: "flex gap-2 flex-wrap" },
+        button("+ Savol", () => { g.questions.push({ number: nextNumber(), text: "", answer: g.qtype === "tfng" ? "true" : "", cefr_level: "B1", opts: "" }); dirty = true; render(); }),
+        button("Guruhni oʻchirish", () => { if (confirm("Guruh va uning savollari oʻchiriladi.")) { p.groups.splice(gi, 1); dirty = true; render(); } })));
+  }
+  function audioBox(p) {
+    const note = h("p", { class: "text-xs", "aria-live": "polite" }, p.audio_url ? "Audio biriktirilgan." : "Audio hali yuklanmagan.");
+    const player = h("audio", { controls: "", class: "w-full" + (p.audio_url ? "" : " hidden") });
+    if (p.audio_url) player.src = p.audio_url;
+    const file = h("input", { type: "file", accept: ".mp3,.m4a,.wav,.ogg,audio/*", class: "text-xs" });
+    file.addEventListener("change", async () => {
+      if (!file.files[0]) return;
+      const fd = new FormData(); fd.append("file", file.files[0]);
+      note.textContent = "Yuklanmoqda…";
+      try {
+        const r = await fetch("{{ url_for('admin.upload_audio') }}", { method: "POST", headers: { "X-CSRFToken": csrf }, body: fd });
+        const d = await r.json().catch(() => ({}));
+        if (r.ok && d.url) { p.audio_url = d.url; dirty = true; player.src = d.url; player.classList.remove("hidden"); urlInput.value = d.url; note.textContent = "Audio yuklandi."; }
+        else note.textContent = d.error || (r.status === 413 ? "Fayl juda katta (30 MB gacha)." : "Yuklashda xatolik.");
+      } catch (e) { note.textContent = "Internet aloqasi yoʻq."; }
+    });
+    const urlInput = input(p, "audio_url", { placeholder: "yoki https:// havola", maxlength: 255 });
+    return h("div", { class: "border-2 border-black p-3 space-y-2" },
+      h("p", { class: "text-xs font-bold" }, "Audio (mp3, m4a, wav, ogg; 30 MB gacha)"),
+      file, urlInput, player, note);
+  }
+  function imageBox(p) {
+    const note = h("p", { class: "text-xs", "aria-live": "polite" }, p.image_url ? "Rasm biriktirilgan." : "Rasm yuklanmagan (ixtiyoriy).");
+    const img = h("img", { alt: "Yuklangan rasm", class: "max-h-64 border-2 border-black bg-white" + (p.image_url ? "" : " hidden") });
+    if (p.image_url) img.src = p.image_url;
+    const file = h("input", { type: "file", accept: ".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp", class: "text-xs" });
+    file.addEventListener("change", async () => {
+      if (!file.files[0]) return;
+      const fd = new FormData(); fd.append("file", file.files[0]);
+      note.textContent = "Yuklanmoqda…";
+      try {
+        const r = await fetch("{{ url_for('admin.upload_image') }}", { method: "POST", headers: { "X-CSRFToken": csrf }, body: fd });
+        const d = await r.json().catch(() => ({}));
+        if (r.ok && d.url) { p.image_url = d.url; dirty = true; img.src = d.url; img.classList.remove("hidden"); note.textContent = "Rasm yuklandi."; }
+        else note.textContent = d.error || (r.status === 413 ? "Rasm juda katta (5 MB gacha)." : "Yuklashda xatolik.");
+      } catch (e) { note.textContent = "Internet aloqasi yoʻq."; }
+    });
+    return h("div", { class: "border-2 border-black p-3 space-y-2" },
+      h("p", { class: "text-xs font-bold" }, "Rasm yoki xarita (PNG, JPG, WebP; 5 MB gacha)"),
+      h("p", { class: "text-xs", style: "color:var(--mut)" }, "Xaritadagi joylarga A, B, C... harflarini rasmning oʻziga yozib qoʻying. Talaba rasmni shu part ichida koʻradi."),
+      file, img, note,
+      p.image_url ? button("Rasmni olib tashlash", () => { p.image_url = ""; dirty = true; render(); }) : "");
+  }
+  function partCard(p, pi) {
+    return h("section", { class: "win mb-6" },
+      h("div", { class: "wh" }, h("span", { class: "dot" }), h("span", {}, "PART " + (pi + 1))),
+      h("div", { class: "p-4 space-y-4 text-sm" },
+        field("Part sarlavhasi", input(p, "title", { maxlength: 150 })),
+        LISTENING ? audioBox(p) : "",
+        imageBox(p),
+        field(LISTENING ? "Transkript (ixtiyoriy). Talabaga test paytida koʻrinmaydi, natija sahifasida koʻrsatiladi"
+                        : "Matn (abzatslar boʻsh qator bilan ajratiladi; Matching headings uchun har abzats I, II, III... deb raqamlanadi)",
+              input(p, "passage", { rows: LISTENING ? 6 : 10 }, "textarea")),
+        p.groups.map((g, gi) => groupCard(p, g, gi)),
+        h("div", { class: "flex gap-2 flex-wrap" },
+          button("+ Savollar guruhi", () => { p.groups.push({ qtype: "mcq", instruction: "", shared: "", questions: [] }); dirty = true; render(); }),
+          button("Partni oʻchirish", () => { if (confirm("Part va uning hamma savollari oʻchiriladi.")) { state.parts.splice(pi, 1); dirty = true; render(); } }))));
+  }
+  function render() { document.getElementById("parts").replaceChildren(...state.parts.map(partCard)); }
+  render();
+
+  document.getElementById("addPart").onclick = () => { state.parts.push({ title: "", passage: "", audio_url: "", image_url: "", groups: [] }); dirty = true; render(); };
+  document.getElementById("renumber").onclick = () => { let n = 1; allQuestions().forEach(q => { q.number = n++; }); dirty = true; render(); };
+
+  // ---- save ----
+  document.getElementById("save").onclick = async function () {
+    const box = document.getElementById("errors"), btn = this;
+    const payload = {
+      id: state.id, skill: state.skill, title: state.title, duration_min: state.duration_min, is_active: state.is_active,
+      parts: state.parts.map((p, i) => ({ number: i + 1, title: p.title, passage: p.passage, audio_url: p.audio_url, image_url: p.image_url,
+        groups: p.groups.map(g => ({ qtype: g.qtype, instruction: g.instruction,
+          questions: g.questions.map(q => ({ number: q.number, text: q.text, answer: q.answer, cefr_level: q.cefr_level,
+            options: g.qtype === "mcq" ? textOpt(q.opts) : isOpt(g.qtype) ? optsOf(g) : null })) })) }))
+    };
+    btn.disabled = true; box.classList.add("hidden");
+    try {
+      const r = await fetch("{{ url_for('admin.save') }}", { method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": csrf }, body: JSON.stringify(payload) });
+      const d = await r.json().catch(() => ({}));
+      if (r.ok && d.ok) { dirty = false; location.href = d.redirect; return; }
+      const errs = d.errors || ["Saqlashda xatolik yuz berdi."];
+      box.replaceChildren(h("b", {}, "Saqlanmadi. Quyidagilarni tuzating:"), h("ul", { class: "list-disc ml-5 mt-2" }, errs.map(e => h("li", {}, e))));
+      box.classList.remove("hidden"); box.scrollIntoView({ behavior: "smooth", block: "center" });
+    } catch (e) {
+      box.textContent = "Internet aloqasi yoʻq. Maʼlumotlar yoʻqolmadi, qayta urinib koʻring.";
+      box.classList.remove("hidden");
+    } finally { btn.disabled = false; }
+  };
+  window.addEventListener("beforeunload", e => { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
+})();
+</script>
+{% endblock %}

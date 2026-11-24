@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Mashq — Levi{% endblock %}
+{% block content %}
+<section class="max-w-5xl mx-auto">
+  <p class="hd text-3xl text-white mb-4">Nimani mashq qilamiz?</p>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for title, text, url in cards %}
+    <a class="win block p-4" href="{{ url }}"><p class="hd text-xl">{{ title }}</p><p class="text-sm mt-2">{{ text }}</p></a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

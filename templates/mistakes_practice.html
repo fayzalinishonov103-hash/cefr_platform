@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Xatolarni qayta ishlash — Levi{% endblock %}
+{% block ticker %}{% endblock %}
+{% from "_qfield.html" import field %}
+{% block content %}
+<form method="post" action="{{ url_for('mistakes.practice') }}" class="max-w-2xl mx-auto space-y-4">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="skill" value="{{ skill }}">
+  <p class="hd text-2xl text-white">Xatolarni qayta ishlaymiz</p>
+  {% for c in cards %}
+  <section class="win p-4 read">
+    <p class="text-[11px] mb-2" style="color:var(--mut)">{{ loop.index }}. {{ c.m.test }} · Part {{ c.m.part }}{% if c.m.level %} · {{ c.m.level }}{% endif %}</p>
+    {% if c.instruction %}<p class="text-xs mb-2" style="color:var(--mut)">{{ c.instruction }}</p>{% endif %}
+    {% if c.image %}<a href="{{ c.image }}" target="_blank" rel="noopener"><img src="{{ c.image }}" alt="Xarita yoki rasm" class="max-w-full max-h-96 mx-auto mb-3 border-2 border-black bg-white"></a>{% endif %}
+    {% if c.audio %}<audio controls preload="none" src="{{ c.audio }}" class="w-full mb-3"></audio>{% endif %}
+    {% if c.paras %}<details class="mb-3"><summary class="cursor-pointer text-xs font-bold">MATNNI KO'RISH</summary>
+      <div class="passage p-4 mt-2 max-h-72 overflow-y-auto">{% for p in c.paras %}<p>{{ p }}</p>{% endfor %}</div></details>{% endif %}
+    {{ field(c, 'm') }}
+  </section>
+  {% endfor %}
+  <button class="btn w-full" type="submit">TEKSHIRISH</button>
+</form>
+{% endblock %}

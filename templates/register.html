@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Roʻyxatdan oʻtish — Levi{% endblock %}
+{% block content %}
+<section class="win max-w-md mx-auto">
+  <div class="wh"><span class="dot"></span><span class="dot"></span><span>ROʻYXATDAN OʻTISH</span></div>
+  <div class="p-5 space-y-4 text-sm">
+    {% if telegram_bot %}
+    <div class="text-center">
+      <p class="text-xs mb-2" style="color:var(--mut)">Eng tez yoʻl: parolsiz, bitta tugma bilan</p>
+      <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="{{ telegram_bot }}"
+              data-size="large" data-auth-url="{{ url_for('auth.telegram', _external=True) }}" data-request-access="write"></script>
+      <p class="text-xs mt-3 pt-3 border-t-2 border-black" style="color:var(--mut)">yoki email bilan</p>
+    </div>
+    {% endif %}
+    <form method="post" class="space-y-4">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label class="block">Ism<input class="inp mt-1" name="name" value="{{ name or '' }}" maxlength="80" autocomplete="name" required {{ '' if telegram_bot else 'autofocus' }}></label>
+      <label class="block">Email<input class="inp mt-1" type="email" name="email" value="{{ email or '' }}" maxlength="120" autocomplete="username" required></label>
+      <label class="block">Parol (kamida 10 ta belgi, oddiy parol qabul qilinmaydi)<input class="inp mt-1" type="password" name="password" minlength="10" maxlength="128" autocomplete="new-password" data-reveal required></label>
+      <p id="pwHint" class="text-xs -mt-2" style="color:var(--mut)" aria-live="polite"></p>
+      <div class="hp" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+      {% if config.get('VERIFY_ENABLED') %}<p class="text-xs" style="color:var(--mut)">Emailingizga tasdiqlash kodi yuboramiz. Kodsiz ham Reading va Listening bilan boshlashingiz mumkin.</p>{% endif %}
+      <p class="text-xs" style="color:var(--mut)">Hisob yaratish bilan <a class="underline font-bold" href="{{ url_for('onboarding.terms') }}" target="_blank" rel="noopener">Foydalanish shartlari</a> va <a class="underline font-bold" href="{{ url_for('onboarding.privacy') }}" target="_blank" rel="noopener">Maxfiylik siyosati</a> bilan rozilik bildirasiz.</p>
+      <button class="btn w-full" type="submit">HISOB YARATISH</button>
+      <p class="text-xs">Hisobingiz bormi? <a class="underline font-bold" href="{{ url_for('auth.login') }}">Kiring</a></p>
+    </form>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+(function () {
+  var pw = document.querySelector('input[name="password"]'), hint = document.getElementById("pwHint");
+  if (pw && hint) pw.addEventListener("input", function () {          // only a length hint; the real rules are checked on the server
+    var n = pw.value.length;
+    hint.textContent = !n ? "" : n < 10 ? "Yana " + (10 - n) + " ta belgi kerak." : n < 14 ? "Yaxshi." : "Juda yaxshi.";
+  });
+})();
+</script>
+{% endblock %}

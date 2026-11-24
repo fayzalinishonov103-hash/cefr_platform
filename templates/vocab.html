@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Lugʻat daftari — Levi{% endblock %}
+{% block content %}
+<div class="grid lg:grid-cols-12 gap-5">
+  <section class="lg:col-span-4 win">
+    <div class="wh"><span class="dot"></span><span class="dot"></span><span>SOʻZ QOʻSHISH</span></div>
+    <form method="post" action="{{ url_for('vocab.add') }}" class="p-4 space-y-3 text-sm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label class="block">Soʻz<input class="inp mt-1" name="word" maxlength="80" required></label>
+      <label class="block">Maʼnosi<input class="inp mt-1" name="meaning" maxlength="200"></label>
+      <label class="block">Misol / izoh<input class="inp mt-1" name="context" maxlength="300"></label>
+      <button class="btn w-full" type="submit">SAQLASH</button>
+    </form>
+    <div class="p-4 border-t-2 border-black text-sm">
+      <p><b>{{ words|length }}</b> ta soʻz · takrorlash uchun tayyor: <b>{{ due }}</b></p>
+      <a class="btn p mt-3 {{ '' if due else 'opacity-50 pointer-events-none' }}" href="{{ url_for('vocab.review') }}">TAKRORLASH</a>
+    </div>
+  </section>
+  <section class="lg:col-span-8 win">
+    <div class="wh"><span class="dot"></span><span>MENING SOʻZLARIM</span></div>
+    {% if words %}
+    <div class="overflow-x-auto"><table class="w-full text-xs">
+      <thead><tr class="text-left border-b-2 border-black"><th class="p-3">Soʻz</th><th class="p-3">Maʼnosi</th><th class="p-3">Daraja</th><th class="p-3"></th></tr></thead>
+      <tbody>{% for w in words %}<tr class="border-b border-black/20 align-top">
+        <td class="p-3 font-bold">{{ w.word }}{% if w.context %}<span class="block font-normal" style="color:var(--mut)">{{ w.context }}</span>{% endif %}</td>
+        <td class="p-3">{{ w.meaning or "—" }}</td>
+        <td class="p-3" title="Takrorlash qutisi">{{ w.box + 1 }}/5</td>
+        <td class="p-3"><form method="post" action="{{ url_for('vocab.delete', word_id=w.id) }}" onsubmit="return confirm('Oʻchirilsinmi?')">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="underline" type="submit">Oʻchirish</button></form></td></tr>{% endfor %}</tbody>
+    </table></div>
+    {% else %}<div class="p-6 text-sm"><p class="font-bold">Daftar boʻsh.</p>
+      <p class="mt-1" style="color:var(--mut)">Reading testida AI maslahat bergan yoki bilmagan soʻzingizni bir bosishda saqlang, yoki chapdagi formadan qoʻshing.</p></div>{% endif %}
+  </section>
+</div>
+{% endblock %}

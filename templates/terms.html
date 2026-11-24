@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Foydalanish shartlari — Levi{% endblock %}
+{% block content %}
+{# QORALAMA: eʼlon qilishdan oldin yurist koʻrib chiqsin (Oʻzbekiston qonunchiligi, isteʼmolchilar huquqlari, shaxsiy maʼlumotlar). #}
+<section class="win max-w-2xl mx-auto">
+  <div class="wh"><span class="dot"></span><span class="dot"></span><span>FOYDALANISH SHARTLARI</span></div>
+  <div class="p-5 space-y-4 text-sm read">
+    <p class="hd text-3xl">Levi: foydalanish shartlari</p>
+    <p><b>1. Xizmat nima.</b> Levi CEFR imtihoniga tayyorlanish uchun mashqlar, AI maslahat va baholash vositalarini beradi. Sayt rasmiy imtihon markazi emas.</p>
+    <p><b>2. AI baholari taxminiy.</b> Writing va Speaking baholari sun'iy intellekt tomonidan beriladi, xato qilishi mumkin va rasmiy imtihon natijasini kafolatlamaydi. Ularni oʻrganish uchun yoʻnalish sifatida ishlating. Speaking bahosi faqat aytilgan matnga asoslanadi, talaffuzni baholamaydi.</p>
+    <p><b>3. Hisob.</b> Parolingizni sir saqlang. Hisobingizdagi harakatlar uchun oʻzingiz javobgarsiz. Hisobni istalgan vaqtda Sozlamalardan oʻchirishingiz mumkin.</p>
+    <p><b>4. Qoidalar.</b> Saytni buzishga, avtomatik (bot) hisoblar yaratishga, AI xizmatidan haddan tashqari foydalanishga, boshqalarning hisobiga kirishga yoki mazmuni qonunga zid matnlarni yuborishga ruxsat yoʻq. Qoidabuzar hisob cheklanishi yoki oʻchirilishi mumkin.</p>
+    <p><b>5. Siz yuborgan matnlar.</b> Insho va javoblaringiz sizniki. Ularni baholash uchun AI xizmatiga yuboramiz (batafsil <a class="underline font-bold" href="{{ url_for('onboarding.privacy') }}">Maxfiylik siyosati</a>da).</p>
+    <p><b>6. Kontent.</b> Saytdagi testlar va materiallar mualliflik huquqi bilan himoyalangan. Ularni ruxsatsiz nusxalab tarqatish mumkin emas.</p>
+    <p><b>7. Oʻzgarishlar.</b> Shartlar yangilanishi mumkin. Muhim oʻzgarishlar saytda eʼlon qilinadi.</p>
+    <p><b>8. Aloqa.</b> {% if contact %}<b>{{ contact }}</b>{% else %}Savollar uchun sayt administratoriga murojaat qiling.{% endif %}</p>
+  </div>
+</section>
+{% endblock %}

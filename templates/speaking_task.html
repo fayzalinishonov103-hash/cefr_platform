@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}{{ prompt.title }} — Speaking{% endblock %}
+{% block ticker %}{% endblock %}
+{% block content %}
+<div class="grid lg:grid-cols-12 gap-5">
+  <section class="lg:col-span-5 win lg:sticky lg:top-4 self-start">
+    <div class="wh"><span class="dot"></span><span class="dot"></span><span>{{ label|upper }}</span></div>
+    <div class="p-4 space-y-3 read">
+      <p class="font-bold">{{ prompt.title }}</p>
+      <div class="whitespace-pre-line leading-relaxed">{{ prompt.prompt }}</div>
+      <p class="text-xs" style="color:var(--mut)">Tayyorgarlik: {{ prompt.think_seconds }} soniya. Javob: {{ prompt.speak_seconds }} soniyagacha.</p>
+    </div>
+  </section>
+
+  <section class="lg:col-span-7 win">
+    <div class="wh"><span class="dot"></span><span>SIZNING JAVOBINGIZ</span></div>
+    <div class="p-5 space-y-4 text-sm" id="rec" data-think="{{ prompt.think_seconds|int }}" data-speak="{{ prompt.speak_seconds|int }}">
+      <input type="hidden" id="csrf" value="{{ csrf_token() }}">
+      <div class="text-center py-4 border-2 border-black">
+        <p class="text-[11px]" style="color:var(--mut)" id="state">TAYYOR</p>
+        <p class="hd text-6xl" id="clock">00:00</p>
+        <div class="bar mt-3 mx-6"><i id="meter" style="width:0%"></i></div>
+      </div>
+      <p id="msg" class="font-bold" aria-live="polite">Boshlash tugmasini bosing va mikrofonga ruxsat bering.</p>
+      <div class="flex flex-wrap gap-3">
+        <button type="button" class="btn" id="bStart">BOSHLASH</button>
+        <button type="button" class="btn w hidden" id="bSkip">TAYYORMAN, YOZISHNI BOSHLASH</button>
+        <button type="button" class="btn w hidden" id="bStop">TOʻXTATISH</button>
+        <button type="button" class="btn w hidden" id="bRetry">QAYTA YOZISH</button>
+        <button type="button" class="btn hidden" id="bSend">AI BILAN TEKSHIRISH</button>
+      </div>
+      <audio id="player" controls class="w-full hidden"></audio>
+      <p class="text-[11px]" style="color:var(--mut)">Yozuv faqat matnga aylantirish uchun yuboriladi va saqlanmaydi. AI talaffuzni baholamaydi, faqat nima deganingizni (mazmun, ravonlik, lugʻat, grammatika) baholaydi.</p>
+    </div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function () {
+  const box = document.getElementById("rec");
+  const THINK = +box.dataset.think, SPEAK = +box.dataset.speak;
+  const $ = id => document.getElementById(id);
+  const el = { state: $("state"), clock: $("clock"), meter: $("meter"), msg: $("msg"), start: $("bStart"), skip: $("bSkip"),
+               stop: $("bStop"), retry: $("bRetry"), send: $("bSend"), player: $("player") };
+  const show = (b, on) => b.classList.toggle("hidden", !on);
+  const fmt = s => String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+  let stream = null, recorder = null, chunks = [], blob = null, tick = null, seconds = 0, mime = "";
+
+  if (!navigator.mediaDevices || !window.MediaRecorder) {
+    el.msg.textContent = "Brauzeringiz ovoz yozishni qoʻllamaydi. Chrome, Edge, Firefox yoki Safari 14.1+ dan foydalaning (sayt https:// da ochilishi kerak).";
+    show(el.start, false); return;
+  }
+  const pickMime = () => ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"]
+    .find(t => MediaRecorder.isTypeSupported(t)) || "";
+
+  function countdown(total, onTick, onDone) {
+    let left = total; onTick(left);
+    clearInterval(tick);
+    tick = setInterval(() => { left -= 1; onTick(left); if (left <= 0) { clearInterval(tick); onDone(); } }, 1000);
+  }
+  function releaseMic() { if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } }
+  function reset() {
+    clearInterval(tick); releaseMic(); blob = null; chunks = [];
+    el.state.textContent = "TAYYOR"; el.clock.textContent = "00:00"; el.meter.style.width = "0%";
+    [el.skip, el.stop, el.retry, el.send, el.player].forEach(b => show(b, false)); show(el.start, true);
+    el.msg.textContent = "Boshlash tugmasini bosing va mikrofonga ruxsat bering.";
+  }
+
+  el.start.addEventListener("click", async () => {
+    show(el.start, false);
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+    catch (e) { el.msg.textContent = "Mikrofonga ruxsat berilmadi. Brauzer sozlamalarida ruxsat bering va qayta urinib koʻring."; show(el.start, true); return; }
+    if (THINK > 0) {
+      el.state.textContent = "TAYYORGARLIK"; el.msg.textContent = "Fikrlaringizni jamlang. Vaqt tugagach yozish oʻzi boshlanadi.";
+      show(el.skip, true);
+      countdown(THINK, s => { el.clock.textContent = fmt(s); el.meter.style.width = (100 * (THINK - s) / THINK) + "%"; }, record);
+    } else record();
+  });
+  el.skip.addEventListener("click", () => { clearInterval(tick); record(); });
+
+  function record() {
+    show(el.skip, false);
+    mime = pickMime(); chunks = [];
+    recorder = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+    recorder.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+    recorder.onstop = () => {
+      clearInterval(tick); releaseMic();
+      blob = new Blob(chunks, { type: (recorder.mimeType || mime || "audio/webm").split(";")[0] });
+      el.player.src = URL.createObjectURL(blob);
+      el.state.textContent = "YOZUV TAYYOR"; el.msg.textContent = "Eshitib koʻring. Yoqsa yuboring, yoqmasa qayta yozing.";
+      [el.player, el.retry, el.send].forEach(b => show(b, true)); show(el.stop, false);
+    };
+    recorder.start();
+    const t0 = performance.now();
+    el.state.textContent = "YOZILMOQDA"; el.msg.textContent = "Gapiring. Maksimal vaqt tugaganda yozuv oʻzi toʻxtaydi.";
+    show(el.stop, true);
+    countdown(SPEAK, s => { seconds = Math.round((performance.now() - t0) / 1000); el.clock.textContent = fmt(s);
+                            el.meter.style.width = (100 * (SPEAK - s) / SPEAK) + "%"; },
+              () => { if (recorder.state !== "inactive") recorder.stop(); });
+  }
+  el.stop.addEventListener("click", () => { if (recorder && recorder.state !== "inactive") recorder.stop(); });
+  el.retry.addEventListener("click", reset);
+
+  el.send.addEventListener("click", async () => {
+    if (!blob) return;
+    el.send.disabled = el.retry.disabled = true;
+    el.msg.textContent = "AI tinglamoqda va tekshirmoqda, 20–60 soniya kuting. Sahifani yopmang…";
+    const fd = new FormData(); fd.append("audio", blob, "answer"); fd.append("seconds", seconds);
+    try {
+      const r = await fetch("{{ url_for('speaking.submit', prompt_id=prompt.id) }}", { method: "POST", headers: { "X-CSRFToken": $("csrf").value }, body: fd });
+      const d = await r.json().catch(() => ({}));
+      if (r.ok && d.redirect) { location.href = d.redirect; return; }
+      el.msg.textContent = d.error || (r.status === 413 ? "Yozuv juda katta." : "Xatolik yuz berdi. Yozuv saqlab qolindi, qayta urinib koʻring.");
+    } catch (e) { el.msg.textContent = "Internet aloqasi yoʻq. Yozuv yoʻqolmadi, qayta urinib koʻring."; }
+    finally { el.send.disabled = el.retry.disabled = false; }
+  });
+  window.addEventListener("beforeunload", releaseMic);
+})();
+</script>
+{% endblock %}

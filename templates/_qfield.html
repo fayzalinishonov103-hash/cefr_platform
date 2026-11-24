@@ -1,0 +1,14 @@
+{% macro field(c, prefix) %}
+  {% set q = c.q %}
+  {% if c.qtype == 'gap_fill' %}
+    {% if c.bits %}<label>{{ c.bits[0] }}<input class="inp !inline-block !w-36 !py-1 mx-1" name="{{ prefix }}{{ q.id }}" maxlength="60" autocomplete="off">{{ c.bits[1] }}</label>
+    {% else %}<label class="block"><span class="block mb-1">{{ q.text }}</span><input class="inp" name="{{ prefix }}{{ q.id }}" maxlength="60" autocomplete="off"></label>{% endif %}
+  {% elif c.qtype in ('match', 'heading', 'map') %}
+    <label class="block"><span class="block mb-1">{{ q.text }}</span>
+      <select class="inp" name="{{ prefix }}{{ q.id }}"><option value="">— tanlang —</option>
+        {% for v, label in q.options or [] %}<option value="{{ v }}">{{ v }}{% if label and label != v %}. {{ label }}{% endif %}</option>{% endfor %}</select></label>
+  {% else %}
+    <p class="mb-2">{{ q.text }}</p>
+    {% for v, label in q.options or [] %}<label class="ropt"><input type="radio" name="{{ prefix }}{{ q.id }}" value="{{ v }}"><span>{{ label }}</span></label>{% endfor %}
+  {% endif %}
+{% endmacro %}

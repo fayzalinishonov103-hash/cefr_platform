@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% set nav_skill = 'admin' %}
+{% block title %}Video soʻzlari — Admin{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+  <h1 class="hd text-2xl">{{ v.title }}</h1>
+  <a href="{{ url_for('admin_shadowing.manage') }}" class="btn w !py-2 !text-xs">ORQAGA</a>
+</div>
+<section class="win mb-6"><div class="wh"><span class="dot"></span><span>+ SOʻZLAR QOʻSHISH</span></div>
+  <form method="post" class="p-4 text-xs space-y-3">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label class="block"><span class="block mb-1 font-bold">Har qatorga bitta soʻz: <code>soʻz | tarjima | misol (ixtiyoriy)</code>. Bir vaqtda 50 tagacha.</span>
+      <textarea class="inp" name="lines" rows="8" placeholder="reluctant | istamaydigan | She was reluctant to answer.&#10;take for granted | e'tiborsiz qoldirmoq" required></textarea></label>
+    <button class="btn">QOʻSHISH</button>
+  </form></section>
+<section class="win"><div class="wh"><span class="dot"></span><span>MAVJUD SOʻZLAR ({{ v.words|length }})</span></div>
+  <div class="overflow-x-auto"><table class="w-full text-xs">
+    <tbody>{% for w in v.words %}<tr class="border-b border-black/20 align-top">
+      <td class="p-3 font-bold">{{ w.word }}</td><td class="p-3">{{ w.meaning }}</td><td class="p-3"><i>{{ w.example }}</i></td>
+      <td class="p-3"><form method="post" action="{{ url_for('admin_shadowing.word_delete', video_id=v.id, word_id=w.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn w !py-1 !text-[11px]">OʻCHIRISH</button></form></td></tr>
+    {% else %}<tr><td class="p-5">Hali soʻz yoʻq.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Maxfiylik siyosati — Levi{% endblock %}
+{% block content %}
+{# QORALAMA: eʼlon qilishdan oldin Oʻzbekistonning shaxsiy maʼlumotlar toʻgʻrisidagi qonunchiligi boʻyicha yurist koʻrib chiqsin. #}
+<section class="win max-w-2xl mx-auto">
+  <div class="wh"><span class="dot"></span><span class="dot"></span><span>MAXFIYLIK SIYOSATI</span></div>
+  <div class="p-5 space-y-4 text-sm read">
+    <p class="hd text-3xl">Qanday maʼlumot yigʻamiz</p>
+    <p><b>Hisob:</b> ism, email (yoki Telegram identifikatori) va parol. Parol faqat shifrlangan (hash) holda saqlanadi.</p>
+    <p><b>Oʻqish natijalari:</b> topshirgan testlaringiz, insho va speaking javoblaringiz, lugʻat daftaringiz.</p>
+    <p><b>Reja uchun savollar (ixtiyoriy):</b> maqsadingiz, maqsadli daraja, imtihon sanasi va kunlik vaqt. Ular kunlik rejani sizga moslash uchun ishlatiladi.</p>
+    <p><b>Email:</b> hisobingiz uchun, tasdiqlash kodini va parolni tiklash havolasini yuborish uchun ishlatiladi. Bitta email bilan bitta hisob ochiladi.</p>
+    <p class="hd text-2xl pt-2">Sun'iy intellekt xizmati</p>
+    <p>Insho, speaking javobi va AI maslahat soʻrovlaringiz baholash uchun uchinchi tomon AI xizmatiga (OpenAI) yuboriladi. Speaking ovoz yozuvi matnga aylantirish uchun yuboriladi va bizda saqlanmaydi, faqat matni saqlanadi. Shuning uchun inshoda oʻzingizning telefon raqamingiz, manzilingiz kabi shaxsiy maʼlumotlarni yozmang.</p>
+    <p class="hd text-2xl pt-2">Nimani soʻramaymiz</p>
+    <p>Yosh, viloyat, qiziqishlar, aniq tugʻilgan sana, telefon raqami va uy manzilini soʻramaymiz.</p>
+    <p class="hd text-2xl pt-2">Maʼlumotlaringiz ustidan nazorat</p>
+    <p>Onboarding javoblarini istalgan vaqtda <a class="underline font-bold" href="{{ url_for('onboarding.edit') }}">shu sahifada</a> oʻzgartirishingiz mumkin. <b>Sozlamalar</b> sahifasida hisobni oʻchirsangiz, unga bogʻliq barcha maʼlumotlar, jumladan onboarding javoblari ham oʻchiriladi.</p>
+    <p>Statistika umumiy (yigʻma) koʻrinishda koʻriladi. Maʼlumotlaringiz uchinchi shaxslarga sotilmaydi.</p>
+    <p class="hd text-2xl pt-2">Aloqa</p>
+    <p>{% if contact %}Savollar uchun: <b>{{ contact }}</b>{% else %}Savollar uchun sayt administratoriga murojaat qiling.{% endif %}</p>
+  </div>
+</section>
+{% endblock %}

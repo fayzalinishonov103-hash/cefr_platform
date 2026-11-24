@@ -1,0 +1,19 @@
+# /etc/systemd/system/levi.service
+# Yoqish:  sudo systemctl daemon-reload && sudo systemctl enable --now levi
+# Sozlamalar (.env) ilovaning oʻzi tomonidan /srv/levi/app/.env dan oʻqiladi.
+[Unit]
+Description=Levi (CEFR tayyorlov platformasi)
+After=network.target postgresql.service
+
+[Service]
+User=levi
+Group=levi
+WorkingDirectory=/srv/levi/app
+ExecStart=/srv/levi/venv/bin/gunicorn wsgi:app --workers 3 --timeout 300 --bind 127.0.0.1:8000 --access-logfile -
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

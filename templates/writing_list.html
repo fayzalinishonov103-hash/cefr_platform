@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Writing — Levi{% endblock %}
+{% block content %}
+<section class="win max-w-3xl mx-auto">
+  <div class="wh"><span class="dot"></span><span class="dot"></span><span>WRITING TOPSHIRIQLARI</span></div>
+  <div class="p-5 space-y-4 text-sm">
+    <p style="color:var(--mut)">Topshiriqni tanlang va yozing. AI matningizni 4 mezon bo‘yicha CEFR darajasida baholaydi va xatolarni tushuntiradi.</p>
+    {% for p in prompts %}
+    <div class="border-2 border-black p-4 flex flex-wrap items-center justify-between gap-3">
+      <div><p class="font-bold">{{ p.title }}</p>
+        <p class="text-xs mt-1" style="color:var(--mut)">{{ labels.get(p.task_type, '') }} · {{ p.min_words }}–{{ p.max_words }} soʻz · ~{{ p.minutes }} daqiqa</p></div>
+      {% if current_user.is_authenticated %}<a class="btn" href="{{ url_for('writing.task', prompt_id=p.id) }}">YOZISH</a>
+      {% else %}<a class="btn" href="{{ url_for('auth.login', next=url_for('writing.tasks')) }}">KIRISH</a>{% endif %}
+    </div>
+    {% else %}<p>Hozircha topshiriq yoʻq. Terminalda <code>python seed.py</code> ni ishga tushiring.</p>{% endfor %}
+  </div>
+</section>
+{% endblock %}

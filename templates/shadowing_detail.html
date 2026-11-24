@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{{ v.title }} — Shadowing{% endblock %}
+{% block content %}
+{% set m = marks.get(v.id, []) %}
+<div class="mb-4"><a href="{{ url_for('shadowing.videos') }}" class="btn w !py-2 !text-xs">← BARCHA VIDEOLAR</a></div>
+<div class="grid lg:grid-cols-12 gap-5">
+  <section class="lg:col-span-5 win">
+    <a class="block relative border-b-2 border-black bg-black" href="{{ watch(v.youtube_id) }}" target="_blank" rel="noopener noreferrer" aria-label="YouTube'da ochish">
+      <img src="{{ thumb(v.youtube_id) }}" alt="" referrerpolicy="no-referrer" class="w-full aspect-video object-cover">
+      <span class="absolute inset-0 grid place-items-center"><span class="ic !w-14 !h-14 text-xl">▶</span></span>
+    </a>
+    <div class="p-4 read">
+      <h1 class="font-bold text-[16px] leading-snug">{{ v.title }}</h1>
+      {% if v.channel %}<p class="text-[13px] mt-1" style="color:var(--mut)">{{ v.channel }}</p>{% endif %}
+      <div class="flex gap-2 mt-3 text-[10px] font-bold">
+        <span class="border-2 border-black px-2 py-0.5">{{ kinds.get(v.kind, v.kind)|upper }}</span>
+        {% if v.level %}<span class="px-2 py-0.5" style="background:var(--lime);color:#0a0a0a;border:2px solid #0a0a0a">{{ v.level }}</span>{% endif %}
+      </div>
+      <div class="flex flex-wrap gap-2 mt-4">
+        <a class="btn !py-2 !text-xs" href="{{ watch(v.youtube_id) }}" target="_blank" rel="noopener noreferrer">YOUTUBE'DA OCHISH</a>
+        {% if current_user.is_authenticated %}
+        <form method="post" action="{{ url_for('shadowing.mark', video_id=v.id, kind='seen') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="back" value="{{ request.path }}">
+          <button class="btn {{ '' if 'seen' in m else 'w' }} !py-2 !text-xs">✓ {{ 'KOʻRILDI' if 'seen' in m else 'KOʻRDIM' }}</button></form>
+        <form method="post" action="{{ url_for('shadowing.mark', video_id=v.id, kind='fav') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="back" value="{{ request.path }}">
+          <button class="btn {{ '' if 'fav' in m else 'w' }} !py-2 !text-xs">♥ {{ 'SAQLANGAN' if 'fav' in m else 'SAQLASH' }}</button></form>
+        {% endif %}
+      </div>
+      <p class="text-[12px] mt-4" style="color:var(--mut)">Maslahat: YouTube'da subtitrni yoqing, tezlikni 0.75x qiling va har gapni ovoz chiqarib takrorlang.</p>
+    </div>
+  </section>
+
+  <section class="lg:col-span-7 win">
+    <div class="wh"><span class="dot"></span><span class="dot"></span><span>VIDEODAGI SOʻZLAR</span>
+      {% if current_user.is_authenticated and v.words %}
+      <form method="post" action="{{ url_for('shadowing.save_all_words', video_id=v.id) }}" class="ml-auto"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn !py-1 !text-[11px]">HAMMASINI DAFTARGA QOʻSHISH</button></form>{% endif %}
+    </div>
+    {% if v.words %}
+    <div class="overflow-x-auto"><table class="w-full read text-[14px]">
+      <tbody>{% for w in v.words %}
+        <tr class="border-b border-black/20 align-top">
+          <td class="p-3"><b>{{ w.word }}</b>{% if w.meaning %}<br><span style="color:var(--mut)">{{ w.meaning }}</span>{% endif %}{% if w.example %}<br><i class="text-[13px]">{{ w.example }}</i>{% endif %}</td>
+          <td class="p-3 text-right whitespace-nowrap">
+            {% if current_user.is_authenticated %}
+            <form method="post" action="{{ url_for('shadowing.save_word', video_id=v.id, word_id=w.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn w !py-1 !text-[11px]">+ LUGʻATGA</button></form>
+            {% endif %}
+          </td></tr>{% endfor %}</tbody></table></div>
+    {% if not current_user.is_authenticated %}<p class="p-4 text-xs"><a class="underline" href="{{ url_for('auth.login', next=request.path) }}">Kiring</a>, soʻzlarni lugʻatga saqlash uchun.</p>{% endif %}
+    {% else %}
+    <p class="p-5 text-sm" style="color:var(--mut)">Bu video uchun soʻzlar ro'yxati hali qoʻshilmagan.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

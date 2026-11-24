@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Foydalanuvchilar — Admin{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+  <h1 class="hd text-3xl">FOYDALANUVCHILAR <span class="text-base">({{ total }})</span></h1>
+  <a href="{{ url_for('admin.index') }}" class="btn w !py-2 !text-xs">ORQAGA</a>
+</div>
+<form method="get" class="mb-5 flex gap-3 flex-wrap"><input class="inp !w-64" name="q" value="{{ q }}" placeholder="Ism yoki email boʻyicha qidirish" maxlength="80"><button class="btn !py-2 !text-xs">QIDIRISH</button></form>
+<section class="win"><div class="overflow-x-auto"><table class="w-full text-xs">
+  <thead><tr class="text-left border-b-2 border-black"><th class="p-3">Ism</th><th class="p-3">Email</th><th class="p-3">Roʻyxatdan oʻtgan</th><th class="p-3">Testlar</th><th class="p-3">Rol</th></tr></thead>
+  <tbody>{% for u in people %}<tr class="border-b border-black/20">
+    <td class="p-3 font-bold">{{ u.name }}</td><td class="p-3">{{ 'Telegram' if u.email.endswith('@telegram.local') else u.email }}</td>
+    <td class="p-3">{{ u.created_at.strftime('%d.%m.%Y') if u.created_at else '—' }}</td><td class="p-3">{{ done.get(u.id, 0) }}</td>
+    <td class="p-3">{{ 'ADMIN' if u.is_admin else '' }}</td></tr>
+  {% else %}<tr><td class="p-5" colspan="5">Hech kim topilmadi.</td></tr>{% endfor %}</tbody>
+</table></div></section>
+{% if total > 200 %}<p class="text-xs mt-3">Eng yangi 200 tasi koʻrsatilgan. Qolganini qidiruv orqali toping.</p>{% endif %}
+{% endblock %}

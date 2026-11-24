@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Listening testlari — Levi{% endblock %}
+{% block content %}
+<section class="win max-w-2xl mx-auto">
+  <div class="wh"><span class="dot"></span><span class="dot"></span><span>LISTENING TESTLARI</span></div>
+  <div class="p-5 space-y-4 text-sm">
+    <p class="text-xs" style="color:var(--mut)">Quloqchin taqing. Har bir part audiosi cheklangan marta eshittiriladi, pauza yoʻq.</p>
+    {% for t, count in items %}
+    <div class="border-2 border-black p-4 flex flex-wrap items-center justify-between gap-3">
+      <div><p class="font-bold">{{ t.title }}</p>
+        <p class="text-xs mt-1" style="color:var(--mut)">{{ t.parts|length }} part · {{ count }} savol · {{ t.duration_min }} daqiqa</p></div>
+      {% if current_user.is_authenticated %}
+      <form method="post" action="{{ url_for('listening.start', test_id=t.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn" type="submit">BOSHLASH</button></form>
+      {% else %}
+      <a class="btn" href="{{ url_for('auth.login', next=url_for('listening.tests')) }}">KIRISH</a>
+      {% endif %}
+    </div>
+    {% else %}
+    <p>Hozircha Listening testi yoʻq. Administrator <b>Admin → + LISTENING</b> orqali audio bilan test qoʻshadi.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

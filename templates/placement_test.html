@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Daraja testi — Levi{% endblock %}
+{% block ticker %}{% endblock %}
+{% block content %}
+<form method="post" action="{{ url_for('placement.submit') }}" id="pform" class="max-w-2xl mx-auto">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="sticky top-0 z-30 win mb-4 px-4 py-3 text-sm flex items-center justify-between gap-3">
+    <span>Javob berilgan: <b id="cnt">0</b> / {{ total }}</span>
+    <button class="btn !py-2 !text-xs" type="submit">YAKUNLASH</button>
+  </div>
+  {% for it in items %}
+  <fieldset class="win mb-4 p-4">
+    <legend class="sr-only">{{ it.n }}-savol</legend>
+    <p class="font-bold mb-3 read"><span style="color:var(--mut)">{{ it.n }}.</span> {{ it.text }}</p>
+    {% for idx, label in it.options %}
+    <label class="ropt"><input type="radio" name="p{{ it.n }}" value="{{ idx }}"><span>{{ label }}</span></label>
+    {% endfor %}
+    <label class="ropt" style="opacity:.8"><input type="radio" name="p{{ it.n }}" value="-1"><span>Bilmayman</span></label>
+  </fieldset>
+  {% endfor %}
+  <button class="btn w-full" type="submit">NATIJANI KOʻRISH</button>
+</form>
+<script>
+(function () {
+  var f = document.getElementById("pform"), c = document.getElementById("cnt");
+  function count() { c.textContent = f.querySelectorAll("input[type=radio]:checked").length; }
+  f.addEventListener("change", count);
+  f.addEventListener("submit", function (e) {
+    var left = {{ total }} - f.querySelectorAll("input[type=radio]:checked").length;
+    if (left > 0 && !confirm(left + " ta savolga javob berilmagan (bu “Bilmayman” deb hisoblanadi). Yakunlaymizmi?")) e.preventDefault();
+  });
+})();
+</script>
+{% endblock %}

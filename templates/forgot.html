@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Parolni tiklash — Levi{% endblock %}
+{% block content %}
+<section class="win max-w-md mx-auto">
+  <div class="wh"><span class="dot"></span><span class="dot"></span><span>PAROLNI TIKLASH</span></div>
+  <form method="post" class="p-5 space-y-4 text-sm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <p style="color:var(--mut)">Email manzilingizni kiriting, parolni yangilash havolasini yuboramiz (1 soat amal qiladi).</p>
+    <label class="block">Email<input class="inp mt-1" type="email" name="email" required autofocus></label>
+    <button class="btn w-full" type="submit">HAVOLA YUBORISH</button>
+    <p class="text-xs"><a class="underline" href="{{ url_for('auth.login') }}">Kirishga qaytish</a></p>
+  </form>
+</section>
+{% endblock %}

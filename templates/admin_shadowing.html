@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% set nav_skill = 'admin' %}
+{% block title %}Shadowing videolari — Admin{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+  <h1 class="hd text-3xl">SHADOWING VIDEOLARI</h1>
+  <a href="{{ url_for('admin.index') }}" class="btn w !py-2 !text-xs">ORQAGA</a>
+</div>
+<section class="win mb-6"><div class="wh"><span class="dot"></span><span>+ YANGI VIDEO</span></div>
+  <form method="post" action="{{ url_for('admin_shadowing.new') }}" class="p-4 grid sm:grid-cols-12 gap-3 text-xs">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label class="sm:col-span-12 block"><span class="block mb-1 font-bold">YouTube havolasi</span><input class="inp" name="url" placeholder="https://www.youtube.com/watch?v=..." required></label>
+    <label class="sm:col-span-6 block"><span class="block mb-1 font-bold">Sarlavha (boʻsh qoldirsangiz, YouTube'dan olinadi)</span><input class="inp" name="title" maxlength="200"></label>
+    <label class="sm:col-span-6 block"><span class="block mb-1 font-bold">Kanal nomi (ixtiyoriy)</span><input class="inp" name="channel" maxlength="120"></label>
+    <label class="sm:col-span-4 block"><span class="block mb-1 font-bold">Turi</span>
+      <select class="inp" name="kind">{% for k, l in kinds.items() %}<option value="{{ k }}">{{ l }}</option>{% endfor %}</select></label>
+    <label class="sm:col-span-4 block"><span class="block mb-1 font-bold">Daraja</span>
+      <select class="inp" name="level"><option value="">Belgilanmagan</option>{% for l in levels %}<option value="{{ l }}">{{ l }}</option>{% endfor %}</select></label>
+    <div class="sm:col-span-4 flex items-end"><button class="btn w-full">QOʻSHISH</button></div>
+  </form></section>
+<section class="win"><div class="wh"><span class="dot"></span><span>MAVJUD VIDEOLAR</span></div>
+  <div class="overflow-x-auto"><table class="w-full text-xs">
+    <thead><tr class="text-left border-b-2 border-black"><th class="p-3"></th><th class="p-3">Sarlavha</th><th class="p-3">Turi</th><th class="p-3">Daraja</th><th class="p-3">Holat</th><th class="p-3"></th></tr></thead>
+    <tbody>{% for v in items %}<tr class="border-b border-black/20 align-middle">
+      <td class="p-3"><img src="{{ thumb(v.youtube_id) }}" alt="" loading="lazy" referrerpolicy="no-referrer" class="w-28 aspect-video object-cover border-2 border-black"></td>
+      <td class="p-3 font-bold">{{ v.title }}<br><span class="font-normal" style="color:var(--mut)">{{ v.channel }}</span></td>
+      <td class="p-3">{{ kinds.get(v.kind, v.kind) }}</td><td class="p-3">{{ v.level or '—' }}</td>
+      <td class="p-3"><span class="px-2 py-0.5 font-bold" style="color:#0a0a0a;background:{{ 'var(--lime)' if v.is_active else '#ddd' }}">{{ 'FAOL' if v.is_active else 'YASHIRIN' }}</span></td>
+      <td class="p-3"><div class="flex flex-wrap gap-2">
+        <a class="btn w !py-1 !text-[11px]" href="{{ watch(v.youtube_id) }}" target="_blank" rel="noopener noreferrer">YOUTUBE</a>
+        <a class="btn w !py-1 !text-[11px]" href="{{ url_for('admin_shadowing.words', video_id=v.id) }}">SOʻZLAR ({{ v.words|length }})</a>
+        <form method="post" action="{{ url_for('admin_shadowing.toggle', video_id=v.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn w !py-1 !text-[11px]">{{ 'YASHIRISH' if v.is_active else 'YOQISH' }}</button></form>
+        <form method="post" action="{{ url_for('admin_shadowing.delete', video_id=v.id) }}" onsubmit="return confirm('Video oʻchiriladi. Davom etasizmi?')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn w !py-1 !text-[11px]">OʻCHIRISH</button></form>
+      </div></td></tr>
+    {% else %}<tr><td class="p-5" colspan="6">Hali video yoʻq. Yuqoridagi formaga YouTube havolasini qoʻying.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

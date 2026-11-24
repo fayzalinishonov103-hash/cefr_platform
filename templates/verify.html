@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Emailni tasdiqlash — Levi{% endblock %}
+{% block content %}
+<section class="win max-w-md mx-auto">
+  <div class="wh"><span class="dot"></span><span class="dot"></span><span>EMAILNI TASDIQLASH</span></div>
+  <div class="p-5 space-y-4 text-sm">
+    <p><b>{{ current_user.email }}</b> manziliga 6 xonali kod yubordik. Kodni kiriting yoki xatdagi havolani bosing.</p>
+    <form method="post" class="space-y-3">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input class="inp text-center hd" style="font-size:28px;letter-spacing:.35em" name="code" inputmode="numeric" pattern="[0-9]*" maxlength="6"
+             autocomplete="one-time-code" placeholder="000000" aria-label="Tasdiqlash kodi" required autofocus>
+      <button class="btn w-full" type="submit">TASDIQLASH</button>
+    </form>
+    <form method="post" action="{{ url_for('verify.resend', next=request.args.get('next')) }}" class="text-xs">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      Xat kelmadimi? Spam papkasini tekshiring yoki <button type="submit" class="underline font-bold">kodni qayta yuboring</button>.
+    </form>
+    <p class="text-xs" style="color:var(--mut)">Tasdiqlamasdan ham Reading, Listening, daraja testi va lugʻatdan foydalanishingiz mumkin. Writing, Speaking va AI maslahat uchun tasdiqlash kerak.</p>
+    <p class="text-xs"><a class="underline" href="{{ url_for('main.dashboard') }}">Keyinroq</a></p>
+  </div>
+</section>
+{% endblock %}

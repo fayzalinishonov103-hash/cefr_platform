@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Milliy CEFR sertifikat formatida Reading, Listening, Writing va Speaking mashqlari. AI xatoingizni tushuntiradi, javobni aytmaydi.">
+<meta name="theme-color" content="#0b1730">
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='brand/levi-favicon.svg') }}">
+<link rel="alternate icon" type="image/png" href="{{ url_for('static', filename='brand/levi-favicon.png') }}">
+<title>{% block title %}Levi — Darajangizni biling{% endblock %}</title>
+{% if not config.get('TAILWIND_LOCAL') %}<script src="https://cdn.tailwindcss.com/3.4.17"></script>{% endif %}
+{% if config.get('FONTS_LOCAL') %}<link rel="stylesheet" href="{{ url_for('static', filename='css/fonts.css') }}">
+{% else %}<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">{% endif %}
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+{% if request.endpoint != 'reading.take' and request.method == 'GET' %}<script>try{var f=/[?&]intro=1(&|$)/.test(location.search);if(f||(!sessionStorage.getItem("leviIntro")&&!matchMedia("(prefers-reduced-motion: reduce)").matches)){sessionStorage.setItem("leviIntro","1");document.documentElement.classList.add("intro")}}catch(e){}</script>{% endif %}
+<style>
+/* Palette comes from the logo: deep night-blue, ice-blue light, white. (--lime = main accent, --pur/--purt = blue; names kept for old templates) */
+:root{--bg:#0b1730;--lime:#7fc8ff;--ink:#0a0a0a;--win:#f4f9ff;--wtx:#0a0a0a;--mut:#46556b;--pur:#1f63e0;--purt:#1f63e0;--line:#0a0a0a;--field:#fff;--sh:#2b6fe8;--paper:#fffdf7;--ptx:#1c1917;--read-size:17px;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#050a14;--win:#0f1c33;--wtx:#eaf4ff;--mut:#9fb6d4;--line:#6f93c4;--field:#16284a;--sh:#1c3f7a;--paper:#f6f1e6;--purt:#7fc8ff}}
+:root[data-theme="dark"]{--bg:#050a14;--win:#0f1c33;--wtx:#eaf4ff;--mut:#9fb6d4;--line:#6f93c4;--field:#16284a;--sh:#1c3f7a;--paper:#f6f1e6;--purt:#7fc8ff}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+body{background:var(--bg);color:#fff;font-family:"Space Mono",ui-monospace,monospace}
+.logo-eyes{filter:drop-shadow(0 0 5px #4cc3ff)}
+/* ---------- Levi intro (5.2 s): power-on flicker, slow open, glance, close, the name appears, eyes snap open ---------- */
+#intro{display:none}
+html.intro #intro{display:grid;place-items:center;position:fixed;inset:0;z-index:9999;cursor:pointer;overflow:hidden;background:radial-gradient(ellipse at 50% 42%,#0a1830 0%,#050a14 52%,#020409 100%);animation:iOut .75s cubic-bezier(.4,0,.2,1) 4.5s forwards}
+html.intro body>*:not(#intro){visibility:hidden;animation:iShow .8s ease 4.5s both}
+html.intro.intro-skip #intro{animation:iSkip .35s ease forwards}
+html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
+@keyframes iOut{to{opacity:0;visibility:hidden;transform:scale(1.08)}}
+@keyframes iSkip{to{opacity:0;visibility:hidden}}
+@keyframes iShow{from{opacity:0;visibility:visible}to{opacity:1;visibility:visible}}
+#intro::before{content:"";position:absolute;inset:0;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .75  0 0 0 0 .85  0 0 0 0 1  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");opacity:.07;pointer-events:none}
+#intro::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,transparent 38%,rgba(0,0,0,.78) 100%);pointer-events:none}
+.i-wrap{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:clamp(12px,3.2vw,24px);padding:24px;text-align:center}
+.i-stage{position:relative;display:grid;place-items:center}
+.i-aura,.i-bloom{position:absolute;left:50%;top:50%;width:170%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;pointer-events:none}
+.i-aura{background:radial-gradient(circle,rgba(62,168,255,.34) 0%,rgba(62,168,255,.10) 38%,transparent 66%);opacity:0;animation:iAura 2.9s ease .3s both}
+.i-bloom{background:radial-gradient(circle,rgba(220,242,255,.9) 0%,rgba(110,190,255,.35) 30%,transparent 62%);opacity:0;animation:iBloom .9s ease-out 2.85s both}
+@keyframes iAura{0%{opacity:0}8.6%{opacity:.35}12.1%{opacity:0}15.5%{opacity:.45}19%{opacity:0}24%{opacity:0}48.3%{opacity:.85}65.5%{opacity:1}77.6%{opacity:.3}88%{opacity:.3}94.8%{opacity:1}100%{opacity:.8}}
+@keyframes iBloom{0%{opacity:0;scale:.55}25%{opacity:.55}100%{opacity:0;scale:1.25}}
+.i-eyes{position:relative;width:min(78vw,400px);height:auto;overflow:visible}
+.i-eyes .ig{animation:iGlance 1.5s ease-in-out 1.75s both}
+.i-eyes .ie{transform-box:fill-box;transform-origin:50% 62%;animation:iEyes 2.9s linear .3s both}
+.i-eyes .ih{animation:iHalo 2.9s linear .3s both}
+@keyframes iGlance{0%{transform:translateX(0)}35%{transform:translateX(-3px)}72%{transform:translateX(3px)}100%{transform:translateX(0)}}
+@keyframes iEyes{0%{transform:scaleY(.03);opacity:0}3.4%{opacity:1}8.6%{transform:scaleY(.16)}12.1%{transform:scaleY(.03)}15.5%{transform:scaleY(.26)}19%{transform:scaleY(.03)}24%{transform:scaleY(.03);animation-timing-function:cubic-bezier(.16,1,.3,1)}48.3%{transform:scaleY(1)}65.5%{transform:scaleY(1);animation-timing-function:cubic-bezier(.5,0,.75,0)}77.6%{transform:scaleY(.03)}88%{transform:scaleY(.03);animation-timing-function:cubic-bezier(.2,.9,.2,1)}94.8%{transform:scaleY(1)}100%{transform:scaleY(1)}}
+@keyframes iHalo{0%{opacity:0}8.6%{opacity:.5}12.1%{opacity:0}15.5%{opacity:.6}19%{opacity:0}24%{opacity:0}48.3%{opacity:.85}65.5%{opacity:.95}77.6%{opacity:.35}88%{opacity:.35}94.8%{opacity:1}100%{opacity:.8}}
+.i-word{font-family:"Archivo Black",Impact,sans-serif;font-size:clamp(44px,min(15vw,14vh),92px);line-height:1;letter-spacing:.14em;margin-right:-.14em;color:transparent;-webkit-text-fill-color:transparent;
+  background:linear-gradient(100deg,#9dbfd8 0%,#cfe6f7 36%,#fff 50%,#cfe6f7 64%,#9dbfd8 100%) 100% 0/260% 100%;-webkit-background-clip:text;background-clip:text;
+  opacity:0;animation:iWord 1.15s cubic-bezier(.2,.7,.2,1) 2.7s forwards,iShine 1.5s ease-in-out 3.25s forwards}
+@keyframes iWord{from{opacity:0;transform:translateY(14px);filter:blur(10px) drop-shadow(0 0 0 rgba(76,195,255,0));letter-spacing:.42em;margin-right:-.42em}to{opacity:1;transform:none;filter:blur(0) drop-shadow(0 0 18px rgba(76,195,255,.4));letter-spacing:.14em;margin-right:-.14em}}
+@keyframes iShine{from{background-position:100% 0}to{background-position:0 0}}
+.i-line{height:1px;width:min(60vw,300px);background:linear-gradient(90deg,transparent,#7fc8ff,transparent);transform:scaleX(0);animation:iLine 1s ease 3s forwards}
+@keyframes iLine{to{transform:scaleX(1)}}
+.i-tag{font-family:"Space Mono",ui-monospace,monospace;font-weight:700;font-size:clamp(11px,3vw,14px);letter-spacing:.55em;margin-right:-.55em;color:#7fc8ff;opacity:0;animation:iTag 1s ease 3.2s forwards}
+@keyframes iTag{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.i-d{position:absolute;z-index:1;left:var(--x);bottom:-8px;width:var(--s);height:var(--s);border-radius:50%;background:#bfe6ff;opacity:0;animation:iDust var(--t) linear var(--l) infinite}
+@keyframes iDust{0%{transform:translateY(0);opacity:0}15%{opacity:.5}85%{opacity:.3}100%{transform:translateY(-105vh);opacity:0}}
+.i-skip{position:absolute;z-index:2;left:0;right:0;bottom:calc(22px + env(safe-area-inset-bottom,0px));text-align:center;font:12px "Space Mono",ui-monospace,monospace;color:#7fc8ff;opacity:0;animation:iHint 1s ease 1.2s forwards}
+@keyframes iHint{to{opacity:.38}}
+.hd{font-family:"Archivo Black",Impact,sans-serif;line-height:1.02}
+.win{background:var(--win);color:var(--wtx);border:2px solid var(--line);box-shadow:5px 5px 0 var(--sh)}
+.wh{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:2px solid var(--line);font-size:11px;font-weight:700}
+.dot{width:11px;height:11px;border:2px solid var(--line);background:var(--win);display:inline-block}
+.btn{display:inline-block;border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:.7rem 1.1rem;font-weight:700;font-size:13px;color:var(--ink);background:var(--lime);transition:transform .1s,box-shadow .1s}
+.btn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.btn.w{background:#fff}.btn.p{background:var(--pur);color:#fff;border-color:var(--line)}
+.btn:focus-visible,.chip:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.blk{background:#fff;color:var(--ink);padding:0 .4rem}
+.chip{border:2px solid var(--line);padding:.35rem .7rem;font-weight:700;background:var(--win);color:var(--wtx)}
+.chip.on{background:var(--lime);color:var(--ink);border-color:var(--ink)}
+.bar{height:8px;border:1.5px solid var(--line);background:var(--field)}.bar i{display:block;height:100%;background:var(--purt)}
+.tick{background:var(--lime);color:var(--ink);border-block:2px solid var(--ink);overflow:hidden;white-space:nowrap;font-size:11px;font-weight:700}
+.tick div{display:inline-block;padding:6px 0;animation:mq 28s linear infinite}
+@keyframes mq{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.tick div{animation:none}}
+.ic{width:34px;height:34px;border:2px solid var(--ink);background:var(--lime);color:var(--ink);display:grid;place-items:center;font-family:"Archivo Black",sans-serif}
+.inp{width:100%;border:2px solid var(--line);background:var(--field);color:var(--wtx);padding:.6rem .7rem;font:inherit;font-size:inherit}
+.inp:focus{outline:3px solid var(--purt);outline-offset:1px}
+.ropt{display:flex;gap:.6rem;align-items:center;padding:.5rem .75rem;border:2px solid var(--line);margin-bottom:.4rem;cursor:pointer;line-height:1.45}
+.ropt:hover{background:var(--field)}
+.ropt:has(input:checked){background:var(--lime);color:#0a0a0a;border-color:#0a0a0a}.ropt input{accent-color:#0a0a0a}
+.warn{background:var(--lime);color:#0a0a0a}
+.hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+.pw-wrap{position:relative;display:block;margin-top:.25rem}.pw-wrap .inp{margin-top:0;padding-right:6.2rem}
+.pwt{position:absolute;right:6px;top:50%;transform:translateY(-50%);font:700 11px "Space Mono",ui-monospace,monospace;padding:.3rem .5rem;border:2px solid var(--line);background:var(--win);color:var(--wtx);cursor:pointer}
+.pwt:focus-visible{outline:3px solid var(--purt);outline-offset:1px}
+.pill{position:relative;display:inline-flex;align-items:center;border:2px solid var(--line);padding:.3rem .75rem;font-weight:700;font-size:12px;cursor:pointer;background:var(--field);color:var(--wtx);user-select:none}
+.pill input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.pill:has(input:checked){background:var(--lime);color:#0a0a0a;border-color:#0a0a0a}
+.pill:has(input:focus-visible){outline:3px solid var(--purt);outline-offset:2px}
+.pill:has(input:disabled){opacity:.4;cursor:not-allowed}
+/* any Tailwind "border-black" now follows the theme, so lines stay visible in dark mode */
+.border-black{border-color:var(--line)!important}
+.border-black\/20{border-color:color-mix(in srgb,var(--line) 25%,transparent)!important}
+/* readable long text */
+.read{font-family:Inter,system-ui,sans-serif;font-size:16px;line-height:1.65}
+.passage{background:var(--paper);color:var(--ptx);font-family:"Source Serif 4",Georgia,serif;font-size:var(--read-size);line-height:1.75}
+.passage p{margin:0 0 .95em;max-width:68ch}.passage p:last-child{margin-bottom:0}.passage b{color:#1f63e0;margin-right:.3em}
+.win table{font-family:Inter,system-ui,sans-serif;font-size:14px}
+.skip{position:absolute;left:-999px;top:0;background:var(--lime);color:var(--ink);padding:.6rem 1rem;font-weight:700;z-index:100}.skip:focus{left:8px;top:8px}
+/* hero title: every line is its own box, so lines never overlap or cover each other */
+.hero-t{line-height:1.12;letter-spacing:-.01em}
+.hero-t .ln{display:block;width:fit-content;max-width:100%;margin-bottom:.12em}
+.hero-t .blk{display:block;width:fit-content;max-width:100%;padding:.04em .3em .02em;margin-bottom:.12em}
+.hero-t .lm{color:var(--lime)}
+.lead{font-family:Inter,system-ui,sans-serif;font-size:17px;line-height:1.6;color:#fff;max-width:34rem}
+#toTop{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;display:none}
+#toTop.show{display:block}
+.ib{width:40px;height:40px;display:grid;place-items:center;border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);background:#fff;color:var(--ink);cursor:pointer;list-style:none;font-weight:700;transition:transform .1s,box-shadow .1s}
+.ib::-webkit-details-marker{display:none}
+.ib:hover{transform:translate(1px,1px);box-shadow:2px 2px 0 var(--ink)}
+.ib.on{background:var(--lime)}
+.ib:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.pm{position:absolute;right:0;top:calc(100% + 8px);min-width:210px;z-index:50}
+.pm a,.pm button{display:block;width:100%;text-align:left;padding:.75rem .9rem;font-size:12px;font-weight:700;cursor:pointer}
+.pm a:hover,.pm button:hover{background:var(--field)}
+/* phone: bottom tab bar (thumb reach), bigger tap targets */
+.bnav{display:none}
+@media (max-width:767px){
+  .bnav{position:fixed;left:0;right:0;bottom:0;z-index:45;display:grid;grid-template-columns:repeat(5,1fr);background:var(--win);color:var(--wtx);border-top:2px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+  .bnav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:56px;font-size:10.5px;font-weight:700}
+  .bnav a[aria-current]{background:var(--lime);color:#0a0a0a}
+  .bnav.off{display:none}
+  footer{padding-bottom:calc(60px + env(safe-area-inset-bottom,0px))}
+  #toTop{bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+  .ropt{min-height:44px}
+  input,select,textarea{font-size:16px}
+}
+</style>
+{% if config.get('TAILWIND_LOCAL') %}<link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.css', v=config.get('TAILWIND_VERSION', 0)) }}">{% endif %}
+</head>
+<body>
+{% if request.endpoint != 'reading.take' and request.method == 'GET' %}
+<div id="intro" aria-hidden="true">
+  <i class="i-d" style="--x:45%;--s:2px;--t:11s;--l:-10s"></i><i class="i-d" style="--x:10%;--s:1.5px;--t:14s;--l:-8s"></i><i class="i-d" style="--x:16%;--s:2px;--t:12s;--l:-0s"></i><i class="i-d" style="--x:68%;--s:2px;--t:8s;--l:-1s"></i><i class="i-d" style="--x:59%;--s:3px;--t:8s;--l:-3s"></i><i class="i-d" style="--x:15%;--s:3px;--t:8s;--l:-9s"></i><i class="i-d" style="--x:19%;--s:2px;--t:13s;--l:-10s"></i><i class="i-d" style="--x:78%;--s:1.5px;--t:12s;--l:-9s"></i><i class="i-d" style="--x:54%;--s:1.5px;--t:9s;--l:-0s"></i><i class="i-d" style="--x:75%;--s:2px;--t:10s;--l:-6s"></i><i class="i-d" style="--x:22%;--s:1.5px;--t:12s;--l:-4s"></i><i class="i-d" style="--x:75%;--s:2px;--t:8s;--l:-9s"></i><i class="i-d" style="--x:77%;--s:2px;--t:10s;--l:-1s"></i><i class="i-d" style="--x:74%;--s:1.5px;--t:12s;--l:-0s"></i><i class="i-d" style="--x:83%;--s:2px;--t:11s;--l:-10s"></i><i class="i-d" style="--x:72%;--s:3px;--t:14s;--l:-5s"></i>
+  <div class="i-wrap">
+    <div class="i-stage">
+      <div class="i-aura"></div><div class="i-bloom"></div>
+      <svg class="i-eyes" viewBox="0 8 220 54" role="presentation">
+        <defs>
+          <radialGradient id="ieg" cx="50%" cy="58%" r="75%"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#e4f4ff"/><stop offset="1" stop-color="#98cdfa"/></radialGradient>
+          <filter id="iglow" x="-50%" y="-150%" width="200%" height="400%"><feGaussianBlur stdDeviation="7"/></filter>
+        </defs>
+        <g class="ig"><g class="ie">
+          <g class="ih" filter="url(#iglow)"><path d="M10 14 L102 34 Q100 45 91 50 Q62 58 40 52 Q17 42 10 14 Z" fill="#3ea8ff"/><path d="M210 14 L118 34 Q120 45 129 50 Q158 58 180 52 Q203 42 210 14 Z" fill="#3ea8ff"/></g>
+          <path d="M10 14 L102 34 Q100 45 91 50 Q62 58 40 52 Q17 42 10 14 Z" fill="url(#ieg)" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M210 14 L118 34 Q120 45 129 50 Q158 58 180 52 Q203 42 210 14 Z" fill="url(#ieg)" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
+        </g></g>
+      </svg>
+    </div>
+    <div class="i-word">LEVI</div>
+    <div class="i-line"></div>
+    <div class="i-tag">CEFR PREP</div>
+  </div>
+  <div class="i-skip">Oʻtkazib yuborish uchun bosing</div>
+</div>
+{% endif %}
+<a class="skip" href="#top">Asosiy qismga oʻtish</a>
+<header class="bg-[var(--bg)]">
+  <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
+    <a href="{{ url_for('main.index') }}" class="logo hd text-2xl flex items-center gap-2" aria-label="Levi: bosh sahifa">
+      <svg class="logo-eyes" width="46" height="15" viewBox="0 8 220 54" aria-hidden="true"><path d="M10 14 L102 34 Q100 45 91 50 Q62 58 40 52 Q17 42 10 14 Z" fill="#fff" stroke="#0a0a0a" stroke-width="6" stroke-linejoin="round"/><path d="M210 14 L118 34 Q120 45 129 50 Q158 58 180 52 Q203 42 210 14 Z" fill="#fff" stroke="#0a0a0a" stroke-width="6" stroke-linejoin="round"/></svg>
+      <span>LEVI</span></a>
+    {% set ep = request.endpoint or '' %}{% set bp_ = nav_skill|default(request.blueprint or '') %}
+    {% set nav_links = [('ASOSIY', url_for('main.index'), ep == 'main.index'),
+        ('READING', url_for('reading.tests'), bp_ == 'reading'), ('LISTENING', url_for('listening.tests'), bp_ == 'listening'),
+        ('WRITING', url_for('writing.tasks'), bp_ == 'writing'), ('SPEAKING', url_for('speaking.tasks'), bp_ == 'speaking'),
+        ('SHADOWING', url_for('shadowing.videos'), bp_ == 'shadowing')] %}
+    {% if current_user.is_authenticated %}{% set nav_links = nav_links + [('IMTIHON', url_for('exam.index'), bp_ == 'exam'), ('DASHBOARD', url_for('main.dashboard'), ep == 'main.dashboard')] %}{% endif %}
+    {% if current_user.is_authenticated and current_user.is_admin %}{% set nav_links = nav_links + [('ADMIN', url_for('admin.index'), bp_ == 'admin')] %}{% endif %}
+    <nav class="hidden md:flex border-2 border-black bg-white text-black text-[11px] font-bold" aria-label="Asosiy menyu">
+      {% for label, href, on in nav_links %}<a class="px-3 py-2 {{ 'bg-black text-white' if on }}" href="{{ href }}"{% if on %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}
+    </nav>
+    <div class="flex items-center gap-2">
+    <button type="button" id="themeBtn" class="ib" aria-label="Yorugʻ yoki qorongʻi rejim" title="Yorugʻ / qorongʻi rejim">◐</button>
+    {% if current_user.is_authenticated %}
+    <a class="ib {{ 'on' if bp_ == 'vocab' }}" href="{{ url_for('vocab.index') }}" aria-label="Lugʻat" title="Lugʻat"{% if bp_ == 'vocab' %} aria-current="page"{% endif %}>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></a>
+    <a class="ib {{ 'on' if bp_ == 'account' }}" href="{{ url_for('account.settings') }}" aria-label="Sozlamalar" title="Sozlamalar"{% if bp_ == 'account' %} aria-current="page"{% endif %}>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></a>
+    <details class="relative" id="profMenu">
+      <summary class="ib {{ 'on' if bp_ == 'skills' }}" aria-label="Profil menyusi" title="Profil">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+      </summary>
+      <div class="pm win">
+        <p class="px-3 pt-3 pb-2 text-[11px] border-b-2 border-black" style="color:var(--mut)">{{ current_user.name }}</p>
+        <a href="{{ url_for('skills.profile') }}">SKILLAR PROFILI</a>
+        <form method="post" action="{{ url_for('auth.logout') }}" class="border-t-2 border-black">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit">CHIQISH</button>
+        </form>
+      </div>
+    </details>
+    {% else %}
+    <a href="{{ url_for('auth.login') }}" class="btn !py-2 !text-xs">KIRISH</a>
+    {% endif %}
+    </div>
+  </div>
+</header>
+<nav class="md:hidden border-y-2 border-black bg-white text-black text-[11px] font-bold overflow-x-auto whitespace-nowrap" aria-label="Mobil menyu">
+  {% for label, href, on in nav_links %}<a class="inline-block px-3 py-3 {{ 'bg-black text-white' if on }}" href="{{ href }}"{% if on %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}
+</nav>
+{% block ticker %}<div class="tick" aria-hidden="true"><div>READING • LISTENING • WRITING • SPEAKING • AI MASLAHAT • A1–C2 • READING • LISTENING • WRITING • SPEAKING • AI MASLAHAT • A1–C2 • READING • LISTENING • WRITING • SPEAKING • AI MASLAHAT • A1–C2 • READING • LISTENING • WRITING • SPEAKING • AI MASLAHAT • A1–C2 •</div></div>
+
+{% endblock %}
+<main id="top" class="max-w-6xl mx-auto px-4 py-8">
+{% with messages = get_flashed_messages(with_categories=true) %}{% for cat, msg in messages %}
+  <div class="win mb-5 px-4 py-3 text-sm" role="alert" style="{{ 'background:#fff0f0' if cat == 'error' else 'background:var(--lime);color:#0a0a0a' }}">{{ msg }}</div>
+{% endfor %}{% endwith %}
+{% if current_user.is_authenticated and not current_user.is_verified and bp_ != 'verify' %}
+  <div class="win mb-5 px-4 py-3 text-sm flex flex-wrap items-center justify-between gap-3" style="background:var(--lime);color:#0a0a0a"><span><b>Emailingizni tasdiqlang.</b> Writing, Speaking va AI maslahat uchun kerak.</span><a class="btn w !py-1 !text-[11px]" href="{{ url_for('verify.page') }}">KOD KIRITISH</a></div>
+{% endif %}
+{% set _ex = open_exam() %}{% if _ex and bp_ != 'exam' %}
+  <div class="win mb-5 px-4 py-3 text-sm flex flex-wrap items-center justify-between gap-3" style="background:var(--lime);color:#0a0a0a"><span><b>Toʻliq imtihon davom etmoqda.</b> Tugatish uchun qolgan skillarni bajaring.</span><a class="btn !py-1 !text-[11px]" href="{{ url_for('exam.detail', session_id=_ex.id) }}">OCHISH</a></div>
+{% endif %}
+{% block content %}{% endblock %}
+</main>
+<footer class="border-t-2 border-black bg-black text-white mt-6">
+  <div class="max-w-6xl mx-auto px-4 py-6 text-[11px] flex flex-wrap justify-between gap-3">
+    <span>© 2026 Levi · <a class="underline" href="{{ url_for('onboarding.privacy') }}">Maxfiylik siyosati</a> · <a class="underline" href="{{ url_for('onboarding.terms') }}">Shartlar</a></span>
+    <span class="flex flex-wrap gap-4"><a class="underline" href="{{ url_for('reading.tests') }}">Reading</a><a class="underline" href="{{ url_for('listening.tests') }}">Listening</a><a class="underline" href="{{ url_for('writing.tasks') }}">Writing</a><a class="underline" href="{{ url_for('speaking.tasks') }}">Speaking</a><a class="underline" href="{{ url_for('shadowing.videos') }}">Shadowing</a></span>
+  </div>
+</footer>
+
+{% if ep != 'reading.take' %}
+{% set icons = {'home': '<path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
+  'target': '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
+  'chart': '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  'book': '<path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/>',
+  'user': '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'} %}
+{% set tabs = [('Bosh', url_for('main.dashboard') if current_user.is_authenticated else url_for('main.index'), ep in ('main.index', 'main.dashboard'), 'home'),
+  ('Mashq', url_for('main.practice'), ep == 'main.practice' or bp_ in ('reading', 'listening', 'writing', 'speaking', 'shadowing'), 'target'),
+  ('Daraja', url_for('placement.intro'), bp_ == 'placement', 'chart'),
+  ('Lugʻat', url_for('vocab.index'), bp_ == 'vocab', 'book'),
+  ('Profil', url_for('skills.profile') if current_user.is_authenticated else url_for('auth.login'), bp_ in ('skills', 'account', 'auth'), 'user')] %}
+<nav class="bnav" aria-label="Pastki menyu">
+  {% for label, href, on, ic in tabs %}<a href="{{ href }}"{% if on %} aria-current="page"{% endif %}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ icons[ic]|safe }}</svg>{{ label }}</a>{% endfor %}
+</nav>
+{% endif %}
+<button type="button" id="toTop" class="btn w !py-2 !text-xs" aria-label="Yuqoriga">↑</button>
+<script>
+(function () {                       // let people skip the intro with a tap, click or key (it fades out, no hard cut)
+  var h = document.documentElement;
+  if (!h.classList.contains("intro")) return;
+  var done = false;
+  function end() { h.classList.remove("intro", "intro-skip"); }
+  function skip() { if (done) return; done = true; h.classList.add("intro-skip"); setTimeout(end, 380); }
+  ["click", "keydown", "touchstart"].forEach(function (ev) { addEventListener(ev, skip, { once: true, passive: true }); });
+  setTimeout(function () { done = true; end(); }, 5500);
+})();
+(function () {
+  var b = document.getElementById("toTop");
+  addEventListener("scroll", function () { b.classList.toggle("show", scrollY > 600); }, { passive: true });
+  b.addEventListener("click", function () { scrollTo({ top: 0, behavior: "smooth" }); });
+  var on = document.querySelector('nav[aria-label="Mobil menyu"] [aria-current]');   // keep the active tab visible on phones
+  if (on && on.scrollIntoView) on.scrollIntoView({ inline: "center", block: "nearest" });
+})();
+(function () {
+  var m = document.getElementById("profMenu");
+  if (!m) return;
+  document.addEventListener("click", function (e) { if (m.open && !m.contains(e.target)) m.open = false; });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") m.open = false; });
+})();
+document.querySelectorAll("input[type=password][data-reveal]").forEach(function (i) {      // show / hide password
+  var had = document.activeElement === i, w = document.createElement("span"), b = document.createElement("button");
+  w.className = "pw-wrap"; i.parentNode.insertBefore(w, i); w.appendChild(i);
+  b.type = "button"; b.className = "pwt"; b.textContent = "KOʻRSATISH"; b.setAttribute("aria-pressed", "false");
+  b.setAttribute("aria-label", "Parolni koʻrsatish yoki yashirish");
+  b.addEventListener("click", function () {
+    var show = i.type === "password"; i.type = show ? "text" : "password";
+    b.textContent = show ? "YASHIRISH" : "KOʻRSATISH"; b.setAttribute("aria-pressed", String(show));
+  });
+  w.appendChild(b); if (had) i.focus();
+});
+document.getElementById("themeBtn").addEventListener("click", function () {
+  var root = document.documentElement;
+  var dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  var next = dark ? "light" : "dark";
+  root.dataset.theme = next;
+  try { localStorage.setItem("theme", next); } catch (e) {}
+});
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

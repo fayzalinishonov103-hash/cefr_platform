@@ -1,0 +1,3 @@
+id,task_type,task,min_words,max_words,text,human_level
+1,essay,"Some people think students should wear school uniforms. Do you agree or disagree?",120,180,"PASTE A REAL STUDENT ESSAY HERE (at least 20 words).",B1
+2,informal_letter,"Write a letter to a friend about your last holiday.",100,150,"PASTE A REAL STUDENT LETTER HERE (at least 20 words).",B2

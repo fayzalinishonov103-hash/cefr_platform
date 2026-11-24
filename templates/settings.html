@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Sozlamalar — Levi{% endblock %}
+{% block content %}
+<div class="grid lg:grid-cols-2 gap-5 max-w-4xl mx-auto">
+  <section class="win">
+    <div class="wh"><span class="dot"></span><span class="dot"></span><span>PROFIL</span></div>
+    <form method="post" class="p-5 space-y-3 text-sm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="name">
+      <label class="block"><span class="block mb-1 font-bold text-xs">Ism</span><input class="inp" name="name" maxlength="80" value="{{ current_user.name }}" required></label>
+      <p class="text-xs" style="color:var(--mut)">Email: {{ current_user.email if not telegram else 'Telegram orqali kirgansiz' }}</p>
+      <p class="text-xs"><a class="underline font-bold" href="{{ url_for('onboarding.edit') }}">Maqsad va qiziqishlarimni oʻzgartirish</a> · <a class="underline" href="{{ url_for('onboarding.privacy') }}">Maxfiylik siyosati</a></p>
+      <button class="btn" type="submit">SAQLASH</button>
+    </form>
+  </section>
+
+  {% if not telegram %}
+  <section class="win">
+    <div class="wh"><span class="dot"></span><span>PAROLNI ALMASHTIRISH</span></div>
+    <form method="post" class="p-5 space-y-3 text-sm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="password">
+      <label class="block"><span class="block mb-1 font-bold text-xs">Joriy parol</span><input class="inp" type="password" name="old" autocomplete="current-password" data-reveal required></label>
+      <label class="block"><span class="block mb-1 font-bold text-xs">Yangi parol (kamida 10 belgi)</span><input class="inp" type="password" name="new" minlength="10" maxlength="128" autocomplete="new-password" data-reveal required></label>
+      <label class="block"><span class="block mb-1 font-bold text-xs">Yangi parolni takrorlang</span><input class="inp" type="password" name="again" minlength="10" maxlength="128" autocomplete="new-password" data-reveal required></label>
+      <button class="btn" type="submit">ALMASHTIRISH</button>
+    </form>
+  </section>
+  {% endif %}
+
+  <section class="win lg:col-span-2">
+    <div class="wh"><span class="dot"></span><span>QURILMALAR</span></div>
+    <form method="post" class="p-5 flex flex-wrap items-center justify-between gap-3 text-sm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="signout_all">
+      <p class="text-xs max-w-md" style="color:var(--mut)">Telefon yoki kompyuteringiz yoʻqolgan boʻlsa, yoki umumiy kompyuterda kirib qolgan boʻlsangiz, boshqa barcha qurilmalardan chiqing. Shu qurilmada kirgan holda qolasiz.</p>
+      <button class="btn w" type="submit">BOSHQA QURILMALARDAN CHIQISH</button>
+    </form>
+  </section>
+
+  <section class="win lg:col-span-2">
+    <div class="wh"><span class="dot"></span><span>HISOBNI OʻCHIRISH</span></div>
+    <form method="post" class="p-5 space-y-3 text-sm" onsubmit="return confirm('Hisob va barcha natijalar butunlay oʻchiriladi. Qaytarib boʻlmaydi. Davom etasizmi?')">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="delete">
+      <p>Testlar, Writing va Speaking natijalari, lugʻat daftari butunlay oʻchadi va qaytarib boʻlmaydi.</p>
+      <label class="block"><span class="block mb-1 font-bold text-xs">Tasdiqlash uchun <b>{{ word }}</b> deb yozing</span><input class="inp !w-56" name="confirm" autocomplete="off" required></label>
+      {% if not telegram %}
+      <label class="block"><span class="block mb-1 font-bold text-xs">Joriy parol</span><input class="inp !w-56" type="password" name="password" maxlength="1024" autocomplete="current-password" required></label>
+      {% endif %}
+      <button class="btn w" type="submit">HISOBNI OʻCHIRISH</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

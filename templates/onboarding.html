@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Oʻzingiz haqingizda — Levi{% endblock %}
+{% block ticker %}{% endblock %}
+{% block content %}
+<section class="win max-w-xl mx-auto" aria-labelledby="obTitle">
+  <div class="wh"><span class="dot"></span><span class="dot"></span><span id="obTitle">REJANGIZNI MOSLAYMIZ</span>
+    <span class="ml-auto" id="obCount" aria-live="polite">1 / 6</span></div>
+  <div class="px-5 pt-4"><div class="bar" role="progressbar" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1" id="obBar"><i style="width:16.7%"></i></div></div>
+
+  <form method="post" id="obForm" class="p-5 text-sm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% if short %}<input type="hidden" name="short" value="1">{% endif %}
+
+    <fieldset class="ob-step" data-step="1">
+      <legend class="hd text-2xl mb-1">Nima uchun tayyorlanyapsiz?</legend>
+      <p class="why">Nega soʻraymiz: mashqlar va maslahatlarni maqsadingizga moslash uchun.</p>
+      {% for code, label in goals %}<label class="ropt"><input type="radio" name="goal" value="{{ code }}" {{ 'checked' if v.goal == code }}>{{ label }}</label>{% endfor %}
+    </fieldset>
+
+    <fieldset class="ob-step" data-step="2" hidden>
+      <legend class="hd text-2xl mb-1">Qaysi darajani xohlaysiz?</legend>
+      <p class="why">Nega soʻraymiz: qancha yoʻl qolganini hisoblab, kunlik rejani tuzish uchun.</p>
+      <div class="grid grid-cols-2 gap-x-2">{% for code, label in targets %}<label class="ropt"><input type="radio" name="target_level" value="{{ code }}" {{ 'checked' if v.target_level is not none and v.target_level == code }}>{{ label }}</label>{% endfor %}</div>
+      <label class="block mt-3"><span class="block mb-1 font-bold text-xs">Imtihon sanasi (agar bilsangiz)</span>
+        <input class="inp" type="date" name="exam_date" value="{{ v.exam_date }}" min="{{ today }}" max="{{ last }}"></label>
+    </fieldset>
+
+    <fieldset class="ob-step" data-step="3" hidden>
+      <legend class="hd text-2xl mb-1">Kuniga necha daqiqa ajrata olasiz?</legend>
+      <p class="why">Nega soʻraymiz: kunlik reja sizga ogʻir yoki juda yengil boʻlib qolmasligi uchun.</p>
+      <div class="grid grid-cols-2 gap-x-2">{% for m in minutes %}<label class="ropt"><input type="radio" name="daily_minutes" value="{{ m }}" {{ 'checked' if v.daily_minutes == m }}>{{ m }} daqiqa</label>{% endfor %}</div>
+    </fieldset>
+
+    {% if not short %}
+    <fieldset class="ob-step" data-step="4" hidden>
+      <legend class="hd text-2xl mb-1">Nimalar qiziqtiradi?</legend>
+      <p class="why">Nega soʻraymiz: matn va mashq mavzularini qiziqishingizga yaqin tanlash uchun. {{ max_interests }} tagacha tanlang.</p>
+      <div class="flex flex-wrap gap-2" id="obInterests">{% for code, label in interests %}<label class="pill"><input type="checkbox" name="interests" value="{{ code }}" {{ 'checked' if code in v.interests }}>{{ label }}</label>{% endfor %}</div>
+      <p class="text-xs mt-1" id="obLimit" style="color:var(--mut)" aria-live="polite"></p>
+    </fieldset>
+
+    <fieldset class="ob-step" data-step="5" hidden>
+      <legend class="hd text-2xl mb-1">Yosh oraligʻi va viloyat</legend>
+      <p class="why">Nega soʻraymiz: foydalanuvchilarimiz kimligini bilib, saytni yaxshilash uchun. Aniq tugʻilgan sana, telefon yoki manzil soʻralmaydi.</p>
+      <label class="block"><span class="block mb-1 font-bold text-xs">Yosh oraligʻi</span>
+        <select class="inp" name="age_range"><option value="">Aytmayman</option>{% for code, label in ages %}<option value="{{ code }}" {{ 'selected' if v.age_range == code }}>{{ label }}</option>{% endfor %}</select></label>
+      <label class="block mt-3"><span class="block mb-1 font-bold text-xs">Viloyat</span>
+        <select class="inp" name="region"><option value="">Aytmayman</option>{% for code, label in regions %}<option value="{{ code }}" {{ 'selected' if v.region == code }}>{{ label }}</option>{% endfor %}</select></label>
+    </fieldset>
+
+    {% endif %}
+
+    {% if not short or v.consent %}
+    <fieldset class="ob-step" data-step="6" hidden>
+      <legend class="hd text-2xl mb-1">Bizni qayerdan eshitdingiz?</legend>
+      <p class="why">Nega soʻraymiz: qaysi kanal ishlayotganini bilish uchun.</p>
+      <div class="grid grid-cols-2 gap-x-2">{% for code, label in sources %}<label class="ropt"><input type="radio" name="source" value="{{ code }}" {{ 'checked' if v.source == code }}>{{ label }}</label>{% endfor %}</div>
+      {% if not short %}<label class="ropt mt-3 !items-start"><input type="checkbox" name="consent" value="1" class="mt-1" {{ 'checked' if v.consent }}>
+        <span>Yosh oraligʻi, viloyat va manba haqidagi javoblarimni statistika uchun saqlashga roziman. Rozilik bermasam, bu 3 ta javob saqlanmaydi.
+          <a class="underline font-bold" href="{{ url_for('onboarding.privacy') }}" target="_blank" rel="noopener">Maxfiylik siyosati</a></span></label>{% endif %}
+    </fieldset>
+    {% endif %}
+
+    <div class="flex items-center justify-between gap-2 mt-5">
+      <button type="button" class="btn w" id="obBack" hidden>ORQAGA</button>
+      <span class="flex-1"></span>
+      <button type="button" class="btn" id="obNext">KEYINGISI</button>
+      <button type="submit" class="btn" id="obDone" hidden>SAQLASH VA DAVOM ETISH</button>
+    </div>
+  </form>
+
+  <form method="post" class="px-5 pb-5 -mt-2 text-xs">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="skip">
+    <button type="submit" class="underline font-bold">Hozircha oʻtkazib yuborish</button>
+    <span style="color:var(--mut)"> · keyin Sozlamalardan toʻldirish mumkin</span>
+  </form>
+</section>
+<style>.why{font-family:Inter,system-ui,sans-serif;font-size:13px;line-height:1.5;color:var(--mut);margin:0 0 .9rem}fieldset.ob-step{border:0;padding:0;margin:0;min-width:0}.btn[hidden],.ob-step[hidden]{display:none!important}</style>
+<noscript><style>.ob-step[hidden]{display:block!important}#obDone[hidden]{display:inline-block!important}#obNext,#obBack{display:none!important}</style></noscript>
+{% endblock %}
+{% block scripts %}
+<script>
+(function () {
+  var steps = Array.prototype.slice.call(document.querySelectorAll(".ob-step"));
+  var i = 0, total = steps.length, MAX = {{ max_interests }};
+  var back = document.getElementById("obBack"), next = document.getElementById("obNext"), done = document.getElementById("obDone");
+  var bar = document.getElementById("obBar"), count = document.getElementById("obCount");
+  function show(n) {
+    i = n;
+    steps.forEach(function (s, k) { s.hidden = k !== i; });
+    back.hidden = i === 0; next.hidden = i === total - 1; done.hidden = i !== total - 1;
+    count.textContent = (i + 1) + " / " + total;
+    bar.setAttribute("aria-valuenow", i + 1); bar.firstElementChild.style.width = ((i + 1) / total * 100) + "%";
+    var first = steps[i].querySelector("input,select"); if (first) first.focus({ preventScroll: true });
+  }
+  next.addEventListener("click", function () { if (i < total - 1) show(i + 1); });
+  back.addEventListener("click", function () { if (i > 0) show(i - 1); });
+  var boxes = document.querySelectorAll("#obInterests input"), note = document.getElementById("obLimit");
+  function limit() {
+    var n = document.querySelectorAll("#obInterests input:checked").length;
+    boxes.forEach(function (b) { b.disabled = !b.checked && n >= MAX; });
+    if (note) note.textContent = n >= MAX ? "Eng koʻpi bilan " + MAX + " ta tanlash mumkin." : "";
+  }
+  boxes.forEach(function (b) { b.addEventListener("change", limit); }); limit();
+  // Enter must not submit half-way: it moves to the next question until the last one
+  document.getElementById("obForm").addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && e.target.tagName !== "BUTTON" && i < total - 1) { e.preventDefault(); show(i + 1); }
+  });
+  show(0);
+})();
+</script>
+{% endblock %}

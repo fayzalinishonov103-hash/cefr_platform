@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Toʻliq imtihon — Levi{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-5">
+{% if not exam %}
+  <section class="win">
+    <div class="wh"><span class="dot"></span><span class="dot"></span><span>TOʻLIQ IMTIHON</span></div>
+    <div class="p-5 space-y-4 text-sm">
+      <p>Haqiqiy imtihondagidek: <b>Reading, Listening, Writing va Speaking</b> ketma-ket topshiriladi, oxirida umumiy daraja hisoblanadi. Tartibini oʻzingiz tanlaysiz, testlarni ham.</p>
+      <ul class="list-disc ml-5 space-y-1" style="color:var(--mut)">
+        <li>Imtihon boshlangach, har skilldan bittadan test yoki topshiriq bajaring.</li>
+        <li>Skill ikki marta topshirilsa, oxirgi natija hisobga olinadi.</li>
+        <li>Umumiy ball toʻrt skillning oʻrtachasi. Natija taxminiy, rasmiy imtihon emas.</li>
+      </ul>
+      <form method="post" action="{{ url_for('exam.start') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn" type="submit">IMTIHONNI BOSHLASH</button></form>
+    </div>
+  </section>
+  {% if history %}
+  <section class="win"><div class="wh"><span class="dot"></span><span>OLDINGI IMTIHONLAR</span></div>
+    <div class="overflow-x-auto"><table class="w-full text-xs">
+      <thead><tr class="text-left border-b-2 border-black"><th class="p-3">Sana</th><th class="p-3">Umumiy ball</th><th class="p-3">Daraja</th><th class="p-3"></th></tr></thead>
+      <tbody>{% for e in history %}<tr class="border-b border-black/20"><td class="p-3">{{ e.finished_at.strftime('%d.%m.%Y') }}</td><td class="p-3">{{ e.overall_score }}/75</td><td class="p-3 font-bold">{{ e.overall_level }}</td>
+        <td class="p-3"><a class="underline" href="{{ url_for('exam.detail', session_id=e.id) }}">Koʻrish</a></td></tr>{% endfor %}</tbody></table></div></section>
+  {% endif %}
+{% else %}
+  <section class="win">
+    <div class="wh"><span class="dot"></span><span class="dot"></span><span>{{ 'IMTIHON NATIJASI' if exam.finished_at else 'IMTIHON DAVOM ETMOQDA' }}</span></div>
+    <div class="p-5">
+      {% if exam.finished_at %}
+        <p class="text-[11px]" style="color:var(--mut)">UMUMIY DARAJA</p>
+        <p class="hd text-6xl" style="color:var(--purt)">{{ exam.overall_level }}</p>
+        <p class="text-sm mt-2"><b>{{ exam.overall_score }} / 75</b> ball · {{ exam.finished_at.strftime('%d.%m.%Y') }}</p>
+        <p class="text-[11px] mt-3" style="color:var(--mut)">Taxminiy natija: Writing va Speaking AI baholaydi, Reading va Listening ballari oddiy chiziqli hisoblanadi.</p>
+      {% else %}
+        <p class="hd text-4xl">{{ done }} / 4</p><div class="bar mt-2"><i style="width:{{ done * 25 }}%"></i></div>
+        <p class="text-sm mt-3">Qolgan skillarni bajaring. Tugagach shu sahifaga qaytib, umumiy natijani koʻring.</p>
+      {% endif %}
+    </div>
+  </section>
+  <div class="grid sm:grid-cols-2 gap-5">
+    {% for key, label, endpoint in stages %}{% set r = results.get(key) %}
+    <section class="win">
+      <div class="wh"><span class="dot"></span><span>{{ label|upper }}</span><span class="ml-auto">{{ 'BAJARILDI' if r else 'KUTILMOQDA' }}</span></div>
+      <div class="p-4 text-sm space-y-2">
+        {% if r %}<p class="hd text-3xl">{{ r.level }}</p><p><b>{{ r.score }}/75</b> · {{ r.title }}</p><a class="underline text-xs" href="{{ r.url }}">Natijani koʻrish</a>
+        {% else %}<p style="color:var(--mut)">Hali topshirilmadi.</p><a class="btn !py-2 !text-xs" href="{{ url_for(endpoint) }}">{{ label|upper }} BOSHLASH</a>{% endif %}
+      </div>
+    </section>{% endfor %}
+  </div>
+  <div class="flex gap-3 flex-wrap">
+    {% if not exam.finished_at %}
+    <form method="post" action="{{ url_for('exam.cancel', session_id=exam.id) }}" onsubmit="return confirm('Imtihon bekor qilinadi. Davom etasizmi?')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn w" type="submit">BEKOR QILISH</button></form>
+    {% else %}<form method="post" action="{{ url_for('exam.start') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn" type="submit">YANA IMTIHON</button></form>{% endif %}
+    <a class="btn w" href="{{ url_for('main.dashboard') }}">DASHBOARD</a>
+  </div>
+{% endif %}
+</div>
+{% endblock %}

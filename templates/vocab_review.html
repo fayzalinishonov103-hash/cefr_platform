@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Takrorlash — Levi{% endblock %}
+{% block content %}
+<section class="win max-w-lg mx-auto">
+  <div class="wh"><span class="dot"></span><span class="dot"></span><span>TAKRORLASH</span><span class="ml-auto">Qoldi: {{ left }}</span></div>
+  {% if word %}
+  <div class="p-6 text-center space-y-4">
+    <p class="hd text-4xl break-words">{{ word.word }}</p>
+    {% if word.context %}<p class="text-sm" style="color:var(--mut)">{{ word.context }}</p>{% endif %}
+    <div id="answer" class="hidden text-lg font-bold">{{ word.meaning or "(maʼno kiritilmagan)" }}</div>
+    <button type="button" id="showBtn" class="btn w">MAʼNOSINI KOʻRSATISH</button>
+    <form method="post" action="{{ url_for('vocab.grade', word_id=word.id) }}" id="gradeBtns" class="hidden flex gap-3 justify-center">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn w" name="result" value="unknown" type="submit">BILMADIM</button>
+      <button class="btn" name="result" value="known" type="submit">BILDIM</button>
+    </form>
+  </div>
+  {% else %}
+  <div class="p-6 text-sm"><p class="font-bold">Hozircha takrorlash uchun soʻz yoʻq.</p><a class="btn mt-4" href="{{ url_for('vocab.index') }}">LUGʻATGA QAYTISH</a></div>
+  {% endif %}
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+var sb = document.getElementById("showBtn");
+if (sb) sb.addEventListener("click", function () {
+  document.getElementById("answer").classList.remove("hidden");
+  document.getElementById("gradeBtns").classList.remove("hidden");
+  sb.classList.add("hidden");
+});
+</script>
+{% endblock %}

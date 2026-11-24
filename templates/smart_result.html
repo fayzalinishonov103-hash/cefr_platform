@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Mashq natijasi — Levi{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-5">
+  <section class="win">
+    <div class="wh"><span class="dot"></span><span class="dot"></span><span>{{ 'KUNLIK CHALLENGE' if ps.kind == 'daily' else 'AQLLI MASHQ' }} NATIJASI</span></div>
+    <div class="p-5 grid sm:grid-cols-3 gap-4 text-sm">
+      <div><p class="text-[11px]" style="color:var(--mut)">TOʻGʻRI</p><p class="hd text-5xl">{{ ps.correct }} / {{ ps.total }}</p></div>
+      <div><p class="text-[11px]" style="color:var(--mut)">OLINGAN XP</p><p class="hd text-5xl" style="color:var(--purt)">+{{ xp }}</p></div>
+      <div><p class="text-[11px]" style="color:var(--mut)">XP DARAJASI</p><p class="hd text-5xl">{{ g.level }}</p><div class="bar mt-1"><i style="width:{{ g.pct }}%"></i></div></div>
+    </div>
+    <div class="p-5 pt-0 flex gap-3 flex-wrap">
+      <a class="btn" href="{{ url_for('smart.home') }}">YANA MASHQ</a><a class="btn w" href="{{ url_for('main.dashboard') }}">DASHBOARD</a>
+    </div>
+  </section>
+  <section class="win">
+    <div class="wh"><span class="dot"></span><span>JAVOBLAR TAHLILI</span></div>
+    <div class="overflow-x-auto"><table class="w-full text-xs">
+      <thead><tr class="text-left border-b-2 border-black"><th class="p-3">Savol</th><th class="p-3">Natija</th><th class="p-3">Toʻgʻri javob</th><th class="p-3">Nega tanlangan</th></tr></thead>
+      <tbody>{% for r in rows %}<tr class="border-b border-black/20 align-top">
+        <td class="p-3">{{ r.q.text|truncate(70) }}<br><span style="color:var(--mut)">{{ r.test }} · Part {{ r.part }}</span></td>
+        <td class="p-3 font-bold">{{ 'TOʻGʻRI' if r.ok else 'XATO' }}</td><td class="p-3">{{ r.key }}</td>
+        <td class="p-3">{% for t in r.tags %}<span class="chip !py-0 !text-[10px]">{{ t }}</span> {% endfor %}</td></tr>{% endfor %}</tbody>
+    </table></div>
+  </section>
+</div>
+{% endblock %}

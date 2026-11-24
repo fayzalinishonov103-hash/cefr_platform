@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% if attempt.test.skill == 'listening' %}{% set nav_skill = 'listening' %}{% endif %}
+{% block title %}Natija — {{ attempt.test.title }}{% endblock %}
+{% block content %}
+<div class="grid lg:grid-cols-12 gap-5">
+  <section class="lg:col-span-5 win">
+    <div class="wh"><span class="dot"></span><span class="dot"></span><span>{{ attempt.test.skill|upper }} NATIJASI</span></div>
+    <div class="p-5">
+      <p class="text-[11px]" style="color:var(--mut)">TAXMINIY DARAJA</p>
+      <p class="hd text-6xl" style="color:var(--purt)">{{ attempt.cefr_level }}</p>
+      <p class="mt-3 text-sm"><b>{{ g.raw }} / {{ g.max }}</b> toʻgʻri javob</p>
+      <p class="text-sm"><b>{{ attempt.scaled_score }} / 75</b> ball</p>
+      <p class="text-[11px] mt-4" style="color:var(--mut)">Hisob soddalashtirilgan, rasmiy imtihon natijasidan farq qilishi mumkin.</p>
+      <div class="mt-5 flex gap-3 flex-wrap">
+        <a class="btn" href="{{ url_for('main.dashboard') }}">DASHBOARD</a>
+        <a class="btn w" href="{{ url_for(attempt.test.skill ~ '.tests') }}">YANA TEST</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="lg:col-span-7 win">
+    <div class="wh"><span class="dot"></span><span>SAVOL DARAJASI BOʻYICHA</span></div>
+    <div class="p-5 space-y-3 text-sm">
+      {% for level, ok, total in g.by_level %}
+      <div><div class="flex justify-between"><span><b>{{ level }}</b> savollari</span><span>{{ ok }} / {{ total }}</span></div>
+        <div class="bar mt-1"><i style="width:{{ (ok * 100 / total)|round|int }}%"></i></div></div>
+      {% endfor %}
+      <p class="text-xs" style="color:var(--mut)">Qaysi darajadagi savollarda xato qilganingiz mashqni qayerdan boshlashni koʻrsatadi.</p>
+    </div>
+  </section>
+
+  <section class="lg:col-span-12 win">
+    <div class="wh"><span class="dot"></span><span>JAVOBLAR TAHLILI</span></div>
+    <div class="p-4 space-y-6">
+      {% for part, rows in g.review|groupby('part') %}
+      <div>
+        <p class="font-bold mb-2 text-sm">Part {{ part }}</p>
+        <div class="overflow-x-auto"><table class="w-full text-xs">
+          <thead><tr class="text-left border-b-2 border-black"><th class="p-2">№</th><th class="p-2">Savol</th><th class="p-2">Sizning javobingiz</th><th class="p-2">Toʻgʻri javob</th><th class="p-2"></th></tr></thead>
+          <tbody>{% for r in rows %}
+            <tr class="border-b border-black/20 align-top">
+              <td class="p-2 font-bold">{{ r.number }}</td>
+              <td class="p-2">{{ r.text|truncate(70) }}</td>
+              <td class="p-2">{{ r.given }}</td>
+              <td class="p-2">{{ r.correct }}</td>
+              <td class="p-2"><span class="px-2 py-0.5 font-bold" style="color:#0a0a0a;background:{{ 'var(--lime)' if r.ok else '#ffb4b4' }}">{{ 'TOʻGʻRI' if r.ok else ('JAVOBSIZ' if r.empty else 'XATO') }}</span></td>
+            </tr>{% endfor %}
+          </tbody></table></div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if attempt.test.parts|selectattr('image_url')|list %}
+  <section class="lg:col-span-12 win">
+    <div class="wh"><span class="dot"></span><span>XARITA / RASMLAR</span></div>
+    <div class="p-4 grid md:grid-cols-2 gap-4 text-sm">
+      {% for p in attempt.test.parts if p.image_url %}
+      <figure><a href="{{ p.image_url }}" target="_blank" rel="noopener"><img src="{{ p.image_url }}" alt="Part {{ p.number }}" class="max-w-full border-2 border-black bg-white"></a><figcaption class="text-xs mt-1" style="color:var(--mut)">Part {{ p.number }}{% if p.title %} · {{ p.title }}{% endif %}</figcaption></figure>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if attempt.test.skill == 'listening' %}
+  <section class="lg:col-span-12 win">
+    <div class="wh"><span class="dot"></span><span>TRANSKRIPT</span></div>
+    <div class="p-4 space-y-3 text-sm">
+      {% for p in attempt.test.parts if p.passage %}
+      <details class="border-2 border-black p-3"><summary class="font-bold cursor-pointer">Part {{ p.number }}{% if p.title %} · {{ p.title }}{% endif %}</summary>
+        <div class="mt-3 space-y-2">{% for para in p.passage.split('\n\n') if para.strip() %}<p>{{ para.strip() }}</p>{% endfor %}</div></details>
+      {% else %}<p style="color:var(--mut)">Bu test uchun transkript kiritilmagan.</p>{% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

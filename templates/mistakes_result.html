@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Natija — Xatolar daftari{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-4">
+  <section class="win"><div class="wh"><span class="dot"></span><span class="dot"></span><span>NATIJA</span></div>
+    <div class="p-5 text-sm">
+      <p class="hd text-4xl">{{ fixed }} / {{ review|length }}</p>
+      <p class="mt-1">to'g'ri javob. Daftarda <b>{{ left }}</b> ta xato qoldi.</p>
+    </div></section>
+  {% for r in review %}
+  <section class="win p-4 text-sm">
+    <p class="font-bold">{{ '✓' if r.ok else '✗' }} {{ r.m.text or '—' }}</p>
+    <p class="mt-2">Sizning javobingiz: <b>{{ r.given or 'berilmadi' }}</b></p>
+    {% if not r.ok %}<p>To'g'ri javob: <b>{{ r.correct }}</b></p>{% endif %}
+    <p class="text-xs mt-1" style="color:var(--mut)">{{ r.m.test }} · Part {{ r.m.part }}</p>
+  </section>
+  {% endfor %}
+  <div class="flex gap-2 flex-wrap">
+    {% if left %}<a class="btn" href="{{ url_for('mistakes.practice', skill=skill) }}">YANA MASHQ</a>{% endif %}
+    <a class="btn w" href="{{ url_for('mistakes.index') }}">DAFTARGA</a>
+  </div>
+</div>
+{% endblock %}

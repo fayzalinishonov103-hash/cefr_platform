@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Haftalik reyting — Levi{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-5">
+  <section class="win">
+    <div class="wh"><span class="dot"></span><span class="dot"></span><span>HAFTALIK REYTING (SOʻNGGI 7 KUN XP)</span></div>
+    <div class="p-5 text-sm space-y-3">
+      {% if not member %}
+      <p>Reyting <b>ixtiyoriy</b>. Qoʻshilsangiz, faqat tanlagan taxallusingiz koʻrinadi, ismingiz va emailingiz hech kimga koʻrinmaydi. Istagan payt chiqib ketishingiz mumkin.</p>
+      <form method="post" action="{{ url_for('smart.join') }}" class="flex gap-2 flex-wrap items-end"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label class="block text-xs"><span class="block mb-1 font-bold">Taxallus (3–20 belgi: lotin harflari, raqam, _ yoki -)</span><input class="inp !w-64" name="nickname" minlength="3" maxlength="20" pattern="[A-Za-z0-9_\-]{3,20}" required></label>
+        <button class="btn" type="submit">REYTINGGA QOʻSHILISH</button></form>
+      {% else %}
+      <p>Sizning oʻrningiz: <b>#{{ mine[0] }}</b> ({{ mine[1] }}) · {{ mine[2] }} XP · jami {{ total }} ishtirokchi</p>
+      <form method="post" action="{{ url_for('smart.leave') }}" onsubmit="return confirm('Reytingdan chiqasizmi? Taxallusingiz oʻchiriladi.')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn w !py-2 !text-xs" type="submit">REYTINGDAN CHIQISH</button></form>
+      {% endif %}
+    </div>
+  </section>
+  <section class="win">
+    <div class="wh"><span class="dot"></span><span>ENG YAXSHILAR</span></div>
+    <table class="w-full text-sm"><tbody>
+      {% for rank, nick, xp, uid in top %}<tr class="border-b border-black/20 {{ 'font-bold' if mine and mine[3] == uid }}"><td class="p-3 w-14">#{{ rank }}</td><td class="p-3">{{ nick }}</td><td class="p-3 text-right">{{ xp }} XP</td></tr>
+      {% else %}<tr><td class="p-5" style="color:var(--mut)">Hozircha hech kim qoʻshilmagan.</td></tr>{% endfor %}
+    </tbody></table>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Xatolar daftari — Levi{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-5">
+  <section class="win">
+    <div class="wh"><span class="dot"></span><span class="dot"></span><span>XATOLAR DAFTARI</span></div>
+    <div class="p-5 text-sm space-y-3">
+      <p>Reading va Listening'da noto'g'ri yoki javobsiz qoldirgan savollaringiz shu yerda yig'iladi. Xatoni qayta ishlab to'g'ri javob bersangiz, u daftardan o'chadi.</p>
+      <div class="flex gap-2 flex-wrap">
+        <a class="chip {{ 'on' if not skill }}" href="{{ url_for('mistakes.index') }}">HAMMASI</a>
+        <a class="chip {{ 'on' if skill == 'reading' }}" href="{{ url_for('mistakes.index', skill='reading') }}">READING</a>
+        <a class="chip {{ 'on' if skill == 'listening' }}" href="{{ url_for('mistakes.index', skill='listening') }}">LISTENING</a>
+      </div>
+      {% if total %}
+      <p class="hd text-4xl">{{ total }} <span class="text-base">ta xato</span></p>
+      <p class="text-xs" style="color:var(--mut)">Daraja bo'yicha: {% for lv, n in levels %}<b>{{ lv }}</b> {{ n }}{{ ' · ' if not loop.last }}{% endfor %}</p>
+      <a class="btn" href="{{ url_for('mistakes.practice', skill=skill) }}">{{ size }} TA SAVOLNI MASHQ QILISH</a>
+      {% else %}
+      <p class="font-bold">Hozircha xato yo'q.</p>
+      <p style="color:var(--mut)">Reading yoki Listening testini topshiring: noto'g'ri javoblar shu yerda paydo bo'ladi.</p>
+      <div class="flex gap-2 flex-wrap"><a class="btn" href="{{ url_for('reading.tests') }}">READING</a><a class="btn w" href="{{ url_for('listening.tests') }}">LISTENING</a></div>
+      {% endif %}
+    </div>
+  </section>
+  {% if items %}
+  <section class="win">
+    <div class="wh"><span class="dot"></span><span>SO'NGGI XATOLAR</span></div>
+    <div class="overflow-x-auto"><table class="w-full text-xs">
+      <thead><tr class="text-left border-b-2 border-black"><th class="p-3">Savol</th><th class="p-3">Test</th><th class="p-3">Javobingiz</th><th class="p-3">Daraja</th><th class="p-3"></th></tr></thead>
+      <tbody>{% for m in items %}<tr class="border-b border-black/20">
+        <td class="p-3 min-w-[12rem]">{{ (m.text or '—')[:110] }}</td>
+        <td class="p-3">{{ m.test }} · Part {{ m.part }}</td>
+        <td class="p-3">{{ m.given or 'javob berilmagan' }}</td>
+        <td class="p-3">{{ m.level or '—' }}</td>
+        <td class="p-3"><a class="underline" href="{{ url_for('reading.result', attempt_id=m.attempt_id) }}">Natija</a></td></tr>{% endfor %}</tbody></table></div>
+    {% if total > items|length %}<p class="p-3 text-xs" style="color:var(--mut)">Eng so'nggi {{ items|length }} ta ko'rsatildi.</p>{% endif %}
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Yangi parol — Levi{% endblock %}
+{% block content %}
+<section class="win max-w-md mx-auto">
+  <div class="wh"><span class="dot"></span><span class="dot"></span><span>YANGI PAROL</span></div>
+  <form method="post" class="p-5 space-y-4 text-sm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label class="block">Yangi parol (kamida 10 belgi)<input class="inp mt-1" type="password" name="password" minlength="10" maxlength="128" autocomplete="new-password" data-reveal required autofocus></label>
+    <label class="block">Parolni takrorlang<input class="inp mt-1" type="password" name="password2" minlength="10" maxlength="128" autocomplete="new-password" data-reveal required></label>
+    <button class="btn w-full" type="submit">PAROLNI SAQLASH</button>
+  </form>
+</section>
+{% endblock %}

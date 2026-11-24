@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Statistika — {{ test.title }}{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+  <h1 class="hd text-3xl">STATISTIKA</h1>
+  <a href="{{ url_for('admin.index') }}" class="btn w !py-2 !text-xs">ORQAGA</a>
+</div>
+<div class="grid sm:grid-cols-3 gap-5 mb-5">
+  <div class="win p-4"><p class="text-[11px]" style="color:var(--mut)">TEST</p><p class="font-bold">{{ test.title }}</p></div>
+  <div class="win p-4"><p class="text-[11px]" style="color:var(--mut)">TOPSHIRILGAN URINISHLAR</p><p class="hd text-4xl">{{ s.attempts }}</p></div>
+  <div class="win p-4"><p class="text-[11px]" style="color:var(--mut)">OʻRTACHA BALL</p><p class="hd text-4xl">{{ s.avg if s.avg is not none else '—' }}</p></div>
+</div>
+<section class="win">
+  <div class="wh"><span class="dot"></span><span>SAVOLLAR BOʻYICHA TOʻGʻRI JAVOB %</span></div>
+  {% if s.attempts < min_n %}<p class="p-4 text-xs" style="color:var(--mut)">Savollarni belgilash uchun kamida {{ min_n }} ta urinish kerak (hozir {{ s.attempts }}).</p>{% endif %}
+  <div class="overflow-x-auto"><table class="w-full text-xs">
+    <thead><tr class="text-left border-b-2 border-black"><th class="p-3">№</th><th class="p-3">Part</th><th class="p-3">Savol</th><th class="p-3">Daraja</th><th class="p-3">Kalit</th><th class="p-3">Toʻgʻri</th><th class="p-3">Koʻp berilgan xato javob</th><th class="p-3"></th></tr></thead>
+    <tbody>{% for r in s.rows %}<tr class="border-b border-black/20 align-top">
+      <td class="p-3 font-bold">{{ r.number }}</td><td class="p-3">{{ r.part }}</td><td class="p-3">{{ r.text|truncate(60) }}</td><td class="p-3">{{ r.level }}</td><td class="p-3">{{ r.key }}</td>
+      <td class="p-3 w-36">{% if r.pct is not none %}<b>{{ r.pct }}%</b><div class="bar mt-1"><i style="width:{{ r.pct }}%"></i></div>{% else %}—{% endif %}</td>
+      <td class="p-3">{{ r.common_wrong }}</td>
+      <td class="p-3">{% if r.flag %}<span class="px-2 py-0.5 font-bold" style="color:#0a0a0a;background:#ffe08a">{{ r.flag }}</span>{% endif %}</td></tr>{% endfor %}</tbody>
+  </table></div>
+</section>
+{% endblock %}

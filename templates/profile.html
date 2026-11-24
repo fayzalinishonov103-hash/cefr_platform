@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Skillar profili — Levi{% endblock %}
+{% block content %}
+{% set W, H, PAD = p.chart_size %}
+<div class="grid lg:grid-cols-12 gap-5">
+  <section class="lg:col-span-4 win">
+    <div class="wh"><span class="dot"></span><span class="dot"></span><span>UMUMIY DARAJA</span></div>
+    <div class="p-5">
+      <p class="hd text-6xl" style="color:var(--purt)">{{ p.overall_level or "—" }}</p>
+      {% if p.overall is not none %}<p class="text-sm mt-2"><b>{{ p.overall }} / 75</b> ball</p>
+      <p class="text-[11px] mt-3" style="color:var(--mut)">Reading, Listening, Writing va Speaking oxirgi natijalarining oʻrtachasi (faqat topshirilgan skillar hisobga olinadi).</p>
+      {% else %}<p class="text-sm mt-2" style="color:var(--mut)">Birinchi test natijangizdan keyin chiqadi.</p>{% endif %}
+    </div>
+  </section>
+
+  <section class="lg:col-span-8 win">
+    <div class="wh"><span class="dot"></span><span>SKILLAR YONMA-YON</span></div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-0">
+      {% for key, label, url in [('reading','READING', url_for('reading.tests')), ('listening','LISTENING', url_for('listening.tests')), ('writing','WRITING', url_for('writing.tasks')), ('speaking','SPEAKING', url_for('speaking.tasks'))] %}
+      <div class="p-5 {{ 'sm:border-r-2 border-black' if not loop.last }}">
+        <p class="text-[11px]" style="color:var(--mut)">{{ label }}</p>
+        <p class="hd text-4xl">{{ p.levels[key] or "—" }}</p>
+        {% if p.latest[key] is not none %}
+        <p class="text-xs mt-1">{{ p.latest[key] }} / 75 · {{ p.counts[key] }} ta urinish</p>
+        <div class="bar mt-2"><i style="width:{{ (p.latest[key] * 100 / 75)|round|int }}%"></i></div>
+        {% else %}<p class="text-xs mt-1" style="color:var(--mut)">Hali topshirilmagan.</p><a class="btn !py-1 !text-[11px] mt-2" href="{{ url }}">BOSHLASH</a>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="lg:col-span-12 win">
+    <div class="wh"><span class="dot"></span><span>NATIJALAR OʻSISHI</span>
+      <span class="ml-auto text-[11px]">● Reading &nbsp; ▲ Listening &nbsp; ◆ Writing &nbsp; ■ Speaking</span></div>
+    <div class="p-4">
+    {% if p.chart.reading.dots or p.chart.writing.dots or p.chart.listening.dots or p.chart.speaking.dots %}
+      <div class="overflow-x-auto"><svg viewBox="0 0 {{ W }} {{ H }}" class="w-full min-w-[420px]" role="img" aria-label="Natijalar oʻsishi grafigi">
+        {% for v in (0, 25, 50, 75) %}{% set y = H - PAD - (H - 2 * PAD) * v / 75 %}
+        <line x1="{{ PAD }}" x2="{{ W - PAD }}" y1="{{ y }}" y2="{{ y }}" stroke="var(--line)" stroke-opacity=".25"/>
+        <text x="2" y="{{ y + 4 }}" font-size="10" fill="var(--wtx)">{{ v }}</text>{% endfor %}
+        {% if p.chart.reading.dots|length > 1 %}<polyline points="{{ p.chart.reading.points }}" fill="none" stroke="var(--purt)" stroke-width="3"/>{% endif %}
+        {% if p.chart.writing.dots|length > 1 %}<polyline points="{{ p.chart.writing.points }}" fill="none" stroke="var(--wtx)" stroke-width="2.5" stroke-dasharray="6 4"/>{% endif %}
+        {% if p.chart.speaking.dots|length > 1 %}<polyline points="{{ p.chart.speaking.points }}" fill="none" stroke="#0e9f8e" stroke-width="2.5" stroke-dasharray="10 3 2 3"/>{% endif %}
+        {% for d in p.chart.speaking.dots %}<rect x="{{ d.x - 5 }}" y="{{ d.y - 5 }}" width="10" height="10" fill="#0e9f8e" stroke="var(--line)"><title>Speaking {{ d.date }}: {{ d.score }}/75</title></rect>{% endfor %}
+        {% if p.chart.listening.dots|length > 1 %}<polyline points="{{ p.chart.listening.points }}" fill="none" stroke="#e11d74" stroke-width="2.5" stroke-dasharray="2 4"/>{% endif %}
+        {% for d in p.chart.listening.dots %}<polygon points="{{ d.x }},{{ d.y - 6 }} {{ d.x + 6 }},{{ d.y + 5 }} {{ d.x - 6 }},{{ d.y + 5 }}" fill="#e11d74" stroke="var(--line)"><title>Listening {{ d.date }}: {{ d.score }}/75</title></polygon>{% endfor %}
+        {% for d in p.chart.reading.dots %}<circle cx="{{ d.x }}" cy="{{ d.y }}" r="5" fill="var(--purt)"><title>Reading {{ d.date }}: {{ d.score }}/75</title></circle>{% endfor %}
+        {% for d in p.chart.writing.dots %}<rect x="{{ d.x - 5 }}" y="{{ d.y - 5 }}" width="10" height="10" transform="rotate(45 {{ d.x }} {{ d.y }})" fill="var(--wtx)"><title>Writing {{ d.date }}: {{ d.score }}/75</title></rect>{% endfor %}
+      </svg></div>
+      <p class="text-[11px]" style="color:var(--mut)">Oxirgi 10 ta urinish, chapdan oʻngga eskidan yangiga. Balli 0–75 shkalada.</p>
+    {% else %}<p class="text-sm" style="color:var(--mut)">Grafik birinchi natijadan keyin paydo boʻladi.</p>{% endif %}
+    </div>
+  </section>
+
+  <section class="lg:col-span-12 win">
+    <div class="wh"><span class="dot"></span><span>ZAIF JOYLAR TAHLILI (READING)</span></div>
+    <div class="p-5 space-y-5 text-sm">
+    {% if w.attempts == 0 %}
+      <p style="color:var(--mut)">Tahlil uchun kamida bitta Reading testini topshiring.</p>
+    {% else %}
+      {% if w.insights %}<ul class="list-disc ml-5 space-y-1 font-bold">{% for i in w.insights %}<li>{{ i }}</li>{% endfor %}</ul>
+      {% else %}<p style="color:var(--mut)">Hozircha aniq zaif joy koʻrinmayapti (yoki savollar soni kam). Koʻproq test topshirsangiz tahlil aniqlashadi.</p>{% endif %}
+      <div class="grid md:grid-cols-2 gap-6">
+        <div><p class="font-bold mb-2">Savol turi boʻyicha (xato %)</p>
+          {% for t in w.types %}<div class="mb-2"><div class="flex justify-between"><span>{{ t.label }}</span><span>{{ t.wrong_pct }}% · {{ t.total - t.ok }}/{{ t.total }}</span></div>
+            <div class="bar mt-1"><i style="width:{{ t.wrong_pct }}%"></i></div></div>{% endfor %}</div>
+        <div><p class="font-bold mb-2">Savol darajasi boʻyicha (xato %)</p>
+          {% for l in w.levels %}<div class="mb-2"><div class="flex justify-between"><span>{{ l.label }}</span><span>{{ l.wrong_pct }}% · {{ l.total - l.ok }}/{{ l.total }}</span></div>
+            <div class="bar mt-1"><i style="width:{{ l.wrong_pct }}%"></i></div></div>{% endfor %}</div>
+      </div>
+      <p class="text-[11px]" style="color:var(--mut)">Oxirgi {{ w.attempts }} ta urinish asosida. Kamida {{ 3 }} ta savol boʻlgandagina xulosa chiqariladi.</p>
+    {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

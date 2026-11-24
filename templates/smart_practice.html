@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Kunlik challenge' if ps.kind == 'daily' else 'Aqlli mashq' }} — Levi{% endblock %}
+{% block ticker %}{% endblock %}
+{% from "_qfield.html" import field %}
+{% block content %}
+<form method="post" action="{{ url_for('smart.submit', set_id=ps.id) }}" class="max-w-2xl mx-auto space-y-4">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <p class="hd text-2xl text-white">{{ 'Kunlik challenge' if ps.kind == 'daily' else 'Aqlli mashq' }}</p>
+  <p class="text-xs text-white/80">Bu savollar sizning zaif joylaringizga qarab tanlandi. Sabablari har savol ustida yozilgan.</p>
+  {% for c in cards %}
+  <section class="win p-4 read">
+    <p class="text-[11px] mb-1" style="color:var(--mut)">{{ loop.index }}. {{ c.test }} · Part {{ c.part }}</p>
+    {% if c.tags %}<p class="flex gap-1 flex-wrap mb-2">{% for t in c.tags %}<span class="chip !py-0 !text-[10px]">{{ t }}</span>{% endfor %}</p>{% endif %}
+    {% if c.instruction %}<p class="text-xs mb-2" style="color:var(--mut)">{{ c.instruction }}</p>{% endif %}
+    {% if c.image %}<a href="{{ c.image }}" target="_blank" rel="noopener"><img src="{{ c.image }}" alt="Xarita yoki rasm" class="max-w-full max-h-96 mx-auto mb-3 border-2 border-black bg-white"></a>{% endif %}
+    {% if c.audio %}<audio controls preload="none" src="{{ c.audio }}" class="w-full mb-3"></audio>{% endif %}
+    {% if c.paras %}<details class="mb-3"><summary class="cursor-pointer text-xs font-bold">MATNNI KOʻRISH</summary>
+      <div class="passage p-4 mt-2 max-h-72 overflow-y-auto">{% for p in c.paras %}<p>{{ p }}</p>{% endfor %}</div></details>{% endif %}
+    {{ field(c, 's') }}
+  </section>
+  {% endfor %}
+  <button class="btn" type="submit">TEKSHIRISH</button>
+</form>
+{% endblock %}

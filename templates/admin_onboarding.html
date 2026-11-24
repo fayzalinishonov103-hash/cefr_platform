@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Statistika — Levi{% endblock %}
+{% block content %}
+<div class="grid sm:grid-cols-3 lg:grid-cols-5 gap-5 mb-5">
+  {% for label, value in [('FOYDALANUVCHILAR', users), ('SHU HAFTADA YANGI', new7), ('ONBOARDINGNI TUGATGAN', done), ('STATISTIKAGA ROZI', consented), ('AI CHAQIRUVLAR (24 SOAT)', ai24 ~ (' / ' ~ ai_cap if ai_cap else ''))] %}
+  <div class="win p-4"><p class="text-[11px]" style="color:var(--mut)">{{ label }}</p><p class="hd text-4xl">{{ value }}</p></div>
+  {% endfor %}
+</div>
+<p class="text-xs mb-4"><a class="underline" href="{{ url_for('admin.index') }}">← Admin</a> · Yosh, viloyat va manba faqat rozi boʻlgan foydalanuvchilardan.</p>
+<section class="win mb-5">
+  <div class="wh"><span class="dot"></span><span>VORONKA: QAYERDA TOʻKILYAPTI</span></div>
+  <div class="p-4 text-xs space-y-3">
+    {% for label, n in funnel %}<div><div class="flex justify-between"><span>{{ label }}</span><b>{{ n }}{% if users %} · {{ (n / users * 100)|round|int }}%{% endif %}</b></div>
+      <div class="bar mt-1"><i style="width:{{ (n / users * 100)|round|int if users else 0 }}%"></i></div></div>{% endfor %}
+  </div>
+</section>
+<div class="grid md:grid-cols-2 gap-5">
+  {% for title, rows in data.items() %}
+  <section class="win">
+    <div class="wh"><span class="dot"></span><span>{{ title|upper }}</span></div>
+    <div class="p-4 text-xs space-y-2">
+      {% set top = (rows|map(attribute=1)|max) if rows else 1 %}
+      {% for name, n in rows %}
+      <div><div class="flex justify-between"><span>{{ name }}</span><b>{{ n }}</b></div><div class="bar mt-1"><i style="width:{{ (n / top * 100)|round|int }}%"></i></div></div>
+      {% else %}<p style="color:var(--mut)">Hali maʼlumot yoʻq.</p>{% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

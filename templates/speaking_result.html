@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Speaking natijasi — Levi{% endblock %}
+{% block content %}
+<div class="grid lg:grid-cols-12 gap-5">
+  <section class="lg:col-span-4 win">
+    <div class="wh"><span class="dot"></span><span class="dot"></span><span>SPEAKING NATIJASI</span></div>
+    <div class="p-5">
+      <p class="text-[11px]" style="color:var(--mut)">TAXMINIY DARAJA</p>
+      <p class="hd text-6xl" style="color:var(--purt)">{{ g.level }}</p>
+      <p class="text-sm mt-2"><b>{{ g.scaled }} / 75</b> ball · {{ f.words }} soʻz{% if f.seconds %} · {{ f.seconds }} soniya{% endif %}</p>
+      <p class="text-xs mt-1" style="color:var(--mut)">{{ f.title }}</p>
+      {% if not g.on_topic %}<p class="text-xs mt-3 font-bold">Javob topshiriqqa mos kelmadi yoki ingliz tilida emas.</p>{% endif %}
+      <p class="text-[11px] mt-4" style="color:var(--mut)">Bu AI bahosi, taxminiy. U ovozni emas, matnga aylantirilgan javobni baholaydi, shuning uchun talaffuz hisobga olinmagan.</p>
+      <div class="mt-5 flex gap-3 flex-wrap">
+        <a class="btn" href="{{ url_for('speaking.task', prompt_id=f.prompt_id) }}">QAYTA GAPIRISH</a>
+        <a class="btn w" href="{{ url_for('main.dashboard') }}">DASHBOARD</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="lg:col-span-8 win">
+    <div class="wh"><span class="dot"></span><span>MEZONLAR</span></div>
+    <div class="p-4 space-y-4 read">
+      {% for c in g.criteria %}
+      <div><div class="flex justify-between"><b>{{ c.label }}</b><span class="chip on !py-0">{{ c.level }}</span></div>
+        <div class="bar mt-1"><i style="width:{{ (c.points * 100 / 75)|round|int }}%"></i></div>
+        {% if c.comment %}<p class="text-xs mt-1" style="color:var(--mut)">{{ c.comment }}</p>{% endif %}</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if g.strengths or g.next_steps %}
+  <section class="lg:col-span-12 grid md:grid-cols-2 gap-5">
+    <div class="win"><div class="wh"><span class="dot"></span><span>YAXSHI TOMONLARI</span></div>
+      <ul class="p-4 read list-disc ml-5 space-y-1">{% for x in g.strengths %}<li>{{ x }}</li>{% else %}<li>—</li>{% endfor %}</ul></div>
+    <div class="win"><div class="wh"><span class="dot"></span><span>KEYINGI QADAMLAR</span></div>
+      <ul class="p-4 read list-disc ml-5 space-y-1">{% for x in g.next_steps %}<li>{{ x }}</li>{% else %}<li>—</li>{% endfor %}</ul></div>
+  </section>
+  {% endif %}
+
+  {% if g.errors %}
+  <section class="lg:col-span-12 win">
+    <div class="wh"><span class="dot"></span><span>XATOLAR TAHLILI</span></div>
+    <div class="overflow-x-auto"><table class="w-full text-xs">
+      <thead><tr class="text-left border-b-2 border-black"><th class="p-3">Siz aytdingiz</th><th class="p-3">Toʻgʻrisi</th><th class="p-3">Tushuntirish</th></tr></thead>
+      <tbody>{% for e in g.errors %}<tr class="border-b border-black/20 align-top">
+        <td class="p-3">{{ e.original }}</td><td class="p-3 font-bold">{{ e.correction }}</td><td class="p-3">{{ e.explanation }}</td></tr>{% endfor %}</tbody>
+    </table></div>
+  </section>
+  {% endif %}
+
+  <section class="lg:col-span-12 win">
+    <div class="wh"><span class="dot"></span><span>JAVOBINGIZ MATNI (TRANSKRIPT)</span></div>
+    <div class="p-5 read whitespace-pre-line">{{ f.text }}</div>
+  </section>
+</div>
+{% endblock %}

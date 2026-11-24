@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+{% if is_listening %}{% set nav_skill = 'listening' %}{% endif %}
+{% block title %}{{ test.title }} — Levi{% endblock %}
+{% block ticker %}{% endblock %}
+
+{% macro question(q, qtype) %}
+<div class="flex gap-3 items-start">
+  <span class="ic !w-8 !h-8 text-xs shrink-0">{{ q.number }}</span>
+  <div class="flex-1">
+  {% if qtype == 'gap_fill' %}
+    {% set bits = q.text.split('___') %}
+    <label>{{ bits[0] }}<input class="inp !inline-block !w-36 !py-1 mx-1" name="q{{ q.number }}" maxlength="60" autocomplete="off">{{ bits[1] }}</label>
+  {% elif qtype in ('match', 'heading', 'map') %}
+    <label class="block"><span class="block mb-1">{{ q.text }}</span>
+      <select class="inp" name="q{{ q.number }}">
+        <option value="">— tanlang —</option>
+        {% for v, label in q.options %}<option value="{{ v }}">{{ v }}{% if label and label != v %}. {{ label }}{% endif %}</option>{% endfor %}
+      </select></label>
+  {% else %}
+    <p class="mb-2">{{ q.text }}</p>
+    {% for v, label in q.options %}
+    <label class="ropt"><input type="radio" name="q{{ q.number }}" value="{{ v }}"><span>{{ label }}</span></label>
+    {% endfor %}
+  {% endif %}
+  </div>
+</div>
+{% endmacro %}
+
+{% block content %}
+<noscript><style>.part.hidden{display:block!important}</style></noscript>
+<form id="testForm" method="post" action="{{ url_for('reading.submit', attempt_id=attempt.id) }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div class="sticky top-0 z-30 win mb-4">
+    <div class="flex flex-wrap items-center justify-between gap-2 p-2">
+      <div class="flex flex-wrap gap-2" id="partNav">
+        {% for p in parts %}
+        <button type="button" class="chip {{ 'on' if loop.first }}" data-goto="{{ p.number }}">PART {{ p.number }} <span class="text-[10px]" data-count="{{ p.number }}" data-total="{{ p.total }}">0/{{ p.total }}</span></button>
+        {% endfor %}
+      </div>
+      <div class="font-bold text-sm">VAQT <span id="timer" class="px-1">--:--</span></div>
+    </div>
+  </div>
+
+  {% for p in parts %}
+  <section class="part {{ '' if loop.first else 'hidden' }}" id="part-{{ p.number }}" data-part="{{ p.number }}">
+    <div class="lg:grid lg:grid-cols-2 lg:gap-5 lg:items-start">
+    {% if is_listening %}
+    <div class="win" data-audio-box="{{ p.number }}">
+      <div class="wh"><span class="dot"></span><span class="dot"></span><span>PART {{ p.number }} · {{ p.title }}</span></div>
+      <div class="p-5 space-y-3 text-sm">
+        {% if p.audio_url %}
+        <audio preload="auto" src="{{ p.audio_url }}" data-audio></audio>
+        <p>Audio <b>{{ plays }}</b> marta eshittiriladi. Pauza va orqaga qaytarish yoʻq, shuning uchun tayyor boʻlgach bosing.</p>
+        <div class="flex items-center gap-3 flex-wrap">
+          <button type="button" class="btn" data-audio-play>▶ ESHITISH</button>
+          <span class="text-xs">Qolgan tinglash: <b data-plays-left data-max="{{ plays }}">{{ plays }}</b></span>
+        </div>
+        <div class="bar"><i data-audio-bar style="width:0%"></i></div>
+        <p class="text-xs" data-audio-note aria-live="polite"></p>
+        {% else %}<p>Bu part uchun audio yuklanmagan. Administratorga xabar bering.</p>{% endif %}
+        {% if p.image_url %}<a href="{{ p.image_url }}" target="_blank" rel="noopener" title="Katta ochish"><img src="{{ p.image_url }}" alt="{{ p.title or 'Xarita' }}" class="max-w-full mx-auto border-2 border-black bg-white"></a><p class="text-[11px]" style="color:var(--mut)">Rasmni bosing: katta oynada ochiladi.</p>{% endif %}
+      </div>
+    </div>
+    {% else %}
+    <div class="win sticky top-[58px] z-20 lg:top-[70px]">
+      <div class="wh"><span class="dot"></span><span class="dot"></span><span>PART {{ p.number }} · {{ p.title }}</span>
+        <span class="ml-auto flex gap-1"><button type="button" class="chip !py-0 !px-2" data-fs="-1" aria-label="Matnni kichraytirish">A−</button><button type="button" class="chip !py-0 !px-2" data-fs="1" aria-label="Matnni kattalashtirish">A+</button></span></div>
+      <div class="passage p-5 max-h-[40vh] overflow-y-auto lg:max-h-[calc(100vh-150px)]">
+        {% if p.image_url %}<a href="{{ p.image_url }}" target="_blank" rel="noopener" title="Katta ochish"><img src="{{ p.image_url }}" alt="{{ p.title or 'Rasm' }}" class="max-w-full mx-auto mb-3 border-2 border-black bg-white"></a>{% endif %}
+        {% for label, para in p.paragraphs %}<p>{% if label %}<b>{{ label }}</b> {% endif %}{{ para }}</p>
+        {% else %}<p>Matn topilmadi.</p>{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    <div class="win mt-5 lg:mt-0">
+      <div class="wh"><span class="dot"></span><span>SAVOLLAR {{ p.first }}–{{ p.last }}</span></div>
+      <div class="p-4 space-y-7 read">
+        {% for g in p.groups %}
+        <div>
+          <p class="font-bold mb-4">{{ g.instruction }}</p>
+          <div class="space-y-5">{% for q in g.questions %}{{ question(q, g.qtype) }}{% endfor %}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    </div>
+    {% if not is_listening %}
+    <div class="win mt-5" data-hint-box="{{ p.number }}">
+      <div class="wh"><span class="dot"></span><span>AI MASLAHAT</span></div>
+      <div class="p-4 space-y-3 read">
+        <p style="color:var(--mut)">Tiqilib qoldingizmi? AI javobni aytmaydi, lekin qiyin soʻzni tushuntiradi yoki matnning qaysi qismiga qarashni koʻrsatadi.</p>
+        <div class="flex flex-wrap gap-3 items-end">
+          <label class="block">Savol
+            <select class="inp !w-auto mt-1" data-hint-q>
+              <option value="">Butun part</option>
+              {% for n in p.numbers %}<option value="{{ n }}">{{ n }}-savol</option>{% endfor %}
+            </select></label>
+          <button type="button" class="btn p" data-hint-btn="{{ p.number }}">AI MASLAHAT OLISH</button>
+          <span class="text-xs">Qolgan: <b data-hint-left>{{ p.hints_left }}</b></span>
+        </div>
+        <div data-hint-out class="hidden border-2 border-black p-3" aria-live="polite"></div>
+        <div class="flex flex-wrap gap-2 items-end pt-2 border-t-2 border-black" data-vocab-box>
+          <label class="block text-xs">Soʻzni lugʻatga saqlash<input class="inp !w-44 mt-1" data-vocab-word maxlength="80" placeholder="masalan: reliable"></label>
+          <label class="block text-xs">Maʼnosi (ixtiyoriy)<input class="inp !w-44 mt-1" data-vocab-meaning maxlength="200"></label>
+          <button type="button" class="btn w !py-2 !text-xs" data-vocab-save>SAQLASH</button>
+          <span class="text-xs" data-vocab-note aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    <div class="flex justify-between mt-5 mb-8">
+      {% if loop.first %}<span></span>{% else %}<button type="button" class="btn w" data-goto="{{ p.number - 1 }}">OLDINGI PART</button>{% endif %}
+      {% if loop.last %}<button type="submit" class="btn">TESTNI TOPSHIRISH</button>
+      {% else %}<button type="button" class="btn" data-goto="{{ p.number + 1 }}">KEYINGI PART</button>{% endif %}
+    </div>
+  </section>
+  {% endfor %}
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const form = document.getElementById("testForm");
+  if (!form) return;
+  const KEY = "cefr-attempt-{{ attempt.id }}";
+  const parts = [...form.querySelectorAll(".part")];
+  const chips = [...document.querySelectorAll("#partNav .chip")];
+  let forced = false;
+
+  // ---- Part navigation: hide all, show target, highlight button, scroll to top ----
+  function show(n) {
+    parts.forEach(p => p.classList.toggle("hidden", +p.dataset.part !== n));
+    chips.forEach(c => c.classList.toggle("on", +c.dataset.goto === n));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.addEventListener("click", e => {
+    const b = e.target.closest("[data-goto]");
+    if (b) show(+b.dataset.goto);
+  });
+
+  // ---- Answered counters ----
+  function answeredIn(root) {
+    const seen = new Set();
+    root.querySelectorAll("input[name^=q],select[name^=q]").forEach(el => {
+      if (el.type === "radio" ? el.checked : el.value.trim()) seen.add(el.name);
+    });
+    return seen.size;
+  }
+  function refresh() {
+    parts.forEach(p => {
+      const c = document.querySelector('[data-count="' + p.dataset.part + '"]');
+      if (c) c.textContent = answeredIn(p) + "/" + c.dataset.total;
+    });
+  }
+
+  // ---- Autosave to localStorage (survives refresh; never required) ----
+  function save() {
+    try {
+      const data = {};
+      new FormData(form).forEach((v, k) => { if (k.startsWith("q")) data[k] = v; });
+      localStorage.setItem(KEY, JSON.stringify(data));
+    } catch (e) {}
+  }
+  function restore() {
+    try {
+      const data = JSON.parse(localStorage.getItem(KEY) || "{}");
+      Object.entries(data).forEach(([k, v]) => {
+        const radio = form.querySelector('input[type=radio][name="' + k + '"][value="' + v + '"]');
+        if (radio) { radio.checked = true; return; }
+        const el = form.querySelector('[name="' + k + '"]:not([type=radio])');
+        if (el) el.value = v;
+      });
+    } catch (e) {}
+  }
+  form.addEventListener("input", () => { save(); refresh(); });
+  form.addEventListener("change", () => { save(); refresh(); });
+  restore(); refresh();
+
+  // Enter inside a text box must not submit the whole test by accident
+  form.addEventListener("keydown", e => {
+    if (e.key === "Enter" && e.target.tagName === "INPUT") e.preventDefault();
+  });
+
+  // ---- Manual submit with a check for unanswered questions ----
+  form.addEventListener("submit", e => {
+    if (!forced) {
+      const total = parts.reduce((s, p) => s + (+document.querySelector('[data-count="' + p.dataset.part + '"]').dataset.total), 0);
+      const left = total - parts.reduce((s, p) => s + answeredIn(p), 0);
+      if (left > 0 && !confirm(left + " ta savol javobsiz. Baribir topshirasizmi?")) { e.preventDefault(); return; }
+    }
+    try { localStorage.removeItem(KEY); } catch (err) {}
+  });
+
+  // ---- Timer: starts from the server's remaining seconds ----
+  const left0 = {{ remaining|int }}, t0 = performance.now(), box = document.getElementById("timer");
+  const timer = setInterval(function tick() {
+    const s = Math.max(0, left0 - Math.floor((performance.now() - t0) / 1000));
+    box.textContent = String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+    if (s <= 300) box.classList.add("warn");
+    if (s <= 0) { clearInterval(timer); forced = true; try { localStorage.removeItem(KEY); } catch (err) {} form.submit(); }
+  }, 1000);
+
+  // ---- AI hint: POST current part/question, show the reply (text only, never HTML) ----
+  const csrf = form.querySelector("[name=csrf_token]").value;
+  function currentAnswer(n) {
+    const radio = form.querySelector('input[type=radio][name="q' + n + '"]:checked');
+    if (radio) return radio.value;
+    const el = form.querySelector('[name="q' + n + '"]:not([type=radio])');
+    return el ? el.value.trim() : "";
+  }
+  document.addEventListener("click", async e => {
+    const btn = e.target.closest("[data-hint-btn]");
+    if (!btn) return;
+    const box = btn.closest("[data-hint-box]");
+    const out = box.querySelector("[data-hint-out]");
+    const q = box.querySelector("[data-hint-q]").value;
+    btn.disabled = true;
+    out.classList.remove("hidden");
+    out.textContent = "AI oʻylayapti…";
+    try {
+      const r = await fetch("{{ url_for('ai.hint', attempt_id=attempt.id) }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": csrf },
+        body: JSON.stringify({ part: +btn.dataset.hintBtn, question: q ? +q : null, user_answer: q ? currentAnswer(q) : "" })
+      });
+      const d = await r.json().catch(() => ({}));
+      out.textContent = d.hint || d.error || "Xatolik yuz berdi. Keyinroq urinib koʻring.";
+      if (typeof d.left === "number") box.querySelector("[data-hint-left]").textContent = d.left;
+    } catch (err) {
+      out.textContent = "Internet aloqasi yoʻq. Test davom etadi, keyinroq urinib koʻring.";
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  // ---- Save a word to the vocabulary notebook (works during the test, never blocks it) ----
+  document.addEventListener("click", async e => {
+    const btn = e.target.closest("[data-vocab-save]");
+    if (!btn) return;
+    const box = btn.closest("[data-vocab-box]");
+    const hintBox = btn.closest("[data-hint-box]");
+    const note = box.querySelector("[data-vocab-note]");
+    const word = box.querySelector("[data-vocab-word]").value.trim();
+    if (!word) { note.textContent = "Soʻzni kiriting."; return; }
+    const hintText = hintBox.querySelector("[data-hint-out]").textContent.trim();
+    btn.disabled = true;
+    try {
+      const r = await fetch("{{ url_for('vocab.add') }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json", "X-CSRFToken": csrf },
+        body: JSON.stringify({ word: word, meaning: box.querySelector("[data-vocab-meaning]").value,
+                               context: hintText.startsWith("AI oʻylayapti") ? "" : hintText.slice(0, 280) })
+      });
+      const d = await r.json().catch(() => ({}));
+      note.textContent = d.note || d.error || "Saqlanmadi, qayta urinib koʻring.";
+      if (r.ok) { box.querySelector("[data-vocab-word]").value = ""; box.querySelector("[data-vocab-meaning]").value = ""; }
+    } catch (err) {
+      note.textContent = "Internet aloqasi yoʻq.";
+    } finally { btn.disabled = false; }
+  });
+
+  // ---- Listening: each part plays from the start, no pause or seek, limited number of plays ----
+  // (the limit is enforced in the browser and remembered per attempt; it is a practice aid, not exam security)
+  document.querySelectorAll("[data-audio-box]").forEach(box => {
+    const audio = box.querySelector("[data-audio]");
+    if (!audio) return;
+    const btn = box.querySelector("[data-audio-play]"), leftEl = box.querySelector("[data-plays-left]");
+    const bar = box.querySelector("[data-audio-bar]"), note = box.querySelector("[data-audio-note]");
+    const pkey = "cefr-plays-{{ attempt.id }}-" + box.dataset.audioBox;
+    let left = +leftEl.dataset.max;
+    try { const saved = localStorage.getItem(pkey); if (saved !== null) left = Math.min(left, Math.max(0, +saved)); } catch (e) {}
+    function paint() {
+      leftEl.textContent = left;
+      btn.disabled = left <= 0 || !audio.paused;
+      if (left <= 0 && audio.paused) note.textContent = "Tinglash imkoniyati tugadi.";
+    }
+    btn.addEventListener("click", () => {
+      if (left <= 0 || !audio.paused) return;
+      audio.currentTime = 0;
+      audio.play().then(() => {
+        left -= 1;
+        try { localStorage.setItem(pkey, left); } catch (e) {}
+        note.textContent = "Audio eshittirilmoqda…"; paint();
+      }).catch(() => { note.textContent = "Audio ochilmadi. Internetni tekshirib, qayta bosing."; });
+    });
+    audio.addEventListener("timeupdate", () => { if (audio.duration) bar.style.width = (100 * audio.currentTime / audio.duration) + "%"; });
+    audio.addEventListener("ended", () => { note.textContent = left > 0 ? "Audio tugadi." : ""; bar.style.width = "0%"; paint(); });
+    audio.addEventListener("error", () => { note.textContent = "Audio yuklanmadi. Sahifani yangilang yoki administratorga xabar bering."; });
+    paint();
+  });
+
+  // ---- Passage text size (A- / A+), remembered between visits ----
+  let fs = 17;
+  try { fs = +localStorage.getItem("cefr-fs") || 17; } catch (e) {}
+  function applyFs() {
+    fs = Math.min(24, Math.max(14, fs));
+    document.documentElement.style.setProperty("--read-size", fs + "px");
+    try { localStorage.setItem("cefr-fs", fs); } catch (e) {}
+  }
+  applyFs();
+  document.addEventListener("click", e => {
+    const b = e.target.closest("[data-fs]");
+    if (b) { fs += +b.dataset.fs; applyFs(); }
+  });
+})();
+</script>
+{% endblock %}

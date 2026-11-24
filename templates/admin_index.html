@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Admin — Levi{% endblock %}
+{% block content %}
+<div class="grid sm:grid-cols-3 gap-5 mb-5">
+  {% for label, value in [('FOYDALANUVCHILAR', stats.users), ('TESTLAR', stats.tests), ('TOPSHIRILGAN URINISHLAR', stats.attempts)] %}
+  <div class="win p-4"><p class="text-[11px]" style="color:var(--mut)">{{ label }}</p><p class="hd text-4xl">{{ value }}</p></div>
+  {% endfor %}
+</div>
+<section class="win">
+  <div class="wh"><span class="dot"></span><span class="dot"></span><span>TESTLAR</span>
+    <span class="ml-auto flex gap-2"><a href="{{ url_for('admin.users') }}" class="btn w !py-1 !text-[11px]">FOYDALANUVCHILAR</a><a href="{{ url_for('onboarding.stats') }}" class="btn w !py-1 !text-[11px]">ONBOARDING</a><a href="{{ url_for('admin.writing_prompts') }}" class="btn w !py-1 !text-[11px]">WRITING</a><a href="{{ url_for('admin_shadowing.manage') }}" class="btn w !py-1 !text-[11px]">SHADOWING</a><a href="{{ url_for('admin.speaking_prompts') }}" class="btn w !py-1 !text-[11px]">SPEAKING</a><a href="{{ url_for('admin.import_test') }}" class="btn p !py-1 !text-[11px]">AI BILAN IMPORT</a>
+    <a href="{{ url_for('admin_ai.listening_generate') }}" class="btn w !py-1 !text-[11px]">AI BILAN LISTENING</a>
+    <a href="{{ url_for('admin.new_test', skill='listening') }}" class="btn w !py-1 !text-[11px]">+ LISTENING</a>
+    <a href="{{ url_for('admin.new_test') }}" class="btn !py-1 !text-[11px]">+ READING</a></span></div>
+  <div class="overflow-x-auto"><table class="w-full text-xs">
+    <thead><tr class="text-left border-b-2 border-black"><th class="p-3">Nomi</th><th class="p-3">Skill</th><th class="p-3">Holat</th><th class="p-3">Savollar</th><th class="p-3">Urinishlar</th><th class="p-3">Amallar</th></tr></thead>
+    <tbody>
+    {% for r in rows %}{% set t = r.test %}
+      <tr class="border-b border-black/20 align-middle">
+        <td class="p-3 font-bold">{{ t.title }}</td><td class="p-3">{{ t.skill|upper }}</td>
+        <td class="p-3"><span class="px-2 py-0.5 font-bold" style="color:#0a0a0a;background:{{ 'var(--lime)' if t.is_active else '#ddd' }}">{{ 'FAOL' if t.is_active else 'YASHIRIN' }}</span></td>
+        <td class="p-3">{{ r.questions }}</td><td class="p-3">{{ r.attempts }}</td>
+        <td class="p-3"><div class="flex flex-wrap gap-2">
+          <a class="btn w !py-1 !text-[11px]" href="{{ url_for('admin.edit_test', test_id=t.id) }}">TAHRIRLASH</a>
+          <a class="btn w !py-1 !text-[11px]" href="{{ url_for('admin.test_stats', test_id=t.id) }}">STATISTIKA</a>
+          <form method="post" action="{{ url_for(t.skill ~ '.start', test_id=t.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn w !py-1 !text-[11px]">SINAB KOʻRISH</button></form>
+          <form method="post" action="{{ url_for('admin.toggle', test_id=t.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn w !py-1 !text-[11px]">{{ 'YASHIRISH' if t.is_active else 'YOQISH' }}</button></form>
+          <form method="post" action="{{ url_for('admin.delete', test_id=t.id) }}" onsubmit="return confirm('Test butunlay oʻchiriladi. Davom etasizmi?')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn w !py-1 !text-[11px]">OʻCHIRISH</button></form>
+        </div></td>
+      </tr>
+    {% else %}
+      <tr><td class="p-5" colspan="6">Hali test yoʻq. "+ READING" yoki "+ LISTENING" tugmasini bosing.</td></tr>
+    {% endfor %}
+    </tbody></table></div>
+</section>
+{% endblock %}

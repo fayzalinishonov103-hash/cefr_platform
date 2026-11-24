@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Daraja aniqlash — Levi{% endblock %}
+{% block content %}
+<section class="win max-w-2xl mx-auto">
+  <div class="wh"><span class="dot"></span><span class="dot"></span><span>DARAJA ANIQLASH TESTI</span></div>
+  <div class="p-5 space-y-4 text-sm read">
+    <p class="hd text-3xl">Ingliz tilidagi darajangiz qaysi?</p>
+    <ul class="list-disc pl-5 space-y-1">
+      <li>{{ total }} ta qisqa savol (grammatika va lugʻat), taxminan 8 daqiqa.</li>
+      <li>Savollar osondan qiyinga qarab ketadi. Bilmasangiz, <b>“Bilmayman”</b> ni tanlang: taxmin qilish natijani buzadi.</li>
+      <li>Natija taxminiy. U sizga mos mashqlarni tanlashga yordam beradi, rasmiy daraja emas.</li>
+      <li>Ingliz tilini endi boshlayotgan boʻlsangiz ham qoʻrqmang: bu test shu uchun.</li>
+    </ul>
+    {% if last %}
+    <p class="warn px-3 py-2 border-2 border-black">Oxirgi natijangiz: <b>{{ last.cefr_level }} · {{ names[last.cefr_level] }}</b>.
+      <a class="underline" href="{{ url_for('placement.result', result_id=last.id) }}">Batafsil</a></p>
+    {% endif %}
+    <div class="flex gap-2 flex-wrap pt-2">
+      {% if current_user.is_authenticated %}
+      <a class="btn" href="{{ url_for('placement.test') }}">{{ 'QAYTA TOPSHIRISH' if last else 'TESTNI BOSHLASH' }}</a>
+      <a class="btn w" href="{{ url_for('main.dashboard') }}">KEYINROQ</a>
+      {% else %}
+      <a class="btn" href="{{ url_for('auth.register') }}">ROʻYXATDAN OʻTIB BOSHLASH</a>
+      <a class="btn w" href="{{ url_for('auth.login') }}">KIRISH</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
