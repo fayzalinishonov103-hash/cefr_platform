@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}C1 Transformatsiya Natijasi — Levi{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+
+  <!-- Overview Header -->
+  <div class="win p-6 bg-gradient-to-r from-sky-950/40 via-slate-900 to-indigo-950/40">
+    <div class="wh mb-3"><span class="dot"></span><span class="dot"></span><span>TAHLIL VA C1 TRANSFORMATSIYA YAKUNI</span></div>
+    
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">Dastlabki: {{ res.estimated_level or 'B1' }}</span>
+          <span class="text-sky-400 font-bold text-lg">➔</span>
+          <span class="px-3 py-1 rounded-md text-sm font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">Transformatsiya: C1 / C2</span>
+        </div>
+        <h1 class="hd text-3xl mt-3">INSHONGIZ C1 DARAJAGA KOʻTARILDI!</h1>
+        <p class="text-xs text-slate-300 mt-1">Jami {{ words }} ta soʻz tahlil qilindi. {{ res.sentences|length }} ta gap mukammallashtirildi.</p>
+      </div>
+
+      <div class="text-right">
+        <a href="{{ url_for('writing.c1_transform_view') }}" class="btn text-xs !py-2.5">YANGI MATN KIRITISH →</a>
+        <p class="text-[10px] text-slate-400 mt-1">Bugungi qolgan kvota: {{ remaining }} ta</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full C1 Upgraded Essay Box -->
+  <section class="win p-6 border-emerald-500/40 shadow-xl bg-slate-900/80">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+      <div class="flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+        <h2 class="hd text-xl text-emerald-400">TOʻLIQ C1 DARAJADAGI MATN</h2>
+      </div>
+      <button type="button" id="copyBtn" class="text-xs font-bold px-3 py-1.5 rounded-lg border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition flex items-center gap-1.5">
+        <span id="copyText">📋 Nusxa olish</span>
+      </button>
+    </div>
+    <div class="p-4 rounded-lg bg-slate-950/70 border border-slate-800 text-slate-100 font-sans text-base leading-relaxed" id="c1Full">
+      {{ res.upgraded_full_text }}
+    </div>
+  </section>
+
+  <!-- O'zbekcha fikrlash xatolari (L1 Transfer) -->
+  {% if res.uzbek_l1_errors %}
+  <section class="win p-6 border-amber-500/40">
+    <div class="wh mb-4 !border-amber-500/40 !bg-amber-500/10 text-amber-300 font-bold flex items-center gap-2">
+      <span>🧠 OʻZBEKCHA FIKRLASH SABABLI KELIB CHIQADIGAN XATOLAR (L1 INTERFERENCE)</span>
+    </div>
+    <p class="text-xs text-slate-300 mb-4">
+      Oʻzbek tilida soʻzlashuvchilar miyasida oʻzbekcha oʻylab, ingliz tiliga soʻzma-soʻz tarjima qilganda ushbu tipik xatolar yuzaga keladi:
+    </p>
+    <div class="grid md:grid-cols-2 gap-4">
+      {% for err in res.uzbek_l1_errors %}
+      <div class="p-4 rounded-xl border border-slate-800 bg-slate-900/50 space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-rose-400 font-bold line-through">{{ err.error }}</span>
+          <span class="text-slate-500 font-bold">➔</span>
+          <span class="text-emerald-400 font-bold">{{ err.correction }}</span>
+        </div>
+        <div class="p-2.5 rounded bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200 leading-relaxed font-sans">
+          <b>Nega bu xato boʻldi:</b> {{ err.uzbek_reason }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Sentence-by-Sentence Split Screen Comparison -->
+  {% if res.sentences %}
+  <section class="win p-6">
+    <div class="wh mb-4"><span class="dot"></span><span>BOSQICHMA-BOSQICH GAPLAR SOLISHTIRUVI</span></div>
+    <div class="space-y-4">
+      {% for s in res.sentences %}
+      <div class="p-4 rounded-xl border border-slate-800 bg-slate-900/40 space-y-3">
+        <div class="grid md:grid-cols-2 gap-3 text-sm font-sans">
+          <div class="p-3 rounded-lg bg-slate-950/50 border border-slate-800">
+            <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Dastlabki gap:</span>
+            <p class="text-slate-300">{{ s.original }}</p>
+          </div>
+          <div class="p-3 rounded-lg bg-emerald-950/20 border border-emerald-500/30">
+            <span class="text-[10px] uppercase font-bold text-emerald-400 block mb-1">C1 takomillashgan versiya:</span>
+            <p class="text-emerald-200 font-medium">{{ s.c1_version }}</p>
+          </div>
+        </div>
+        <div class="text-xs text-slate-400 flex items-center gap-2 pt-1">
+          <span class="text-sky-400 font-bold">💡 Nima oʻzgartirildi:</span>
+          <span>{{ s.key_change }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- C1 Academic Vocabulary Flashcards -->
+  {% if res.c1_vocabulary %}
+  <section class="win p-6">
+    <div class="wh mb-4"><span class="dot"></span><span>FOYDALANILGAN C1 AKADEMIK LUGʻAT VA IBORALAR</span></div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {% for v in res.c1_vocabulary %}
+      <div class="p-3.5 rounded-lg border border-slate-800 bg-slate-900/60 space-y-1">
+        <p class="font-bold text-sky-400 text-sm">{{ v.word }}</p>
+        <p class="text-xs text-slate-300 font-medium">{{ v.meaning }}</p>
+        <p class="text-[11px] text-slate-400 italic pt-1 border-t border-slate-800">"{{ v.example }}"</p>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Coach Tip -->
+  {% if res.coach_tip %}
+  <div class="win p-5 bg-gradient-to-r from-sky-950/30 to-slate-900 border-sky-400/40">
+    <div class="flex items-start gap-3">
+      <span class="text-2xl">🎓</span>
+      <div>
+        <p class="font-bold text-sky-400 text-xs uppercase tracking-wider">AI Oʻqituvchi Maslahati</p>
+        <p class="text-xs text-slate-200 mt-1 font-sans leading-relaxed">{{ res.coach_tip }}</p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function() {
+  var btn = document.getElementById("copyBtn");
+  var full = document.getElementById("c1Full");
+  var copyText = document.getElementById("copyText");
+  if (btn && full) {
+    btn.addEventListener("click", function() {
+      navigator.clipboard.writeText(full.innerText.trim()).then(function() {
+        copyText.textContent = "✓ Nusxa olindi!";
+        setTimeout(function() { copyText.textContent = "📋 Nusxa olish"; }, 2500);
+      });
+    });
+  }
+})();
+</script>
+{% endblock %}

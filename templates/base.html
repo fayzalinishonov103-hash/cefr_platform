@@ -211,6 +211,7 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
     {% set nav_links = [('ASOSIY', url_for('main.index'), ep == 'main.index'),
         ('READING', url_for('reading.tests'), bp_ == 'reading'), ('LISTENING', url_for('listening.tests'), bp_ == 'listening'),
         ('WRITING', url_for('writing.tasks'), bp_ == 'writing'), ('SPEAKING', url_for('speaking.tasks'), bp_ == 'speaking'),
+        ('⚔️ BATTLE', url_for('battle.lobby'), bp_ == 'battle'),
         ('SHADOWING', url_for('shadowing.videos'), bp_ == 'shadowing')] %}
     {% if current_user.is_authenticated %}{% set nav_links = nav_links + [('IMTIHON', url_for('exam.index'), bp_ == 'exam'), ('DASHBOARD', url_for('main.dashboard'), ep == 'main.dashboard')] %}{% endif %}
     {% if current_user.is_authenticated and current_user.is_admin %}{% set nav_links = nav_links + [('ADMIN', url_for('admin.index'), bp_ == 'admin')] %}{% endif %}
@@ -230,6 +231,8 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
       </summary>
       <div class="pm win">
         <p class="px-3 pt-3 pb-2 text-[11px] border-b-2 border-black" style="color:var(--mut)">{{ current_user.name }}</p>
+        <a href="{{ url_for('writing.c1_transform_view') }}" class="text-sky-500 font-bold">✨ C1 TRANSFORMATOR</a>
+        <a href="{{ url_for('battle.lobby') }}" class="text-rose-500 font-bold">⚔️ 1v1 BATTLE DUEL</a>
         <a href="{{ url_for('skills.profile') }}">SKILLAR PROFILI</a>
         <form method="post" action="{{ url_for('auth.logout') }}" class="border-t-2 border-black">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

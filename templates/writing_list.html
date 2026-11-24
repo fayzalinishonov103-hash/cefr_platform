@@ -5,6 +5,18 @@
   <div class="wh"><span class="dot"></span><span class="dot"></span><span>WRITING TOPSHIRIQLARI</span></div>
   <div class="p-5 space-y-4 text-sm">
     <p style="color:var(--mut)">Topshiriqni tanlang va yozing. AI matningizni 4 mezon bo‘yicha CEFR darajasida baholaydi va xatolarni tushuntiradi.</p>
+
+    <!-- C1 Transform Promo Banner -->
+    <div class="p-4 rounded-xl border-2 border-sky-400/40 bg-gradient-to-r from-sky-950/40 to-slate-900 flex flex-wrap items-center justify-between gap-3 shadow-md">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">✨</span>
+        <div>
+          <p class="font-bold text-white text-base">C1 INSHO CO-PILOT & OʻZBEKCHA TAHLIL</p>
+          <p class="text-xs text-slate-300">Yozgan inshongizni C1 darajaga aylantiring va oʻzbekcha fikrlash xatolarini oʻrganing.</p>
+        </div>
+      </div>
+      <a class="btn !bg-sky-400 hover:!bg-sky-300 text-slate-950 !py-2.5 !px-5 text-xs font-bold" href="{{ url_for('writing.c1_transform_view') }}">C1 TRANSFORMATORGA OʻTISH →</a>
+    </div>
     {% for p in prompts %}
     <div class="border-2 border-black p-4 flex flex-wrap items-center justify-between gap-3">
       <div><p class="font-bold">{{ p.title }}</p>

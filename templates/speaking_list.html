@@ -5,6 +5,18 @@
   <div class="wh"><span class="dot"></span><span class="dot"></span><span>SPEAKING TOPSHIRIQLARI</span></div>
   <div class="p-5 space-y-4 text-sm">
     <p style="color:var(--mut)">Topshiriqni tanlang, mikrofonga javob bering. AI ovozingizni matnga aylantirib, 4 mezon boʻyicha CEFR darajasida baholaydi. Tinch joyda, mikrofon bilan ishlang.</p>
+    
+    <!-- Real-Time AI Examiner Banner -->
+    <div class="p-4 rounded-xl border-2 border-indigo-500/40 bg-gradient-to-r from-indigo-950/40 to-slate-900 flex flex-wrap items-center justify-between gap-3 shadow-md">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">🎙️</span>
+        <div>
+          <p class="font-bold text-white text-base">JONLI AI EXAMINER BILAN INTERVYU</p>
+          <p class="text-xs text-slate-300">Haqiqiy imtihonchi savol beradi, javobingizni tinglab qoʻshimcha savollar bilan davom ettiradi.</p>
+        </div>
+      </div>
+      <a class="btn !bg-indigo-500 hover:!bg-indigo-400 text-white !py-2.5 !px-5 text-xs font-bold" href="{{ url_for('speaking.examiner_view') }}">JONLI SUHBATNI BOSHLASH →</a>
+    </div>
     {% for p in prompts %}
     <div class="border-2 border-black p-4 flex flex-wrap items-center justify-between gap-3">
       <div><p class="font-bold">{{ p.title }}</p>

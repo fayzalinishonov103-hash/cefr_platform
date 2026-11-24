@@ -155,6 +155,19 @@ def ai_budget_ok(user_id, kind, cap, window_hours=24):
     return True
 
 
+def ai_usage_today(user_id, kind, window_hours=24):
+    """Number of times this user invoked `kind` within the last 24 hours."""
+    since = now() - timedelta(hours=window_hours)
+    return UsageLog.query.filter(UsageLog.user_id == user_id, UsageLog.kind == kind,
+                                 UsageLog.created_at >= since).count()
+
+
+def ai_remaining(user_id, kind, cap, window_hours=24):
+    """How many attempts are left today for this user (at least 0)."""
+    used = ai_usage_today(user_id, kind, window_hours=window_hours)
+    return max(0, cap - used)
+
+
 def naive(dt):
     """Naive-UTC version of a datetime (SQLite returns naive, PostgreSQL may return aware)."""
     from datetime import timezone as _tz

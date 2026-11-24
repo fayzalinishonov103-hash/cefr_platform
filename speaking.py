@@ -163,3 +163,68 @@ def result(result_id):
         abort(404)
     return render_template("speaking_result.html", r=item, f=item.feedback, g=item.feedback["grade"],
                            labels=PART_LABELS)
+
+
+EXAMINER_SYSTEM = """You are an experienced, polite British CEFR Speaking Examiner conducting a realistic interactive interview with an Uzbek candidate.
+You receive the candidate's spoken transcript between <speech> tags and recent context.
+Your goal:
+1. React naturally with one conversational sentence.
+2. Ask ONE focused, engaging follow-up question (CEFR B2/C1 standard) that requires explanation or opinion.
+3. Offer constructive feedback on this turn:
+   - "fluency_tip": one short tip in Uzbek (max 15 words)
+   - "vocabulary_boost": {"phrase": "English C1 phrase", "uzbek": "Uzbek translation"}
+Return ONE JSON object:
+{
+  "examiner_reply": "Indeed. While urbanization offers opportunities, it also creates strain. Do you think remote work could encourage people to move back to rural towns?",
+  "fluency_tip": "Javobingiz yaxshi, faqat 'furthermore' yoki 'in contrast' kabi bogʻlovchilarni qoʻshing.",
+  "vocabulary_boost": {"phrase": "decentralize economic activity", "uzbek": "iqtisodiy faoliyatni markazdan qochirish"}
+}
+RULES: examiner_reply is natural British English. fluency_tip and uzbek are in Uzbek Latin script."""
+
+
+@bp.route("/speaking/examiner")
+@login_required
+def examiner_view():
+    limit = current_app.config.get("SPEAKING_EXAMINER_PER_DAY", 1)
+    remaining = security.ai_remaining(current_user.id, "speaking_examiner", limit)
+    initial_question = "Good afternoon! Welcome to the speaking interview. Could you tell me a little bit about yourself and what you enjoy doing in your free time?"
+    return render_template("speaking_examiner.html", question=initial_question, limit=limit, remaining=remaining)
+
+
+@bp.route("/speaking/examiner/respond", methods=["POST"])
+@login_required
+def examiner_respond():
+    limit = current_app.config.get("SPEAKING_EXAMINER_PER_DAY", 1)
+    upload = request.files.get("audio")
+    data = upload.read(MAX_AUDIO_BYTES + 1) if upload else b""
+    if not data or len(data) < MIN_AUDIO_BYTES:
+        return jsonify(error="Ovoz yozuvi topilmadi yoki juda qisqa."), 400
+
+    if not security.ai_budget_ok(current_user.id, "speaking_examiner", limit):
+        return jsonify(error=f"Bugungi bepul Jonli Examiner limitingiz ({limit} ta intervyu) tugadi. Ertaga yana sinab koʻrishingiz mumkin."), 429
+
+    try:
+        transcript = transcribe(data, "examiner" + _audio_ext(upload))
+    except NoApiKey:
+        return jsonify(error="AI sozlanmagan. Administrator bilan bogʻlaning."), 503
+    except Exception:
+        log.exception("Examiner transcribe failed")
+        return jsonify(error="Ovozni taniy olmadi. Iltimos qayta urinib koʻring."), 502
+
+    if len(transcript.split()) < 4:
+        return jsonify(error="Javob juda qisqa yoki mikrofon eshitmadi. Qayta gapiring."), 422
+
+    context = request.form.get("last_question", "")
+    user_prompt = f"PREVIOUS QUESTION:\n{context}\n\nCANDIDATE ANSWER:\n<speech>\n{transcript}\n</speech>"
+    try:
+        reply = ask_grader(EXAMINER_SYSTEM, user_prompt)
+        res = parse_json(reply)
+    except Exception:
+        log.exception("Examiner AI failed")
+        return jsonify(error="AI hozir javob bermadi. Qayta urinib koʻring."), 502
+
+    return jsonify(ok=True, transcript=transcript,
+                   examiner_reply=res.get("examiner_reply", "Thank you. Let us move on to discuss technology."),
+                   fluency_tip=res.get("fluency_tip", "Javobingizni misollar bilan boyiting."),
+                   vocabulary_boost=res.get("vocabulary_boost", {}))
+

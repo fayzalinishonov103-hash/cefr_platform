@@ -339,3 +339,21 @@ class UserProfile(db.Model):
     completed_at = db.Column(db.DateTime)                    # None when the user skipped
     skipped_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime, default=_naive_now, onupdate=_naive_now, nullable=False)
+
+
+class BattleMatch(db.Model):
+    """1v1 CEFR Quick Duel match between two students or against an AI practice rival."""
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(16), unique=True, index=True, nullable=False)
+    player1_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    player2_id = db.Column(db.Integer, db.ForeignKey("user.id"), index=True)
+    player2_name = db.Column(db.String(80), default="Bot Rival")
+    player1_score = db.Column(db.Integer, default=0)
+    player2_score = db.Column(db.Integer, default=0)
+    winner_id = db.Column(db.Integer)
+    status = db.Column(db.String(20), default="active")   # active, finished
+    questions = db.Column(db.JSON)                        # list of 5 questions [{"q": ..., "options": [...], "answer": ...}]
+    created_at = db.Column(db.DateTime, default=_now)
+    player1 = db.relationship("User", foreign_keys=[player1_id])
+    player2 = db.relationship("User", foreign_keys=[player2_id])
+

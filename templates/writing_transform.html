@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}C1 Insho Transformatori — Levi{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+
+  <!-- Header Banner -->
+  <div class="win p-6 relative overflow-hidden bg-gradient-to-r from-sky-950/30 via-slate-900 to-indigo-950/30">
+    <div class="wh mb-4"><span class="dot"></span><span class="dot"></span><span>AI CO-PILOT · INSHO TRANSFORMATORI</span></div>
+    
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sky-500/10 text-sky-400 border border-sky-400/30 mb-2">
+          <span>✨ C1 / C2 Academic Level Enhancer</span>
+        </div>
+        <h1 class="hd text-3xl sm:text-4xl">INSHONGIZNI C1 GA AYLANTIRING</h1>
+        <p class="text-xs text-slate-300 mt-2 max-w-xl leading-relaxed">
+          Oʻz inshongiz yoki fikringizni yozing. Sunʼiy intellekt har bir gapingizni C1 akademik darajaga chiqarib, <b>oʻzbekcha fikrlash tufayli kelib chiqqan xatolarni</b> aniqlab beradi.
+        </p>
+      </div>
+
+      <div class="text-right p-3 rounded-lg border border-slate-700 bg-slate-900/60">
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bugungi AI Kvotangiz</p>
+        <p class="hd text-3xl text-sky-400">{{ remaining }}/{{ limit }}</p>
+        <p class="text-[10px] text-slate-400 mt-0.5">ta bepul tahlil qoldi</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input Form -->
+  <section class="win p-6">
+    <form method="post" action="{{ url_for('writing.c1_transform_submit') }}" class="space-y-4">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="flex items-center justify-between">
+        <label for="c1Text" class="font-bold text-xs uppercase tracking-wider">Matningiz (Insho, xat yoki javob):</label>
+        <button type="button" id="loadSample" class="text-xs text-sky-400 hover:text-sky-300 underline font-semibold">
+          💡 Namunaviy matnni qoʻyish
+        </button>
+      </div>
+
+      <textarea id="c1Text" name="text" rows="8" class="inp !p-4 !font-sans leading-relaxed" 
+                placeholder="Ingliz tilida yozgan insho yoki gapingizni bu yerga kiriting (15–350 ta soʻz)..." required>{{ text or '' }}</textarea>
+
+      <div class="flex items-center justify-between text-xs pt-1">
+        <div class="flex items-center gap-3">
+          <span id="wordCount" class="font-bold text-slate-400">0 soʻz</span>
+          <span class="text-slate-500">·</span>
+          <span class="text-slate-500">Optimal: 50–250 soʻz</span>
+        </div>
+        <span id="lenWarning" class="text-amber-400 font-bold hidden">350 soʻzdan oshmasligi kerak</span>
+      </div>
+
+      <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+        <p class="text-[11px] text-slate-400 max-w-sm">
+          🔒 AI xarajatini tejash uchun matn hajmi 350 soʻz bilan cheklangan. Bepul limit har 24 soatda yangilanadi.
+        </p>
+        <button type="submit" id="submitBtn" class="btn !py-3 !px-6 text-sm font-bold shadow-lg" {{ 'disabled' if remaining <= 0 else '' }}>
+          {% if remaining > 0 %}
+          C1 GA AYLANTIRISH VA TAHLIL QILISH ✨
+          {% else %}
+          Bugungi kvota tugadi (0/{{ limit }})
+          {% endif %}
+        </button>
+      </div>
+    </form>
+  </section>
+
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function() {
+  var ta = document.getElementById("c1Text");
+  var wc = document.getElementById("wordCount");
+  var warn = document.getElementById("lenWarning");
+  var btn = document.getElementById("submitBtn");
+  var sampleBtn = document.getElementById("loadSample");
+
+  var sampleText = "Nowadays many people use internet because it is very convenient for their life. I am agree that technology gives us a lot of advantages. But some students do not want to read book, they just watch funny videos and play games all day. In my opinion government should open the special courses to teach young generation how to use internet correctly.";
+
+  if (sampleBtn && ta) {
+    sampleBtn.addEventListener("click", function() {
+      ta.value = sampleText;
+      updateCount();
+    });
+  }
+
+  if (ta && wc) {
+    ta.addEventListener("input", updateCount);
+    updateCount();
+  }
+
+  function updateCount() {
+    var words = ta.value.trim() ? ta.value.trim().split(/\s+/).length : 0;
+    wc.textContent = words + " ta soʻz";
+    if (words > 350) {
+      wc.className = "font-bold text-rose-500";
+      warn.classList.remove("hidden");
+    } else {
+      wc.className = "font-bold text-slate-400";
+      warn.classList.add("hidden");
+    }
+  }
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}1v1 CEFR Battle — Levi{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+
+  <!-- Header Banner -->
+  <div class="win p-6 bg-gradient-to-r from-indigo-950/40 via-slate-900 to-rose-950/40 border-rose-500/30">
+    <div class="wh mb-4"><span class="dot !bg-rose-500"></span><span class="dot !bg-amber-500"></span><span>1v1 REAL-TIME BATTLE · DUEL ARENA</span></div>
+    
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30 mb-2">
+          <span>⚔️ Jonli Raqobat & Tezkor Sinov</span>
+        </div>
+        <h1 class="hd text-3xl sm:text-4xl text-white">CEFR ONLAYN JANG MAYDONI</h1>
+        <p class="text-xs text-slate-300 mt-2 max-w-lg leading-relaxed">
+          5 ta savol, har biriga 15 soniya! Doʻstingiz yoki virtual raqib bilan bellashing, CEFR soʻz va grammatikasini sinab, reytingda yuqorilang.
+        </p>
+      </div>
+
+      <div class="flex gap-4">
+        <div class="text-center p-3.5 rounded-xl border border-slate-700 bg-slate-900/60 min-w-[90px]">
+          <p class="text-[10px] font-bold text-slate-400 uppercase">Gʻalabalar</p>
+          <p class="hd text-3xl text-emerald-400">{{ wins }}</p>
+        </div>
+        <div class="text-center p-3.5 rounded-xl border border-slate-700 bg-slate-900/60 min-w-[90px]">
+          <p class="text-[10px] font-bold text-slate-400 uppercase">Janglar</p>
+          <p class="hd text-3xl text-sky-400">{{ total }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Start Battle Box -->
+  <section class="win p-6 text-center space-y-4">
+    <div class="max-w-md mx-auto space-y-3">
+      <h2 class="hd text-2xl">RAQIBGA QARSHI JANGGA TUSHING!</h2>
+      <p class="text-xs text-slate-300">
+        Jang boshlanishi bilan sizga teng kuchli raqib biriktiriladi. Eng tez va aniq javob bergan ishtirokchi gʻolib boʻladi!
+      </p>
+      <form method="post" action="{{ url_for('battle.start_match') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn !bg-rose-500 hover:!bg-rose-400 text-white !py-3.5 !px-8 text-base font-bold shadow-lg shadow-rose-950/40 hover:scale-105 transition">
+          ⚔️ TEZKOR JANGNI BOSHLASH →
+        </button>
+      </form>
+      <p class="text-[11px] text-slate-400 pt-2">⚡ 100% bepul, AI kvotangizdan ketmaydi!</p>
+    </div>
+  </section>
+
+  <!-- Recent Matches -->
+  {% if recent %}
+  <section class="win p-6">
+    <div class="wh mb-4"><span class="dot"></span><span>OXIRGI JANGLAR</span></div>
+    <div class="space-y-2.5">
+      {% for m in recent %}
+      <div class="flex items-center justify-between p-3.5 rounded-lg border border-slate-800 bg-slate-900/40 text-xs font-sans">
+        <div class="flex items-center gap-3">
+          <span class="text-lg">{% if m.winner_id == current_user.id %}🏆{% else %}💀{% endif %}</span>
+          <div>
+            <p class="font-bold text-slate-200">Raqib: {{ m.player2_name }}</p>
+            <p class="text-[11px] text-slate-400">{{ m.created_at.strftime('%d.%m.%Y, %H:%M') if m.created_at else '' }}</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="font-mono font-bold text-sm text-slate-300">{{ m.player1_score }} : {{ m.player2_score }}</span>
+          <span class="px-2.5 py-1 rounded text-[11px] font-bold {{ 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' if m.winner_id == current_user.id else 'bg-rose-500/20 text-rose-400 border border-rose-500/30' }}">
+            {{ 'Gʻalaba (+25 XP)' if m.winner_id == current_user.id else 'Magʻlubiyat' }}
+          </span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}

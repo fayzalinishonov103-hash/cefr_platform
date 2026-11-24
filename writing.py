@@ -179,3 +179,82 @@ def result(result_id):
         abort(404)
     return render_template("writing_result.html", r=item, f=item.feedback, g=item.feedback["grade"],
                            labels=TASK_LABELS)
+
+
+C1_SYSTEM = """You are an expert CEFR C1/C2 English Stylistics and Academic Writing Coach with specialized expertise in Uzbek language transfer (L1 Uzbek interference).
+Input: English text from an Uzbek-speaking student between <text> tags.
+Task:
+1. Transform the student's text into a natural, sophisticated C1/C2 level version.
+2. Provide a sentence-by-sentence comparison:
+   - "original": original sentence
+   - "c1_version": rewritten C1 sentence
+   - "key_change": short explanation in Uzbek of what changed
+3. Identify 1 to 4 specific Uzbek thinking / L1 interference errors (e.g. "I am agree", "open light", "make photo", missing articles, preposition slips, word-for-word Uzbek translation):
+   - "error": mistaken fragment
+   - "correction": natural English
+   - "uzbek_reason": concise explanation in Uzbek explaining why Uzbek speakers make this mistake and how to fix it
+4. Highlight 3 to 5 advanced C1 collocations or vocabulary items used in the upgraded version:
+   - "word": English word/collocation
+   - "meaning": Uzbek translation
+   - "example": short example sentence
+5. "estimated_level": estimated CEFR level of the original text (A2, B1, B2)
+6. "coach_tip": 1-2 sentence motivating recommendation in Uzbek
+Return ONE valid JSON object:
+{
+  "estimated_level": "B1",
+  "upgraded_full_text": str,
+  "sentences": [{"original": str, "c1_version": str, "key_change": str}],
+  "uzbek_l1_errors": [{"error": str, "correction": str, "uzbek_reason": str}],
+  "c1_vocabulary": [{"word": str, "meaning": str, "example": str}],
+  "coach_tip": str
+}
+RULES: All explanations in Uzbek Latin script. Keep explanations concise, educational, and practical."""
+
+
+@bp.route("/writing/c1-transform")
+@login_required
+def c1_transform_view():
+    limit = current_app.config.get("C1_TRANSFORM_PER_DAY", 2)
+    remaining = security.ai_remaining(current_user.id, "c1_transform", limit)
+    return render_template("writing_transform.html", limit=limit, remaining=remaining, text="")
+
+
+@bp.route("/writing/c1-transform/submit", methods=["POST"])
+@login_required
+def c1_transform_submit():
+    text = request.form.get("text", "").strip()
+    limit = current_app.config.get("C1_TRANSFORM_PER_DAY", 2)
+    remaining = security.ai_remaining(current_user.id, "c1_transform", limit)
+
+    def back(msg, code=400):
+        flash(msg, "error")
+        return render_template("writing_transform.html", limit=limit, remaining=remaining, text=text), code
+
+    words = len(text.split())
+    if words < 15:
+        return back("Matn juda qisqa. Tahlil va C1 ga aylantirish uchun kamida 15 ta soʻz yozing.")
+    if words > 350 or len(text) > 2500:
+        return back("AI limitini tejash maqsadida matn uzunligi 350 ta soʻzdan oshmasligi kerak.")
+
+    if not security.ai_budget_ok(current_user.id, "c1_transform", limit):
+        return back(f"Bugungi bepul C1 Transformatsiya limitingiz ({limit} ta) tugadi. Ertaga yana davom ettirishingiz mumkin.", 429)
+
+    user_msg = f"<text>\n{text}\n</text>"
+    try:
+        reply = ask_grader(C1_SYSTEM, user_msg)
+    except NoApiKey:
+        return back("AI xizmati hozir ulanmagan. Iltimos administrator bilan bogʻlaning.", 503)
+    except Exception:
+        log.exception("C1 Transform failed")
+        return back("AI hozir javob bermadi. Matningiz saqlab qolindi, qayta urinib koʻring.", 502)
+
+    data = parse_json(reply)
+    if not data or not data.get("upgraded_full_text"):
+        return back("AI tahlilida xatolik yuz berdi. Iltimos qayta urinib koʻring.", 502)
+
+    return render_template("writing_transform_result.html",
+                           original=text,
+                           res=data,
+                           words=words,
+                           remaining=security.ai_remaining(current_user.id, "c1_transform", limit))
+

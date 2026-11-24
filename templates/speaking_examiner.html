@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% block title %}Jonli AI Speaking Examiner — Levi{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+
+  <!-- Header Banner -->
+  <div class="win p-6 bg-gradient-to-r from-sky-950/40 via-slate-900 to-indigo-950/40 border-sky-400/40">
+    <div class="wh mb-3"><span class="dot !bg-sky-400"></span><span class="dot !bg-emerald-400"></span><span>REAL-TIME INTERACTIVE SPEAKING · AI EXAMINER</span></div>
+    
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sky-500/10 text-sky-400 border border-sky-400/30 mb-2">
+          <span>🎙️ Jonli Savol-Javob & Qoʻshimcha Savollar</span>
+        </div>
+        <h1 class="hd text-3xl sm:text-4xl text-white">JONLI AI IMTIHONCHI</h1>
+        <p class="text-xs text-slate-300 mt-1 max-w-lg leading-relaxed">
+          Xuddi haqiqiy CEFR imtihonchisi kabi jonli savol beradi, javobingizni tinglaydi va aytgan fikringizdan kelib chiqib qoʻshimcha savollar (follow-up) beradi.
+        </p>
+      </div>
+
+      <div class="text-right p-3 rounded-xl border border-slate-700 bg-slate-900/60">
+        <p class="text-[10px] font-bold text-slate-400 uppercase">Bugungi Kvota</p>
+        <p class="hd text-3xl text-sky-400">{{ remaining }}/{{ limit }}</p>
+        <p class="text-[10px] text-slate-400">seans qoldi</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Examiner Chat & Voice Arena -->
+  <section class="win p-6 space-y-5" id="examinerArena">
+    <!-- Dialogue Stream -->
+    <div class="space-y-4 max-h-[460px] overflow-y-auto pr-2" id="chatStream">
+      <!-- Initial Examiner Greeting -->
+      <div class="flex items-start gap-3">
+        <div class="w-10 h-10 rounded-full bg-indigo-600/30 border-2 border-indigo-400 flex items-center justify-center text-lg flex-shrink-0">
+          🇬🇧
+        </div>
+        <div class="p-4 rounded-2xl rounded-tl-none bg-slate-800/80 border border-slate-700 text-slate-100 text-sm font-sans leading-relaxed shadow-md max-w-xl">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[11px] font-bold text-indigo-400">Examiner David</span>
+            <button type="button" class="text-xs text-sky-400 hover:text-sky-300 underline font-semibold play-btn" data-text="{{ question }}">🔊 Ovozda eshitish</button>
+          </div>
+          <p id="currentQuestionText">{{ question }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Turn Controls -->
+    <div class="p-4 rounded-xl border border-slate-800 bg-slate-950/60 text-center space-y-4">
+      <div id="statusIndicator" class="text-xs text-slate-400 font-bold">
+        Mikrofon tugmasini bosing va ingliz tilida javob bering (30–60 soniya)
+      </div>
+
+      <div class="flex items-center justify-center gap-4">
+        <button type="button" id="recordBtn" class="w-16 h-16 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-rose-950/50 transition transform hover:scale-105" title="Ovoz yozish">
+          🎤
+        </button>
+      </div>
+
+      <div class="flex items-center justify-center gap-2 text-xs font-mono text-slate-400" id="recordTimer">
+        <span>00:00</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function() {
+  var stream = document.getElementById("chatStream");
+  var recordBtn = document.getElementById("recordBtn");
+  var statusText = document.getElementById("statusIndicator");
+  var timerEl = document.getElementById("recordTimer");
+  var mediaRecorder = null;
+  var audioChunks = [];
+  var isRecording = false;
+  var recTimer = null;
+  var recSeconds = 0;
+  var lastQuestion = {{ question|tojson }};
+
+  // Text-To-Speech for Examiner
+  function speakEnglish(text) {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = "en-GB";
+      u.rate = 0.95;
+      window.speechSynthesis.speak(u);
+    }
+  }
+
+  // Play initial examiner greeting
+  document.addEventListener("click", function(e) {
+    if (e.target && e.target.classList.contains("play-btn")) {
+      speakEnglish(e.target.getAttribute("data-text") || "");
+    }
+  });
+
+  // Microphone Handling
+  if (recordBtn) {
+    recordBtn.addEventListener("click", function() {
+      if (!isRecording) {
+        startRecording();
+      } else {
+        stopRecording();
+      }
+    });
+  }
+
+  function startRecording() {
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function(s) {
+      audioChunks = [];
+      mediaRecorder = new MediaRecorder(s);
+      mediaRecorder.ondataavailable = function(e) {
+        if (e.data.size > 0) audioChunks.push(e.data);
+      };
+      mediaRecorder.onstop = sendAudioTurn;
+      mediaRecorder.start();
+      isRecording = true;
+      recordBtn.classList.add("animate-pulse", "!bg-emerald-500");
+      recordBtn.innerHTML = "⏹️";
+      statusText.textContent = "Ovozingiz yozilmoqda... Javob tugagach tugmani bosing.";
+      statusText.className = "text-xs text-emerald-400 font-bold";
+
+      recSeconds = 0;
+      clearInterval(recTimer);
+      recTimer = setInterval(function() {
+        recSeconds++;
+        var m = Math.floor(recSeconds / 60);
+        var sec = recSeconds % 60;
+        timerEl.textContent = (m < 10 ? "0" + m : m) + ":" + (sec < 10 ? "0" + sec : sec);
+      }, 1000);
+    }).catch(function(err) {
+      alert("Mikrofonga ruxsat berilmadi: " + err.message);
+    });
+  }
+
+  function stopRecording() {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+      isRecording = false;
+      recordBtn.classList.remove("animate-pulse", "!bg-emerald-500");
+      recordBtn.innerHTML = "⏳";
+      recordBtn.disabled = true;
+      clearInterval(recTimer);
+      statusText.textContent = "AI imtihonchi javobingizni tahlil qilmoqda...";
+      statusText.className = "text-xs text-sky-400 font-bold animate-pulse";
+    }
+  }
+
+  function sendAudioTurn() {
+    var blob = new Blob(audioChunks, { type: "audio/webm" });
+    var fd = new FormData();
+    fd.append("audio", blob, "turn.webm");
+    fd.append("last_question", lastQuestion);
+
+    fetch("{{ url_for('speaking.examiner_respond') }}", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": document.querySelector('input[name="csrf_token"]') ? document.querySelector('input[name="csrf_token"]').value : ""
+      },
+      body: fd
+    }).then(function(r) { return r.json(); }).then(function(res) {
+      recordBtn.disabled = false;
+      recordBtn.innerHTML = "🎤";
+
+      if (res.error) {
+        statusText.textContent = res.error;
+        statusText.className = "text-xs text-rose-400 font-bold";
+        return;
+      }
+
+      // Add student answer to chat
+      addStudentBubble(res.transcript);
+
+      // Add feedback card if any
+      if (res.fluency_tip || (res.vocabulary_boost && res.vocabulary_boost.phrase)) {
+        addCoachingBubble(res.fluency_tip, res.vocabulary_boost);
+      }
+
+      // Add Examiner follow-up
+      setTimeout(function() {
+        addExaminerBubble(res.examiner_reply);
+        lastQuestion = res.examiner_reply;
+        speakEnglish(res.examiner_reply);
+        statusText.textContent = "Examiner savolini eshiting va keyingi javobingizni bering.";
+        statusText.className = "text-xs text-slate-400 font-bold";
+      }, 700);
+
+    }).catch(function(err) {
+      recordBtn.disabled = false;
+      recordBtn.innerHTML = "🎤";
+      statusText.textContent = "Aloqada xatolik yuz berdi. Qayta urinib koʻring.";
+      statusText.className = "text-xs text-rose-400 font-bold";
+    });
+  }
+
+  function addStudentBubble(text) {
+    var d = document.createElement("div");
+    d.className = "flex items-start gap-3 justify-end";
+    d.innerHTML = '<div class="p-4 rounded-2xl rounded-tr-none bg-sky-950/40 border border-sky-400/30 text-sky-100 text-sm font-sans leading-relaxed shadow-md max-w-xl text-right">' +
+                  '<span class="text-[11px] font-bold text-sky-400 block mb-1">Sizning javobingiz</span><p>' + escapeHtml(text) + '</p></div>' +
+                  '<div class="w-10 h-10 rounded-full bg-sky-500/20 border-2 border-sky-400 flex items-center justify-center font-bold text-sky-300 flex-shrink-0">U</div>';
+    stream.appendChild(d);
+    stream.scrollTop = stream.scrollHeight;
+  }
+
+  function addCoachingBubble(tip, vocab) {
+    var d = document.createElement("div");
+    d.className = "p-3 rounded-xl bg-slate-900 border border-amber-500/30 text-xs font-sans text-slate-300 space-y-1 mx-12";
+    var h = '<div class="flex items-center gap-1.5 text-amber-400 font-bold">💡 Tezkor Tahlil:</div>';
+    if (tip) h += '<p><b>Ravonlik:</b> ' + escapeHtml(tip) + '</p>';
+    if (vocab && vocab.phrase) h += '<p><b>C1 Iborasi:</b> <span class="text-sky-400 font-bold">' + escapeHtml(vocab.phrase) + '</span> (' + escapeHtml(vocab.uzbek || '') + ')</p>';
+    d.innerHTML = h;
+    stream.appendChild(d);
+    stream.scrollTop = stream.scrollHeight;
+  }
+
+  function addExaminerBubble(text) {
+    var d = document.createElement("div");
+    d.className = "flex items-start gap-3";
+    d.innerHTML = '<div class="w-10 h-10 rounded-full bg-indigo-600/30 border-2 border-indigo-400 flex items-center justify-center text-lg flex-shrink-0">🇬🇧</div>' +
+                  '<div class="p-4 rounded-2xl rounded-tl-none bg-slate-800/80 border border-slate-700 text-slate-100 text-sm font-sans leading-relaxed shadow-md max-w-xl">' +
+                  '<div class="flex items-center justify-between mb-1"><span class="text-[11px] font-bold text-indigo-400">Examiner David</span>' +
+                  '<button type="button" class="text-xs text-sky-400 hover:text-sky-300 underline font-semibold play-btn" data-text="' + escapeHtml(text) + '">🔊 Ovozda eshitish</button></div>' +
+                  '<p>' + escapeHtml(text) + '</p></div>';
+    stream.appendChild(d);
+    stream.scrollTop = stream.scrollHeight;
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+})();
+</script>
+{% endblock %}

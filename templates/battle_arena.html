@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+{% block title %}Jang Maydoni — Levi{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-5" id="arenaApp">
+
+  <!-- Battle Header -->
+  <div class="win p-4 bg-slate-900 border-rose-500/40">
+    <div class="flex items-center justify-between">
+      <!-- Player 1 -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-full bg-sky-500/20 border-2 border-sky-400 flex items-center justify-center font-bold text-sky-300">
+          {{ current_user.name[:1]|upper }}
+        </div>
+        <div>
+          <p class="font-bold text-xs text-sky-400">SIZ</p>
+          <p class="font-bold text-sm text-white" id="p1Score">0 ball</p>
+        </div>
+      </div>
+
+      <!-- VS Badge & Timer -->
+      <div class="text-center">
+        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500 text-white uppercase tracking-widest">VS</span>
+        <div class="mt-1 flex items-center justify-center gap-1 font-mono font-bold text-lg text-amber-400" id="timerBox">
+          ⏱️ <span id="timeLeft">15</span>s
+        </div>
+      </div>
+
+      <!-- Player 2 -->
+      <div class="flex items-center gap-2.5 text-right">
+        <div>
+          <p class="font-bold text-xs text-rose-400" id="p2Name">{{ m.player2_name }}</p>
+          <p class="font-bold text-sm text-white" id="p2Score">0 ball</p>
+        </div>
+        <div class="w-10 h-10 rounded-full bg-rose-500/20 border-2 border-rose-400 flex items-center justify-center font-bold text-rose-300">
+          R
+        </div>
+      </div>
+    </div>
+
+    <!-- Question Progress Bar -->
+    <div class="w-full bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
+      <div id="qProgress" class="bg-gradient-to-r from-sky-400 to-rose-500 h-full transition-all duration-300" style="width: 20%"></div>
+    </div>
+  </div>
+
+  <!-- Question Card -->
+  <section class="win p-6 text-center space-y-5" id="questionCard">
+    <div class="flex items-center justify-between text-xs font-bold text-slate-400 border-b border-slate-800 pb-2">
+      <span id="qNumber">Savol 1 / 5</span>
+      <span class="text-amber-400" id="qLevel">B2 Daraja</span>
+    </div>
+
+    <h2 class="hd text-xl sm:text-2xl text-slate-100 min-h-[60px] flex items-center justify-center" id="qText">
+      Yuklanmoqda...
+    </h2>
+
+    <!-- Options Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2" id="optionsBox">
+      <!-- Generated via JS -->
+    </div>
+  </section>
+
+  <!-- Final Victory / Defeat Modal -->
+  <div id="resultModal" class="win p-8 text-center space-y-5 hidden bg-slate-900 border-amber-500/40 shadow-2xl">
+    <div id="resultIcon" class="text-6xl animate-bounce">🏆</div>
+    <h2 class="hd text-3xl" id="resultTitle">GʻALABA!</h2>
+    <p class="text-sm text-slate-300 font-sans" id="resultDesc">Raqibingiz ustidan ajoyib ustunlikka erishdingiz!</p>
+    
+    <div class="flex justify-center items-center gap-6 p-4 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xl font-bold">
+      <div class="text-sky-400">Siz: <span id="finalP1">0</span></div>
+      <div class="text-slate-600">:</div>
+      <div class="text-rose-400">Raqib: <span id="finalP2">0</span></div>
+    </div>
+
+    <div class="pt-3 flex justify-center gap-3">
+      <form method="post" action="{{ url_for('battle.start_match') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn !bg-rose-500 hover:!bg-rose-400 text-white !py-2.5 !px-5 text-xs font-bold">
+          ⚔️ Qayta Jang Qilish
+        </button>
+      </form>
+      <a href="{{ url_for('battle.lobby') }}" class="btn w !py-2.5 !px-5 text-xs font-bold">Lobbiyga qaytish</a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function() {
+  var questions = {{ q_list|tojson }};
+  var code = {{ m.code|tojson }};
+  var currentIdx = 0;
+  var userScore = 0;
+  var rivalScore = 0;
+  var timer = null;
+  var timeLeft = 15;
+  var answered = false;
+
+  var qText = document.getElementById("qText");
+  var qNum = document.getElementById("qNumber");
+  var qLvl = document.getElementById("qLevel");
+  var optBox = document.getElementById("optionsBox");
+  var qProg = document.getElementById("qProgress");
+  var p1ScoreEl = document.getElementById("p1Score");
+  var p2ScoreEl = document.getElementById("p2Score");
+  var timeEl = document.getElementById("timeLeft");
+  var card = document.getElementById("questionCard");
+  var modal = document.getElementById("resultModal");
+
+  function startQuestion(idx) {
+    if (idx >= questions.length) {
+      finishBattle();
+      return;
+    }
+    answered = false;
+    timeLeft = 15;
+    timeEl.textContent = timeLeft;
+    timeEl.parentElement.classList.remove("text-rose-500");
+    timeEl.parentElement.classList.add("text-amber-400");
+
+    var q = questions[idx];
+    qNum.textContent = "Savol " + (idx + 1) + " / " + questions.length;
+    qLvl.textContent = (q.level || "B2") + " Daraja";
+    qText.textContent = q.q;
+    qProg.style.width = ((idx + 1) / questions.length * 100) + "%";
+
+    optBox.innerHTML = "";
+    q.options.forEach(function(opt) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "p-3.5 rounded-xl border-2 border-slate-700 bg-slate-800/80 hover:bg-slate-700 hover:border-sky-400 text-slate-100 font-bold text-sm transition text-left flex items-center justify-between";
+      btn.textContent = opt;
+      btn.onclick = function() { handleAnswer(btn, opt, q.answer); };
+      optBox.appendChild(btn);
+    });
+
+    clearInterval(timer);
+    timer = setInterval(function() {
+      timeLeft--;
+      timeEl.textContent = timeLeft;
+      if (timeLeft <= 5) {
+        timeEl.parentElement.classList.remove("text-amber-400");
+        timeEl.parentElement.classList.add("text-rose-500");
+      }
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        handleTimeout(q.answer);
+      }
+    }, 1000);
+  }
+
+  function handleAnswer(btn, selected, correct) {
+    if (answered) return;
+    answered = true;
+    clearInterval(timer);
+
+    var isRight = selected.toLowerCase() === correct.toLowerCase();
+    if (isRight) {
+      userScore++;
+      p1ScoreEl.textContent = userScore + " ball";
+      btn.className = "p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-500/20 text-emerald-300 font-bold text-sm text-left flex items-center justify-between";
+    } else {
+      btn.className = "p-3.5 rounded-xl border-2 border-rose-500 bg-rose-500/20 text-rose-300 font-bold text-sm text-left flex items-center justify-between";
+      highlightCorrect(correct);
+    }
+
+    // Rival bot simulated response (75% chance right on time)
+    setTimeout(function() {
+      if (Math.random() < 0.75) {
+        rivalScore++;
+        p2ScoreEl.textContent = rivalScore + " ball";
+      }
+    }, 800);
+
+    setTimeout(function() {
+      currentIdx++;
+      startQuestion(currentIdx);
+    }, 1400);
+  }
+
+  function handleTimeout(correct) {
+    if (answered) return;
+    answered = true;
+    highlightCorrect(correct);
+    setTimeout(function() {
+      currentIdx++;
+      startQuestion(currentIdx);
+    }, 1500);
+  }
+
+  function highlightCorrect(correct) {
+    Array.from(optBox.children).forEach(function(b) {
+      if (b.textContent.trim().toLowerCase() === correct.toLowerCase()) {
+        b.className = "p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-500/20 text-emerald-300 font-bold text-sm text-left flex items-center justify-between";
+      }
+    });
+  }
+
+  function finishBattle() {
+    clearInterval(timer);
+    card.classList.add("hidden");
+    modal.classList.remove("hidden");
+
+    var isWin = userScore >= rivalScore;
+    document.getElementById("resultTitle").textContent = isWin ? "GʻALABA! 🏆" : "DURANG YOKI MAGʻLUBIYAT";
+    document.getElementById("resultIcon").textContent = isWin ? "🏆" : "⚔️";
+    document.getElementById("resultDesc").textContent = isWin ? "Raqibingiz ustidan ajoyib gʻalabaga erishdingiz! +25 XP hisobingizga qoʻshildi." : "Yaxshi urinish! Keyingi jangda albatta gʻolib boʻlasiz.";
+    document.getElementById("finalP1").textContent = userScore;
+    document.getElementById("finalP2").textContent = rivalScore;
+
+    // Send score to backend
+    fetch("/battle/" + code + "/submit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": document.querySelector('input[name="csrf_token"]') ? document.querySelector('input[name="csrf_token"]').value : ""
+      },
+      body: JSON.stringify({ score: userScore })
+    });
+  }
+
+  // Start initial question
+  startQuestion(0);
+})();
+</script>
+{% endblock %}

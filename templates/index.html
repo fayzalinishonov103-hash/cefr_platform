@@ -101,9 +101,9 @@
     </div>
   </section>
 
-  <!-- Writing yuklash -->
-  <a href="{{ url_for('writing.tasks') }}" class="lg:col-span-2 border-2 border-dashed border-sky-400/60 rounded-xl bg-sky-950/20 hover:bg-sky-900/30 grid place-items-center text-center p-5 min-h-[140px] transition hover:scale-[1.02]">
-    <div><p class="hd text-4xl text-sky-400">+</p><p class="text-[11.5px] font-bold mt-2 text-slate-100">INSHONI YOZING<br><span class="text-sky-300">AI TEKSHIRADI</span></p></div>
+  <!-- Writing yuklash / C1 Transform -->
+  <a href="{{ url_for('writing.c1_transform_view') }}" class="lg:col-span-2 border-2 border-dashed border-sky-400/60 rounded-xl bg-sky-950/20 hover:bg-sky-900/30 grid place-items-center text-center p-5 min-h-[140px] transition hover:scale-[1.02]">
+    <div><p class="hd text-4xl text-sky-400">✨</p><p class="text-[11.5px] font-bold mt-2 text-slate-100">C1 INSHO CO-PILOT<br><span class="text-sky-300">OʻZBEKCHA TAHLIL</span></p></div>
   </a>
 
   <!-- Nega -->
@@ -114,6 +114,18 @@
       <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold">✓</span><div><b>0–75 shkalasi</b><br><span style="color:var(--mut)">4 skillning rasmiy oʻrtacha bali.</span></div></li>
       <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold">✓</span><div><b>Xatolar ustida ishlash</b><br><span style="color:var(--mut)">AI faqat xatoni koʻrsatib, toʻgʻri yoʻnaltiradi.</span></div></li>
     </ul>
+  </section>
+
+  <!-- 1v1 Battle Promo Banner -->
+  <section class="lg:col-span-12 win p-5 bg-gradient-to-r from-rose-950/40 via-slate-900 to-indigo-950/40 border-rose-500/40 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-4">
+      <span class="text-4xl">⚔️</span>
+      <div>
+        <h3 class="hd text-xl text-white">1v1 CEFR JANG MAYDONI (DUEL)</h3>
+        <p class="text-xs text-slate-300 mt-0.5">Doʻstingiz yoki virtual raqib bilan 5 ta tezkor savolda bellashing. 100% bepul, token sarflanmaydi!</p>
+      </div>
+    </div>
+    <a href="{{ url_for('battle.lobby') }}" class="btn !bg-rose-500 hover:!bg-rose-400 text-white !py-2.5 !px-5 text-xs font-bold">JANGGA KIRISH →</a>
   </section>
 
   <!-- Reading partlari -->
