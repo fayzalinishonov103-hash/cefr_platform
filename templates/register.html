@@ -1,28 +1,89 @@
 {% extends "base.html" %}
 {% block title %}Roʻyxatdan oʻtish — Levi{% endblock %}
 {% block content %}
-<section class="win max-w-md mx-auto">
-  <div class="wh"><span class="dot"></span><span class="dot"></span><span>ROʻYXATDAN OʻTISH</span></div>
-  <div class="p-5 space-y-4 text-sm">
+<section class="win max-w-md mx-auto shadow-2xl">
+  <div class="wh flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="dot"></span><span class="dot"></span>
+      <span class="tracking-wider">ROʻYXATDAN OʻTISH</span>
+    </div>
+    <span class="text-[10px] font-bold text-sky-700 dark:text-sky-300 bg-sky-100 dark:bg-sky-900/50 px-2 py-0.5 rounded border border-sky-300/40">🔒 XAVFSIZ</span>
+  </div>
+  <div class="p-6 space-y-5 text-sm">
     {% if telegram_bot %}
-    <div class="text-center">
-      <p class="text-xs mb-2" style="color:var(--mut)">Eng tez yoʻl: parolsiz, bitta tugma bilan</p>
+    <div class="text-center p-3 rounded-lg bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800">
+      <p class="text-xs mb-2.5 font-bold" style="color:var(--mut)">Eng tez yoʻl: parolsiz, 1 bosishda kirish</p>
       <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="{{ telegram_bot }}"
               data-size="large" data-auth-url="{{ url_for('auth.telegram', _external=True) }}" data-request-access="write"></script>
-      <p class="text-xs mt-3 pt-3 border-t-2 border-black" style="color:var(--mut)">yoki email bilan</p>
+      <div class="relative my-3">
+        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-300 dark:border-slate-700"></div></div>
+        <div class="relative flex justify-center text-xs"><span class="px-2 bg-slate-50 dark:bg-slate-800 text-slate-500 font-semibold">yoki email bilan</span></div>
+      </div>
     </div>
     {% endif %}
-    <form method="post" class="space-y-4">
+
+    <form method="post" class="space-y-4" id="regForm">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <label class="block">Ism<input class="inp mt-1" name="name" value="{{ name or '' }}" maxlength="80" autocomplete="name" required {{ '' if telegram_bot else 'autofocus' }}></label>
-      <label class="block">Email<input class="inp mt-1" type="email" name="email" value="{{ email or '' }}" maxlength="120" autocomplete="username" required></label>
-      <label class="block">Parol (kamida 10 ta belgi, oddiy parol qabul qilinmaydi)<input class="inp mt-1" type="password" name="password" minlength="10" maxlength="128" autocomplete="new-password" data-reveal required></label>
-      <p id="pwHint" class="text-xs -mt-2" style="color:var(--mut)" aria-live="polite"></p>
+      
+      <div>
+        <label class="block font-bold text-xs uppercase tracking-wider mb-1" for="nameInput">Toʻliq ismingiz</label>
+        <input id="nameInput" class="inp" name="name" value="{{ name or '' }}" maxlength="80" autocomplete="name" placeholder="Masalan: Azizbek Rahimiy" required {{ '' if telegram_bot else 'autofocus' }}>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <label class="block font-bold text-xs uppercase tracking-wider" for="emailInput">Email pochtangiz</label>
+          <span id="emailStatus" class="text-[11px] font-semibold text-slate-400"></span>
+        </div>
+        <input id="emailInput" class="inp" type="email" name="email" value="{{ email or '' }}" maxlength="120" autocomplete="username" placeholder="nomingiz@misol.uz" required>
+      </div>
+
+      <div>
+        <label class="block font-bold text-xs uppercase tracking-wider mb-1" for="pwInput">Parol (kamida 10 ta belgi)</label>
+        <div class="relative flex items-center">
+          <input id="pwInput" class="inp pr-20" type="password" name="password" minlength="10" maxlength="128" autocomplete="new-password" placeholder="Kuchli maxfiy parol" required>
+          <button type="button" id="togglePw" class="absolute right-2 px-2.5 py-1 text-xs font-bold rounded border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition" aria-label="Parolni ko'rsatish">Koʻrish</button>
+        </div>
+
+        <!-- Parol kuchi indikatori -->
+        <div class="mt-2.5 space-y-1.5" id="pwMeterBox">
+          <div class="flex gap-1 h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div id="bar1" class="h-full w-1/3 bg-transparent transition-all duration-300"></div>
+            <div id="bar2" class="h-full w-1/3 bg-transparent transition-all duration-300"></div>
+            <div id="bar3" class="h-full w-1/3 bg-transparent transition-all duration-300"></div>
+          </div>
+          <div class="flex justify-between items-center text-[11px]">
+            <span id="pwStatusText" class="font-bold text-slate-400">Parol kiritilmagan</span>
+            <span id="pwHint" style="color:var(--mut)" aria-live="polite">Kamida 10 ta belgi</span>
+          </div>
+          <ul class="text-[11px] space-y-0.5 text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-200 dark:border-slate-800" id="pwRules">
+            <li id="ruleLen" class="flex items-center gap-1.5"><span class="icon">○</span> Kamida 10 ta belgi</li>
+            <li id="ruleMix" class="flex items-center gap-1.5"><span class="icon">○</span> Harf va raqamlar aralashmasi</li>
+            <li id="ruleComplex" class="flex items-center gap-1.5"><span class="icon">○</span> Oddiy yoki oson topiluvchi parol emas</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Honeypot bot himoyasi -->
       <div class="hp" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
-      {% if config.get('VERIFY_ENABLED') %}<p class="text-xs" style="color:var(--mut)">Emailingizga tasdiqlash kodi yuboramiz. Kodsiz ham Reading va Listening bilan boshlashingiz mumkin.</p>{% endif %}
-      <p class="text-xs" style="color:var(--mut)">Hisob yaratish bilan <a class="underline font-bold" href="{{ url_for('onboarding.terms') }}" target="_blank" rel="noopener">Foydalanish shartlari</a> va <a class="underline font-bold" href="{{ url_for('onboarding.privacy') }}" target="_blank" rel="noopener">Maxfiylik siyosati</a> bilan rozilik bildirasiz.</p>
-      <button class="btn w-full" type="submit">HISOB YARATISH</button>
-      <p class="text-xs">Hisobingiz bormi? <a class="underline font-bold" href="{{ url_for('auth.login') }}">Kiring</a></p>
+
+      {% if config.get('VERIFY_ENABLED') %}
+      <div class="p-3 rounded-lg bg-sky-50 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800/40 text-xs text-sky-800 dark:text-sky-300 flex items-start gap-2">
+        <span>ℹ️</span>
+        <p>Emailingizga tasdiqlash kodi yuboriladi. Kodsiz ham Reading va Listening mashqlarini darhol boshlashingiz mumkin.</p>
+      </div>
+      {% endif %}
+
+      <p class="text-[11px] leading-relaxed" style="color:var(--mut)">
+        Hisob yaratish orqali <a class="underline font-bold text-slate-800 dark:text-slate-200 hover:text-sky-500" href="{{ url_for('onboarding.terms') }}" target="_blank" rel="noopener">Foydalanish shartlari</a> va <a class="underline font-bold text-slate-800 dark:text-slate-200 hover:text-sky-500" href="{{ url_for('onboarding.privacy') }}" target="_blank" rel="noopener">Maxfiylik siyosati</a>ga rozilik bildirasiz.
+      </p>
+
+      <button class="btn w-full !py-3 text-sm font-bold shadow-md hover:shadow-lg" type="submit">HISOB YARATISH →</button>
+
+      <div class="pt-3 border-t border-slate-200 dark:border-slate-800 text-center text-xs">
+        <span style="color:var(--mut)">Hisobingiz allaqachon bormi?</span>
+        <a class="underline font-bold text-sky-600 dark:text-sky-400 hover:text-sky-500 ml-1" href="{{ url_for('auth.login') }}">Tizimga kiring</a>
+      </div>
     </form>
   </div>
 </section>
@@ -30,11 +91,97 @@
 {% block scripts %}
 <script>
 (function () {
-  var pw = document.querySelector('input[name="password"]'), hint = document.getElementById("pwHint");
-  if (pw && hint) pw.addEventListener("input", function () {          // only a length hint; the real rules are checked on the server
-    var n = pw.value.length;
-    hint.textContent = !n ? "" : n < 10 ? "Yana " + (10 - n) + " ta belgi kerak." : n < 14 ? "Yaxshi." : "Juda yaxshi.";
-  });
+  var pw = document.getElementById("pwInput");
+  var toggle = document.getElementById("togglePw");
+  var bar1 = document.getElementById("bar1");
+  var bar2 = document.getElementById("bar2");
+  var bar3 = document.getElementById("bar3");
+  var statusText = document.getElementById("pwStatusText");
+  var hint = document.getElementById("pwHint");
+  var ruleLen = document.getElementById("ruleLen");
+  var ruleMix = document.getElementById("ruleMix");
+  var ruleComplex = document.getElementById("ruleComplex");
+  var email = document.getElementById("emailInput");
+  var emailStatus = document.getElementById("emailStatus");
+
+  // Parol ko'rsatish/yashirish
+  if (toggle && pw) {
+    toggle.addEventListener("click", function () {
+      var isPw = pw.type === "password";
+      pw.type = isPw ? "text" : "password";
+      toggle.textContent = isPw ? "Yashirish" : "Koʻrish";
+    });
+  }
+
+  // Email formatini real vaqtda tekshirish
+  if (email && emailStatus) {
+    email.addEventListener("input", function () {
+      var val = email.value.trim();
+      if (!val) { emailStatus.textContent = ""; return; }
+      var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+      emailStatus.textContent = valid ? "✓ Toʻgʻri format" : "Format xato";
+      emailStatus.className = "text-[11px] font-bold " + (valid ? "text-emerald-500" : "text-amber-500");
+    });
+  }
+
+  // Parol kuchi tahlili
+  if (pw) {
+    pw.addEventListener("input", function () {
+      var val = pw.value;
+      var len = val.length;
+
+      // Talablar tekshiruvi
+      var hasLen = len >= 10;
+      var hasLetters = /[a-zA-Z]/.test(val);
+      var hasDigits = /[0-9]/.test(val);
+      var hasSpecial = /[^a-zA-Z0-9]/.test(val);
+      var hasMix = hasLetters && (hasDigits || hasSpecial);
+      var isComplex = len >= 12 && hasLetters && hasDigits && hasSpecial;
+
+      // Qoidalar ko'rsatkichi
+      setRule(ruleLen, hasLen);
+      setRule(ruleMix, hasMix);
+      setRule(ruleComplex, hasLen && (isComplex || len >= 14));
+
+      if (!len) {
+        bar1.className = bar2.className = bar3.className = "h-full w-1/3 bg-transparent";
+        statusText.textContent = "Parol kiritilmagan";
+        statusText.className = "font-bold text-slate-400";
+        if (hint) hint.textContent = "Kamida 10 ta belgi";
+        return;
+      }
+
+      var score = 0;
+      if (hasLen) score++;
+      if (hasMix) score++;
+      if (isComplex || len >= 14) score++;
+
+      if (score === 1) {
+        bar1.className = "h-full w-1/3 bg-rose-500";
+        bar2.className = bar3.className = "h-full w-1/3 bg-slate-200 dark:bg-slate-700";
+        statusText.textContent = "Zaif parol";
+        statusText.className = "font-bold text-rose-500";
+        if (hint) hint.textContent = "Yana " + (10 - len) + " ta belgi kerak";
+      } else if (score === 2) {
+        bar1.className = bar2.className = "h-full w-1/3 bg-amber-500";
+        bar3.className = "h-full w-1/3 bg-slate-200 dark:bg-slate-700";
+        statusText.textContent = "Oʻrtacha parol";
+        statusText.className = "font-bold text-amber-500";
+        if (hint) hint.textContent = "Yaxshi!";
+      } else {
+        bar1.className = bar2.className = bar3.className = "h-full w-1/3 bg-emerald-500";
+        statusText.textContent = "Kuchli parol";
+        statusText.className = "font-bold text-emerald-500";
+        if (hint) hint.textContent = "Juda ajoyib!";
+      }
+    });
+  }
+
+  function setRule(el, valid) {
+    if (!el) return;
+    el.querySelector(".icon").textContent = valid ? "✓" : "○";
+    el.className = "flex items-center gap-1.5 " + (valid ? "text-emerald-500 font-bold" : "text-slate-400");
+  }
 })();
 </script>
 {% endblock %}

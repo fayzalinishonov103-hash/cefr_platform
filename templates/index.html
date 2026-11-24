@@ -1,35 +1,79 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="grid lg:grid-cols-12 gap-5">
+<style>
+@keyframes heroFadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes floatBadge {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.85; }
+}
+.hero-anim { animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.hero-delay-1 { animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+.hero-delay-2 { animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both; }
+.float-box { animation: floatBadge 4s ease-in-out infinite; }
+.glow-spot {
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, rgba(37, 99, 235, 0.05) 50%, transparent 70%);
+  pointer-events: none;
+  animation: pulseGlow 5s ease-in-out infinite;
+}
+</style>
+
+<div class="grid lg:grid-cols-12 gap-6 relative">
+  <div class="glow-spot -top-10 -left-10"></div>
+  <div class="glow-spot top-1/2 right-0"></div>
 
   <!-- Hero -->
-  <section class="lg:col-span-7 pt-2">
+  <section class="lg:col-span-7 pt-3 relative z-10 hero-anim">
+    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-sky-400/30 bg-sky-500/10 text-sky-300 text-xs font-semibold mb-4 float-box">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+      <span>CEFR & Multilevel Milliy Standart 2026</span>
+    </div>
     <h1 class="hd text-4xl sm:text-6xl hero-t"><span class="blk">DARAJANGIZNI</span><span class="ln lm">BILING.</span><span class="blk">A1 DAN C2 GACHA.</span></h1>
-    <p class="lead mt-6">Milliy sertifikat (CEFR) formatida mashq qiling. AI xatoingizni tushuntiradi, lekin javobni aytmaydi.</p>
-    <div class="mt-6 flex flex-wrap gap-4">
+    <p class="lead mt-6 text-slate-200">Milliy sertifikat (CEFR) formatida toʻliq Reading, Listening, Writing va Speaking mashqlari. Sunʼiy intellekt xatolaringizni aniq tushuntiradi, yoʻnaltiradi va darajangizni baholaydi.</p>
+    <div class="mt-7 flex flex-wrap items-center gap-4 hero-delay-1">
       {% if current_user.is_authenticated %}
-      <a href="{{ url_for('main.dashboard') }}" class="btn">DAVOM ETISH</a>
-      <a href="{{ url_for('reading.tests') }}" class="btn w">TESTNI BOSHLASH</a>
+      <a href="{{ url_for('main.dashboard') }}" class="btn text-sm">DAVOM ETISH →</a>
+      <a href="{{ url_for('reading.tests') }}" class="btn w text-sm">TESTNI BOSHLASH</a>
       {% else %}
-      <a href="{{ url_for('auth.register') }}" class="btn">BEPUL BOSHLASH</a>
-      <a href="#skills" class="btn w">SKILLARNI KOʻRISH</a>
+      <a href="{{ url_for('auth.register') }}" class="btn text-sm">BEPUL BOSHLASH →</a>
+      <a href="#skills" class="btn w text-sm">SKILLARNI KOʻRISH</a>
+      <a href="{{ url_for('main.index', intro=1) }}" class="inline-flex items-center gap-1.5 text-xs text-sky-300 hover:text-white underline font-semibold transition ml-1" title="Intro animatsiyasini qayta koʻrish">
+        <span>▶ Intro</span>
+      </a>
       {% endif %}
     </div>
   </section>
 
   <!-- Natijalar oynasi -->
-  <section class="lg:col-span-5 win" aria-label="Natija namunasi">
+  <section class="lg:col-span-5 win relative z-10 hero-delay-2" aria-label="Natija namunasi">
     <div class="wh"><span class="dot"></span><span class="dot"></span><span>NATIJA NAMUNASI</span></div>
-    <div class="p-4">
-      <p class="text-[11px]" style="color:var(--mut)">UMUMIY DARAJA</p>
-      <p class="hd text-5xl" id="lvl">B2</p>
-      <p class="text-xs mt-1" id="lvlTxt" style="color:var(--mut)">Murakkab matnlarni tushunasiz, erkin gaplashasiz.</p>
-      <div class="flex flex-wrap gap-2 mt-3" id="chips"></div>
-      <div class="grid grid-cols-2 mt-4 border-2 border-black text-[11px]">
-        <div class="p-2 border-r-2 border-b-2 border-black">READING<b class="block text-lg">58/75</b></div>
-        <div class="p-2 border-b-2 border-black">LISTENING<b class="block text-lg">61/75</b></div>
-        <div class="p-2 border-r-2 border-black">WRITING<b class="block text-lg">52/75</b></div>
-        <div class="p-2">SPEAKING<b class="block text-lg">55/75</b></div>
+    <div class="p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-wider" style="color:var(--mut)">UMUMIY DARAJA</p>
+          <p class="hd text-6xl mt-1 text-sky-500 dark:text-sky-400 transition" id="lvl">B2</p>
+        </div>
+        <div class="text-right">
+          <span class="inline-block px-3 py-1 rounded-md text-xs font-bold bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">Oʻtdi · 56.5 Ball</span>
+          <p class="text-[11px] mt-1" style="color:var(--mut)">Multilevel shkalasi</p>
+        </div>
+      </div>
+      <p class="text-xs mt-2" id="lvlTxt" style="color:var(--mut)">Murakkab matnlarni tushunasiz, erkin gaplashasiz.</p>
+      <div class="flex flex-wrap gap-2 mt-4" id="chips"></div>
+      <div class="grid grid-cols-2 mt-5 border-2 border-black rounded-lg overflow-hidden text-[11px] font-bold">
+        <div class="p-2.5 border-r-2 border-b-2 border-black bg-slate-50 dark:bg-slate-800/50">READING<b class="block text-xl text-sky-600 dark:text-sky-400">58/75</b></div>
+        <div class="p-2.5 border-b-2 border-black bg-slate-50 dark:bg-slate-800/50">LISTENING<b class="block text-xl text-sky-600 dark:text-sky-400">61/75</b></div>
+        <div class="p-2.5 border-r-2 border-black bg-slate-50 dark:bg-slate-800/50">WRITING<b class="block text-xl text-sky-600 dark:text-sky-400">52/75</b></div>
+        <div class="p-2.5 bg-slate-50 dark:bg-slate-800/50">SPEAKING<b class="block text-xl text-sky-600 dark:text-sky-400">55/75</b></div>
       </div>
     </div>
   </section>
@@ -37,53 +81,66 @@
   <!-- Skillar -->
   <section id="skills" class="lg:col-span-7 win">
     <div class="wh"><span class="dot"></span><span class="dot"></span><span>TOʻRT SKILL</span></div>
-    <div class="grid sm:grid-cols-2 gap-3 p-4 text-xs">
-      <div class="flex gap-3"><span class="ic">R</span><p><b><a class="underline" href="{{ url_for('reading.tests') }}">Reading</a></b><br>5 part, 35 savol, 60 daqiqa. Matn tepada, savollar pastda.</p></div>
-      <div class="flex gap-3"><span class="ic">L</span><p><b><a class="underline" href="{{ url_for('listening.tests') }}">Listening</a></b><br>Audio bilan ishlash: har bir part cheklangan marta eshittiriladi.</p></div>
-      <div class="flex gap-3"><span class="ic">W</span><p><b><a class="underline" href="{{ url_for('writing.tasks') }}">Writing</a></b><br>2 ta topshiriq. AI mezonlar boʻyicha baho beradi.</p></div>
-      <div class="flex gap-3"><span class="ic">S</span><p><b><a class="underline" href="{{ url_for('speaking.tasks') }}">Speaking</a></b><br>Mikrofonga javob bering. Ovoz matnga aylanadi va AI baholaydi.</p></div>
+    <div class="grid sm:grid-cols-2 gap-4 p-5 text-xs">
+      <div class="flex gap-3.5 items-start p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 hover:border-sky-400 transition">
+        <span class="ic">R</span>
+        <div><b><a class="underline hover:text-sky-500 font-bold text-sm" href="{{ url_for('reading.tests') }}">Reading</a></b><br><span style="color:var(--mut)">5 part, 35 savol, 60 daqiqa. Gap fill, matching, headings, MCQ.</span></div>
+      </div>
+      <div class="flex gap-3.5 items-start p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 hover:border-sky-400 transition">
+        <span class="ic">L</span>
+        <div><b><a class="underline hover:text-sky-500 font-bold text-sm" href="{{ url_for('listening.tests') }}">Listening</a></b><br><span style="color:var(--mut)">Haqiqiy audio topshiriqlar: dialoglar, monologlar va xaritalar.</span></div>
+      </div>
+      <div class="flex gap-3.5 items-start p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 hover:border-sky-400 transition">
+        <span class="ic">W</span>
+        <div><b><a class="underline hover:text-sky-500 font-bold text-sm" href="{{ url_for('writing.tasks') }}">Writing</a></b><br><span style="color:var(--mut)">Task 1 va Task 2 insholar. AI CEFR rubrikasi boʻyicha baholaydi.</span></div>
+      </div>
+      <div class="flex gap-3.5 items-start p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 hover:border-sky-400 transition">
+        <span class="ic">S</span>
+        <div><b><a class="underline hover:text-sky-500 font-bold text-sm" href="{{ url_for('speaking.tasks') }}">Speaking</a></b><br><span style="color:var(--mut)">Ovozli javob yozish: Whisper transkripsiyasi va AI tahlili.</span></div>
+      </div>
     </div>
   </section>
 
   <!-- Writing yuklash -->
-  <a href="{{ url_for('writing.tasks') }}" class="lg:col-span-2 border-2 border-dashed border-black bg-[var(--bg)] grid place-items-center text-center p-4 min-h-[140px]" style="border-color:#000;background:rgba(0,0,0,.25)">
-    <div><p class="hd text-3xl">+</p><p class="text-[11px] font-bold mt-1">INSHONI YOZING<br>AI TEKSHIRADI</p></div>
+  <a href="{{ url_for('writing.tasks') }}" class="lg:col-span-2 border-2 border-dashed border-sky-400/60 rounded-xl bg-sky-950/20 hover:bg-sky-900/30 grid place-items-center text-center p-5 min-h-[140px] transition hover:scale-[1.02]">
+    <div><p class="hd text-4xl text-sky-400">+</p><p class="text-[11.5px] font-bold mt-2 text-slate-100">INSHONI YOZING<br><span class="text-sky-300">AI TEKSHIRADI</span></p></div>
   </a>
 
   <!-- Nega -->
   <section class="lg:col-span-3 win">
     <div class="wh"><span class="dot"></span><span>NEGA LEVI?</span></div>
-    <ul class="p-3 text-[11px] space-y-3">
-      <li><b>Haqiqiy format</b><br>Milliy sertifikat tuzilmasi.</li>
-      <li><b>Daraja bahosi</b><br>4 skillning oʻrtachasi.</li>
-      <li><b>Javob berilmaydi</b><br>AI faqat yoʻnaltiradi.</li>
+    <ul class="p-4 text-xs space-y-3.5">
+      <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold">✓</span><div><b>Haqiqiy DTM format</b><br><span style="color:var(--mut)">Milliy sertifikat tuzilmasi va mezonlari.</span></div></li>
+      <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold">✓</span><div><b>0–75 shkalasi</b><br><span style="color:var(--mut)">4 skillning rasmiy oʻrtacha bali.</span></div></li>
+      <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold">✓</span><div><b>Xatolar ustida ishlash</b><br><span style="color:var(--mut)">AI faqat xatoni koʻrsatib, toʻgʻri yoʻnaltiradi.</span></div></li>
     </ul>
   </section>
 
   <!-- Reading partlari -->
   <section id="reading" class="lg:col-span-5 win">
     <div class="wh"><span class="dot"></span><span>READING: 5 PART</span></div>
-    <div class="p-3 text-[11px] space-y-3">
-      <div><div class="flex justify-between"><span>Part 1 · Gap fill</span><span>1–6</span></div><div class="bar mt-1"><i style="width:100%"></i></div></div>
-      <div><div class="flex justify-between"><span>Part 2 · Matching</span><span>7–14</span></div><div class="bar mt-1"><i style="width:80%"></i></div></div>
-      <div><div class="flex justify-between"><span>Part 3 · Headings</span><span>15–20</span></div><div class="bar mt-1"><i style="width:60%"></i></div></div>
-      <div><div class="flex justify-between"><span>Part 4 · MCQ, T/F/NG</span><span>21–29</span></div><div class="bar mt-1"><i style="width:40%"></i></div></div>
-      <div><div class="flex justify-between"><span>Part 5 · MCQ</span><span>30–35</span></div><div class="bar mt-1"><i style="width:25%"></i></div></div>
-      <a href="{{ url_for('reading.tests') }}" class="btn w !text-[11px] !py-2 w-full text-center">TESTNI OCHISH</a>
+    <div class="p-4 text-xs space-y-3.5">
+      <div><div class="flex justify-between font-bold"><span>Part 1 · Gap fill</span><span>1–6 savol</span></div><div class="bar mt-1.5"><i style="width:100%"></i></div></div>
+      <div><div class="flex justify-between font-bold"><span>Part 2 · Matching</span><span>7–14 savol</span></div><div class="bar mt-1.5"><i style="width:80%"></i></div></div>
+      <div><div class="flex justify-between font-bold"><span>Part 3 · Headings</span><span>15–20 savol</span></div><div class="bar mt-1.5"><i style="width:60%"></i></div></div>
+      <div><div class="flex justify-between font-bold"><span>Part 4 · MCQ, T/F/NG</span><span>21–29 savol</span></div><div class="bar mt-1.5"><i style="width:40%"></i></div></div>
+      <div><div class="flex justify-between font-bold"><span>Part 5 · MCQ</span><span>30–35 savol</span></div><div class="bar mt-1.5"><i style="width:25%"></i></div></div>
+      <a href="{{ url_for('reading.tests') }}" class="btn w !text-xs !py-2.5 w-full text-center mt-2">TESTLARNI OCHISH →</a>
     </div>
   </section>
 
   <!-- CTA -->
   <section id="ai" class="lg:col-span-4 win p-5" style="background:#fff;color:#0a0a0a">
-    <p class="hd text-2xl">QISILIB QOLDINGIZMI? AI MASLAHAT BERADI.</p>
-    <p class="text-xs mt-3">Qiyin soʻzni tushuntiradi va kerakli paragrafga yoʻnaltiradi. Javobni aytmaydi.</p>
-    <a href="{{ url_for('reading.tests') }}" class="btn p mt-4">TESTDA SINAB KOʻRING</a>
+    <div class="inline-block px-2.5 py-1 rounded bg-sky-100 text-sky-800 text-[10px] font-bold mb-2">AI ASSISTANT</div>
+    <p class="hd text-2xl leading-tight">QISILIB QOLDINGIZMI? AI MASLAHAT BERADI.</p>
+    <p class="text-xs mt-3 text-slate-600">Qiyin soʻzni kontekstda tushuntiradi va kerakli paragrafga yoʻnaltiradi. Tayyor javobni aytmasdan, mustaqil topishingizga oʻrgatadi.</p>
+    <a href="{{ url_for('reading.tests') }}" class="btn p mt-4 !text-xs">TESTDA SINAB KOʻRING</a>
   </section>
 
   <!-- Yangilik -->
   <section class="lg:col-span-3 win" style="background:var(--lime);color:#0a0a0a">
     <div class="wh"><span class="dot"></span><span>LUGʻAT DAFTARI</span></div>
-    <div class="p-4"><p class="hd text-2xl">SOʻZLARNI ESDA SAQLANG</p><p class="text-[11px] mt-2">Notanish soʻzni saqlang, takrorlash vaqtini tizim eslatadi.</p><a href="{{ url_for('vocab.index') }}" class="btn w mt-3 !text-[11px] !py-2">LUGʻATNI OCHISH</a></div>
+    <div class="p-4"><p class="hd text-2xl">SOʻZLARNI ESDA SAQLANG</p><p class="text-xs mt-2 font-medium">Notanish soʻzni saqlang, interval takrorlash orqali tizim eslatib turadi.</p><a href="{{ url_for('vocab.index') }}" class="btn w mt-4 !text-xs !py-2">LUGʻATNI OCHISH →</a></div>
   </section>
 </div>
 {% endblock %}

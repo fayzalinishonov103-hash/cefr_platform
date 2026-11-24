@@ -14,13 +14,56 @@
 <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 {% if request.endpoint != 'reading.take' and request.method == 'GET' %}<script>try{var f=/[?&]intro=1(&|$)/.test(location.search);if(f||(!sessionStorage.getItem("leviIntro")&&!matchMedia("(prefers-reduced-motion: reduce)").matches)){sessionStorage.setItem("leviIntro","1");document.documentElement.classList.add("intro")}}catch(e){}</script>{% endif %}
 <style>
-/* Palette comes from the logo: deep night-blue, ice-blue light, white. (--lime = main accent, --pur/--purt = blue; names kept for old templates) */
-:root{--bg:#0b1730;--lime:#7fc8ff;--ink:#0a0a0a;--win:#f4f9ff;--wtx:#0a0a0a;--mut:#46556b;--pur:#1f63e0;--purt:#1f63e0;--line:#0a0a0a;--field:#fff;--sh:#2b6fe8;--paper:#fffdf7;--ptx:#1c1917;--read-size:17px;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#050a14;--win:#0f1c33;--wtx:#eaf4ff;--mut:#9fb6d4;--line:#6f93c4;--field:#16284a;--sh:#1c3f7a;--paper:#f6f1e6;--purt:#7fc8ff}}
-:root[data-theme="dark"]{--bg:#050a14;--win:#0f1c33;--wtx:#eaf4ff;--mut:#9fb6d4;--line:#6f93c4;--field:#16284a;--sh:#1c3f7a;--paper:#f6f1e6;--purt:#7fc8ff}
+/* Modern EdTech SaaS Palette: Deep Midnight Navy, Electric Ice-Cyan, Rich Indigo */
+:root{
+  --bg:#070d1e;
+  --lime:#38bdf8;
+  --ink:#0a0a0a;
+  --win:#ffffff;
+  --wtx:#0f172a;
+  --mut:#64748b;
+  --pur:#2563eb;
+  --purt:#2563eb;
+  --line:#0f172a;
+  --field:#f8fafc;
+  --sh:#1e3a8a;
+  --paper:#ffffff;
+  --ptx:#0f172a;
+  --read-size:17px;
+  --emerald:#10b981;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px)
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#040814;
+    --win:#0b1329;
+    --wtx:#f8fafc;
+    --mut:#94a3b8;
+    --line:#334155;
+    --field:#131f38;
+    --sh:#020617;
+    --paper:#0b1329;
+    --purt:#38bdf8;
+    --lime:#38bdf8;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#040814;
+  --win:#0b1329;
+  --wtx:#f8fafc;
+  --mut:#94a3b8;
+  --line:#334155;
+  --field:#131f38;
+  --sh:#020617;
+  --paper:#0b1329;
+  --purt:#38bdf8;
+  --lime:#38bdf8;
+}
 html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
-body{background:var(--bg);color:#fff;font-family:"Space Mono",ui-monospace,monospace}
-.logo-eyes{filter:drop-shadow(0 0 5px #4cc3ff)}
+body{background:var(--bg);color:#fff;font-family:"Space Mono",ui-monospace,monospace;background-image:radial-gradient(circle at 20% 15%,rgba(37,99,235,.12) 0%,transparent 45%),radial-gradient(circle at 80% 80%,rgba(56,189,248,.08) 0%,transparent 50%)}
+.logo-eyes{filter:drop-shadow(0 0 6px #38bdf8)}
 /* ---------- Levi intro (5.2 s): power-on flicker, slow open, glance, close, the name appears, eyes snap open ---------- */
 #intro{display:none}
 html.intro #intro{display:grid;place-items:center;position:fixed;inset:0;z-index:9999;cursor:pointer;overflow:hidden;background:radial-gradient(ellipse at 50% 42%,#0a1830 0%,#050a14 52%,#020409 100%);animation:iOut .75s cubic-bezier(.4,0,.2,1) 4.5s forwards}
@@ -60,24 +103,25 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
 .i-skip{position:absolute;z-index:2;left:0;right:0;bottom:calc(22px + env(safe-area-inset-bottom,0px));text-align:center;font:12px "Space Mono",ui-monospace,monospace;color:#7fc8ff;opacity:0;animation:iHint 1s ease 1.2s forwards}
 @keyframes iHint{to{opacity:.38}}
 .hd{font-family:"Archivo Black",Impact,sans-serif;line-height:1.02}
-.win{background:var(--win);color:var(--wtx);border:2px solid var(--line);box-shadow:5px 5px 0 var(--sh)}
-.wh{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:2px solid var(--line);font-size:11px;font-weight:700}
-.dot{width:11px;height:11px;border:2px solid var(--line);background:var(--win);display:inline-block}
-.btn{display:inline-block;border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:.7rem 1.1rem;font-weight:700;font-size:13px;color:var(--ink);background:var(--lime);transition:transform .1s,box-shadow .1s}
-.btn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
-.btn.w{background:#fff}.btn.p{background:var(--pur);color:#fff;border-color:var(--line)}
-.btn:focus-visible,.chip:focus-visible{outline:3px solid #fff;outline-offset:2px}
-.blk{background:#fff;color:var(--ink);padding:0 .4rem}
-.chip{border:2px solid var(--line);padding:.35rem .7rem;font-weight:700;background:var(--win);color:var(--wtx)}
-.chip.on{background:var(--lime);color:var(--ink);border-color:var(--ink)}
-.bar{height:8px;border:1.5px solid var(--line);background:var(--field)}.bar i{display:block;height:100%;background:var(--purt)}
+.win{background:var(--win);color:var(--wtx);border:2px solid var(--line);border-radius:12px;box-shadow:5px 5px 0 var(--sh);transition:transform .2s ease,box-shadow .2s ease}
+.win:hover{box-shadow:7px 7px 0 var(--sh)}
+.wh{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:2px solid var(--line);font-size:11.5px;font-weight:700;letter-spacing:.05em;border-top-left-radius:10px;border-top-right-radius:10px;background:color-mix(in srgb,var(--win) 92%,var(--line) 8%)}
+.dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--line);background:var(--lime);display:inline-block}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;border:2px solid var(--ink);border-radius:10px;box-shadow:4px 4px 0 var(--ink);padding:.72rem 1.2rem;font-weight:700;font-size:13px;color:var(--ink);background:var(--lime);transition:all .15s cubic-bezier(.4,0,.2,1);cursor:pointer}
+.btn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink);filter:brightness(1.05)}
+.btn.w{background:#fff;color:var(--ink)}.btn.p{background:var(--pur);color:#fff;border-color:var(--line);box-shadow:4px 4px 0 var(--line)}
+.btn:focus-visible,.chip:focus-visible{outline:3px solid #38bdf8;outline-offset:2px}
+.blk{background:#fff;color:var(--ink);padding:0 .4rem;border-radius:4px}
+.chip{border:2px solid var(--line);border-radius:8px;padding:.4rem .8rem;font-weight:700;background:var(--win);color:var(--wtx);cursor:pointer;transition:all .15s ease}
+.chip.on{background:var(--lime);color:var(--ink);border-color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
+.bar{height:10px;border-radius:6px;overflow:hidden;border:1.5px solid var(--line);background:var(--field)}.bar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--pur),var(--lime));transition:width .4s ease}
 .tick{background:var(--lime);color:var(--ink);border-block:2px solid var(--ink);overflow:hidden;white-space:nowrap;font-size:11px;font-weight:700}
-.tick div{display:inline-block;padding:6px 0;animation:mq 28s linear infinite}
+.tick div{display:inline-block;padding:7px 0;animation:mq 28s linear infinite}
 @keyframes mq{to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){.tick div{animation:none}}
-.ic{width:34px;height:34px;border:2px solid var(--ink);background:var(--lime);color:var(--ink);display:grid;place-items:center;font-family:"Archivo Black",sans-serif}
-.inp{width:100%;border:2px solid var(--line);background:var(--field);color:var(--wtx);padding:.6rem .7rem;font:inherit;font-size:inherit}
-.inp:focus{outline:3px solid var(--purt);outline-offset:1px}
+.ic{width:36px;height:36px;border-radius:8px;border:2px solid var(--ink);background:var(--lime);color:var(--ink);display:grid;place-items:center;font-family:"Archivo Black",sans-serif;box-shadow:2px 2px 0 var(--ink)}
+.inp{width:100%;border:2px solid var(--line);border-radius:8px;background:var(--field);color:var(--wtx);padding:.65rem .8rem;font:inherit;font-size:inherit;transition:border-color .15s ease,box-shadow .15s ease}
+.inp:focus{outline:none;border-color:var(--pur);box-shadow:0 0 0 3px rgba(37,99,235,.25)}
 .ropt{display:flex;gap:.6rem;align-items:center;padding:.5rem .75rem;border:2px solid var(--line);margin-bottom:.4rem;cursor:pointer;line-height:1.45}
 .ropt:hover{background:var(--field)}
 .ropt:has(input:checked){background:var(--lime);color:#0a0a0a;border-color:#0a0a0a}.ropt input{accent-color:#0a0a0a}
