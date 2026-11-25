@@ -11,6 +11,8 @@
 {% if not config.get('TAILWIND_LOCAL') %}<script src="https://cdn.tailwindcss.com/3.4.17"></script>{% endif %}
 {% if config.get('FONTS_LOCAL') %}<link rel="stylesheet" href="{{ url_for('static', filename='css/fonts.css') }}">
 {% else %}<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">{% endif %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/gilroy.css') }}">
+<link href="https://fonts.cdnfonts.com/css/gilroy-bold" rel="stylesheet">
 <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 {% if request.endpoint != 'reading.take' and request.method == 'GET' %}<script>try{var f=/[?&]intro=1(&|$)/.test(location.search);if(f||(!sessionStorage.getItem("leviIntro")&&!matchMedia("(prefers-reduced-motion: reduce)").matches)){sessionStorage.setItem("leviIntro","1");document.documentElement.classList.add("intro")}}catch(e){}</script>{% endif %}
 <style>
@@ -62,7 +64,7 @@
   --lime:#38bdf8;
 }
 html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
-body{background:var(--bg);color:#fff;font-family:"Space Mono",ui-monospace,monospace;background-image:radial-gradient(circle at 20% 15%,rgba(37,99,235,.12) 0%,transparent 45%),radial-gradient(circle at 80% 80%,rgba(56,189,248,.08) 0%,transparent 50%)}
+body{background:var(--bg);color:#fff;font-family:'Gilroy',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background-image:radial-gradient(circle at 20% 15%,rgba(37,99,235,.12) 0%,transparent 45%),radial-gradient(circle at 80% 80%,rgba(56,189,248,.08) 0%,transparent 50%)}
 .logo-eyes{filter:drop-shadow(0 0 6px #38bdf8)}
 /* ---------- Levi intro (5.2 s): power-on flicker, slow open, glance, close, the name appears, eyes snap open ---------- */
 #intro{display:none}
@@ -102,12 +104,12 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
 @keyframes iDust{0%{transform:translateY(0);opacity:0}15%{opacity:.5}85%{opacity:.3}100%{transform:translateY(-105vh);opacity:0}}
 .i-skip{position:absolute;z-index:2;left:0;right:0;bottom:calc(22px + env(safe-area-inset-bottom,0px));text-align:center;font:12px "Space Mono",ui-monospace,monospace;color:#7fc8ff;opacity:0;animation:iHint 1s ease 1.2s forwards}
 @keyframes iHint{to{opacity:.38}}
-.hd{font-family:"Archivo Black",Impact,sans-serif;line-height:1.02}
+.hd{font-family:'Gilroy',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-weight:900;letter-spacing:-0.02em;line-height:1.05}
 .win{background:var(--win);color:var(--wtx);border:2px solid var(--line);border-radius:12px;box-shadow:5px 5px 0 var(--sh);transition:transform .2s ease,box-shadow .2s ease}
 .win:hover{box-shadow:7px 7px 0 var(--sh)}
 .wh{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:2px solid var(--line);font-size:11.5px;font-weight:700;letter-spacing:.05em;border-top-left-radius:10px;border-top-right-radius:10px;background:color-mix(in srgb,var(--win) 92%,var(--line) 8%)}
 .dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--line);background:var(--lime);display:inline-block}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;border:2px solid var(--ink);border-radius:10px;box-shadow:4px 4px 0 var(--ink);padding:.72rem 1.2rem;font-weight:700;font-size:13px;color:var(--ink);background:var(--lime);transition:all .15s cubic-bezier(.4,0,.2,1);cursor:pointer}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;border:2px solid var(--ink);border-radius:10px;box-shadow:4px 4px 0 var(--ink);padding:.72rem 1.2rem;font-family:'Gilroy',sans-serif;font-weight:700;font-size:13px;color:var(--ink);background:var(--lime);transition:all .15s cubic-bezier(.4,0,.2,1);cursor:pointer}
 .btn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink);filter:brightness(1.05)}
 .btn.w{background:#fff;color:var(--ink)}.btn.p{background:var(--pur);color:#fff;border-color:var(--line);box-shadow:4px 4px 0 var(--line)}
 .btn:focus-visible,.chip:focus-visible{outline:3px solid #38bdf8;outline-offset:2px}
@@ -119,7 +121,7 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
 .tick div{display:inline-block;padding:7px 0;animation:mq 28s linear infinite}
 @keyframes mq{to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){.tick div{animation:none}}
-.ic{width:36px;height:36px;border-radius:8px;border:2px solid var(--ink);background:var(--lime);color:var(--ink);display:grid;place-items:center;font-family:"Archivo Black",sans-serif;box-shadow:2px 2px 0 var(--ink)}
+.ic{width:36px;height:36px;border-radius:8px;border:2px solid var(--ink);background:var(--lime);color:var(--ink);display:grid;place-items:center;font-family:'Gilroy',sans-serif;font-weight:900;box-shadow:2px 2px 0 var(--ink)}
 .inp{width:100%;border:2px solid var(--line);border-radius:8px;background:var(--field);color:var(--wtx);padding:.65rem .8rem;font:inherit;font-size:inherit;transition:border-color .15s ease,box-shadow .15s ease}
 .inp:focus{outline:none;border-color:var(--pur);box-shadow:0 0 0 3px rgba(37,99,235,.25)}
 .ropt{display:flex;gap:.6rem;align-items:center;padding:.5rem .75rem;border:2px solid var(--line);margin-bottom:.4rem;cursor:pointer;line-height:1.45}
@@ -128,7 +130,7 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
 .warn{background:var(--lime);color:#0a0a0a}
 .hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
 .pw-wrap{position:relative;display:block;margin-top:.25rem}.pw-wrap .inp{margin-top:0;padding-right:6.2rem}
-.pwt{position:absolute;right:6px;top:50%;transform:translateY(-50%);font:700 11px "Space Mono",ui-monospace,monospace;padding:.3rem .5rem;border:2px solid var(--line);background:var(--win);color:var(--wtx);cursor:pointer}
+.pwt{position:absolute;right:6px;top:50%;transform:translateY(-50%);font:700 11px 'Gilroy',sans-serif;padding:.3rem .5rem;border:2px solid var(--line);background:var(--win);color:var(--wtx);cursor:pointer}
 .pwt:focus-visible{outline:3px solid var(--purt);outline-offset:1px}
 .pill{position:relative;display:inline-flex;align-items:center;border:2px solid var(--line);padding:.3rem .75rem;font-weight:700;font-size:12px;cursor:pointer;background:var(--field);color:var(--wtx);user-select:none}
 .pill input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
@@ -139,17 +141,17 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
 .border-black{border-color:var(--line)!important}
 .border-black\/20{border-color:color-mix(in srgb,var(--line) 25%,transparent)!important}
 /* readable long text */
-.read{font-family:Inter,system-ui,sans-serif;font-size:16px;line-height:1.65}
+.read{font-family:'Gilroy',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.65}
 .passage{background:var(--paper);color:var(--ptx);font-family:"Source Serif 4",Georgia,serif;font-size:var(--read-size);line-height:1.75}
 .passage p{margin:0 0 .95em;max-width:68ch}.passage p:last-child{margin-bottom:0}.passage b{color:#1f63e0;margin-right:.3em}
-.win table{font-family:Inter,system-ui,sans-serif;font-size:14px}
+.win table{font-family:'Gilroy',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:14px}
 .skip{position:absolute;left:-999px;top:0;background:var(--lime);color:var(--ink);padding:.6rem 1rem;font-weight:700;z-index:100}.skip:focus{left:8px;top:8px}
 /* hero title: every line is its own box, so lines never overlap or cover each other */
 .hero-t{line-height:1.12;letter-spacing:-.01em}
 .hero-t .ln{display:block;width:fit-content;max-width:100%;margin-bottom:.12em}
 .hero-t .blk{display:block;width:fit-content;max-width:100%;padding:.04em .3em .02em;margin-bottom:.12em}
 .hero-t .lm{color:var(--lime)}
-.lead{font-family:Inter,system-ui,sans-serif;font-size:17px;line-height:1.6;color:#fff;max-width:34rem}
+.lead{font-family:'Gilroy',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.6;color:#fff;max-width:34rem}
 #toTop{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;display:none}
 #toTop.show{display:block}
 .ib{width:40px;height:40px;display:grid;place-items:center;border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);background:#fff;color:var(--ink);cursor:pointer;list-style:none;font-weight:700;transition:transform .1s,box-shadow .1s}

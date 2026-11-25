@@ -68,8 +68,8 @@ def _csp():
     return "; ".join([
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://telegram.org",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-        "font-src 'self' https://fonts.gstatic.com data:",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.cdnfonts.com",
+        "font-src 'self' https://fonts.gstatic.com https://fonts.cdnfonts.com data:",
         "img-src 'self' data: blob: https://i.ytimg.com https://telegram.org",
         "media-src 'self' blob: https:",
         "connect-src 'self'",
