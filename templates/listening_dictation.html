@@ -139,10 +139,12 @@ function playAudio(id, rate) {
   utterance.rate = rate || 1.0;
   utterance.pitch = 1.0;
 
-  // Prefer natural English voices
+  // Prefer natural English voices (British/American high-fidelity)
   const voices = window.speechSynthesis.getVoices();
-  const naturalEn = voices.find(v => (v.lang === "en-GB" || v.lang === "en-US") && v.name.includes("Natural"))
-                 || voices.find(v => v.lang === "en-GB")
+  const naturalEn = voices.find(v => (v.lang === "en-GB" || v.lang.startsWith("en-GB")) && 
+                     (v.name.includes("Natural") || v.name.includes("Online") || v.name.includes("Google") || v.name.includes("Sonia") || v.name.includes("Ryan") || v.name.includes("Libby")))
+                 || voices.find(v => v.lang === "en-GB" || v.lang.startsWith("en-GB"))
+                 || voices.find(v => (v.lang === "en-US" || v.lang.startsWith("en-US")) && (v.name.includes("Natural") || v.name.includes("Online") || v.name.includes("Google")))
                  || voices.find(v => v.lang.startsWith("en"));
   if (naturalEn) utterance.voice = naturalEn;
 

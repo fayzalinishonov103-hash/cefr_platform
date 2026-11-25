@@ -176,9 +176,10 @@
       h("p", { class: "text-xs font-bold" }, "Audio (mp3, m4a, wav, ogg; 30 MB gacha)"),
       file, urlInput, player, note);
   }
-  function imageBox(p) {
-    const note = h("p", { class: "text-xs", "aria-live": "polite" }, p.image_url ? "Rasm biriktirilgan." : "Rasm yuklanmagan (ixtiyoriy).");
-    const img = h("img", { alt: "Yuklangan rasm", class: "max-h-64 border-2 border-black bg-white" + (p.image_url ? "" : " hidden") });
+  function imageBox(p, pi) {
+    const isPart4 = pi === 3 || (!LISTENING);
+    const note = h("p", { class: "text-xs", "aria-live": "polite" }, p.image_url ? "Rasm/xarita biriktirilgan." : (LISTENING ? (pi === 3 ? "Part 4 uchun xarita yuklang (ixtiyoriy)." : "Listeningda xarita faqat 4-partga xos (ixtiyoriy).") : "Rasm yuklanmagan (ixtiyoriy)."));
+    const img = h("img", { alt: "Yuklangan rasm", class: "max-h-64 border border-[var(--line)] rounded-lg bg-white" + (p.image_url ? "" : " hidden") });
     if (p.image_url) img.src = p.image_url;
     const file = h("input", { type: "file", accept: ".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp", class: "text-xs" });
     file.addEventListener("change", async () => {
@@ -192,19 +193,22 @@
         else note.textContent = d.error || (r.status === 413 ? "Rasm juda katta (5 MB gacha)." : "Yuklashda xatolik.");
       } catch (e) { note.textContent = "Internet aloqasi yoʻq."; }
     });
-    return h("div", { class: "border-2 border-black p-3 space-y-2" },
-      h("p", { class: "text-xs font-bold" }, "Rasm yoki xarita (PNG, JPG, WebP; 5 MB gacha)"),
+    return h("div", { class: "border border-[var(--line)] rounded-xl p-3 space-y-2 bg-[var(--field)]" },
+      h("p", { class: "text-xs font-bold flex items-center justify-between" }, 
+        h("span", {}, LISTENING ? (pi === 3 ? "🗺️ Xarita / Diagramma (Part 4 Map Labelling)" : "Rasm / Xarita (Listeningda faqat 4-partda tavsiya etiladi)") : "Rasm yoki xarita (PNG, JPG, WebP; 5 MB gacha)"),
+        LISTENING && pi === 3 ? h("span", { class: "text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold" }, "Part 4 Map") : ""
+      ),
       h("p", { class: "text-xs", style: "color:var(--mut)" }, "Xaritadagi joylarga A, B, C... harflarini rasmning oʻziga yozib qoʻying. Talaba rasmni shu part ichida koʻradi."),
       file, img, note,
       p.image_url ? button("Rasmni olib tashlash", () => { p.image_url = ""; dirty = true; render(); }) : "");
   }
   function partCard(p, pi) {
     return h("section", { class: "win mb-6" },
-      h("div", { class: "wh" }, h("span", { class: "dot" }), h("span", {}, "PART " + (pi + 1))),
+      h("div", { class: "wh" }, h("span", { class: "dot" }), h("span", {}, "PART " + (pi + 1) + (LISTENING && pi === 3 ? " · Map Labelling (Xarita)" : ""))),
       h("div", { class: "p-4 space-y-4 text-sm" },
         field("Part sarlavhasi", input(p, "title", { maxlength: 150 })),
         LISTENING ? audioBox(p) : "",
-        imageBox(p),
+        imageBox(p, pi),
         field(LISTENING ? "Transkript (ixtiyoriy). Talabaga test paytida koʻrinmaydi, natija sahifasida koʻrsatiladi"
                         : "Matn (abzatslar boʻsh qator bilan ajratiladi; Matching headings uchun har abzats I, II, III... deb raqamlanadi)",
               input(p, "passage", { rows: LISTENING ? 6 : 10 }, "textarea")),

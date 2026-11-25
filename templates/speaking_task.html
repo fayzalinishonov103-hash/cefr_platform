@@ -9,6 +9,46 @@
       <p class="font-bold">{{ prompt.title }}</p>
       <div class="whitespace-pre-line leading-relaxed">{{ prompt.prompt }}</div>
       <p class="text-xs" style="color:var(--mut)">Tayyorgarlik: {{ prompt.think_seconds }} soniya. Javob: {{ prompt.speak_seconds }} soniyagacha.</p>
+
+      <!-- CEFR Original Visual Task Cue Card (Rasmlar) -->
+      <div class="mt-4 pt-4 border-t border-[var(--line)] space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-indigo-500 dark:text-cyan-400 flex items-center gap-1.5">
+            <span>📷</span> <span>CEFR VISUAL TASK PROMPT</span>
+          </span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 font-mono font-bold">Rasmiy Format</span>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-2.5">
+          <!-- Picture A -->
+          <div class="p-2.5 rounded-xl border border-[var(--line)] bg-[var(--field)] text-center space-y-1.5">
+            <div class="w-full h-24 rounded-lg overflow-hidden bg-gradient-to-br from-indigo-900/40 to-slate-800 flex flex-col items-center justify-center p-2 text-slate-300 relative">
+              <span class="text-2xl mb-1">🏙️ 📱</span>
+              <span class="text-[11px] font-bold text-cyan-300">Situation A</span>
+              <span class="text-[9px] text-slate-400 leading-tight">Digital & Modern City Life</span>
+            </div>
+            <p class="text-[11px] font-semibold text-[var(--wtx)]">Rasm A: Shahar & Texnologiya</p>
+          </div>
+
+          <!-- Picture B -->
+          <div class="p-2.5 rounded-xl border border-[var(--line)] bg-[var(--field)] text-center space-y-1.5">
+            <div class="w-full h-24 rounded-lg overflow-hidden bg-gradient-to-br from-emerald-900/40 to-slate-800 flex flex-col items-center justify-center p-2 text-slate-300 relative">
+              <span class="text-2xl mb-1">🏡 🌿</span>
+              <span class="text-[11px] font-bold text-emerald-300">Situation B</span>
+              <span class="text-[9px] text-slate-400 leading-tight">Traditional & Natural Setting</span>
+            </div>
+            <p class="text-[11px] font-semibold text-[var(--wtx)]">Rasm B: Anʼanaviy & Tabiiy</p>
+          </div>
+        </div>
+
+        <div class="p-2.5 rounded-xl border border-indigo-500/20 bg-indigo-500/5 text-xs space-y-1">
+          <p class="font-bold text-indigo-500 dark:text-indigo-400">💡 CEFR Taqqoslash Qoidalari:</p>
+          <ul class="list-disc list-inside space-y-0.5 text-[11px]" style="color:var(--mut)">
+            <li><i>"In the first picture, I can observe... while in the second one..."</i></li>
+            <li><i>"Both pictures depict situations where... however, the main contrast is..."</i></li>
+          </ul>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -16,7 +56,7 @@
     <div class="wh"><span class="dot"></span><span>SIZNING JAVOBINGIZ</span></div>
     <div class="p-5 space-y-4 text-sm" id="rec" data-think="{{ prompt.think_seconds|int }}" data-speak="{{ prompt.speak_seconds|int }}">
       <input type="hidden" id="csrf" value="{{ csrf_token() }}">
-      <div class="text-center py-4 border-2 border-black">
+      <div class="text-center py-5 border border-[var(--line)] rounded-2xl bg-[var(--field)] shadow-inner">
         <p class="text-[11px]" style="color:var(--mut)" id="state">TAYYOR</p>
         <p class="hd text-6xl" id="clock">00:00</p>
         <div class="bar mt-3 mx-6"><i id="meter" style="width:0%"></i></div>

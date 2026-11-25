@@ -202,13 +202,13 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
       <div class="i-aura"></div><div class="i-bloom"></div>
       <svg class="i-eyes" viewBox="0 8 220 54" role="presentation">
         <defs>
-          <radialGradient id="ieg" cx="50%" cy="58%" r="75%"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#e4f4ff"/><stop offset="1" stop-color="#98cdfa"/></radialGradient>
+          <radialGradient id="ieg" cx="50%" cy="58%" r="75%"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#e4f4ff"/><stop offset="1" stop-color="#38bdf8"/></radialGradient>
           <filter id="iglow" x="-50%" y="-150%" width="200%" height="400%"><feGaussianBlur stdDeviation="7"/></filter>
         </defs>
         <g class="ig"><g class="ie">
-          <g class="ih" filter="url(#iglow)"><path d="M10 14 L102 34 Q100 45 91 50 Q62 58 40 52 Q17 42 10 14 Z" fill="#3ea8ff"/><path d="M210 14 L118 34 Q120 45 129 50 Q158 58 180 52 Q203 42 210 14 Z" fill="#3ea8ff"/></g>
-          <path d="M10 14 L102 34 Q100 45 91 50 Q62 58 40 52 Q17 42 10 14 Z" fill="url(#ieg)" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
-          <path d="M210 14 L118 34 Q120 45 129 50 Q158 58 180 52 Q203 42 210 14 Z" fill="url(#ieg)" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
+          <g class="ih" filter="url(#iglow)"><path d="M10 14 L102 34 Q100 45 91 50 Q62 58 40 52 Q17 42 10 14 Z" fill="#38bdf8"/><path d="M210 14 L118 34 Q120 45 129 50 Q158 58 180 52 Q203 42 210 14 Z" fill="#38bdf8"/></g>
+          <path d="M10 14 L102 34 Q100 45 91 50 Q62 58 40 52 Q17 42 10 14 Z" fill="url(#ieg)" stroke="#4f46e5" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M210 14 L118 34 Q120 45 129 50 Q158 58 180 52 Q203 42 210 14 Z" fill="url(#ieg)" stroke="#4f46e5" stroke-width="2.5" stroke-linejoin="round"/>
         </g></g>
       </svg>
     </div>
@@ -222,9 +222,21 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
 <a class="skip" href="#top">Asosiy qismga oʻtish</a>
 <header class="bg-[var(--bg)]">
   <div class="{% block header_container %}max-w-6xl mx-auto px-4{% endblock %} py-4 flex items-center justify-between gap-3">
-    <a href="{{ url_for('main.index') }}" class="logo hd text-2xl flex items-center gap-2" aria-label="Levi: bosh sahifa">
-      <svg class="logo-eyes" width="46" height="15" viewBox="0 8 220 54" aria-hidden="true"><path d="M10 14 L102 34 Q100 45 91 50 Q62 58 40 52 Q17 42 10 14 Z" fill="#fff" stroke="#0a0a0a" stroke-width="6" stroke-linejoin="round"/><path d="M210 14 L118 34 Q120 45 129 50 Q158 58 180 52 Q203 42 210 14 Z" fill="#fff" stroke="#0a0a0a" stroke-width="6" stroke-linejoin="round"/></svg>
-      <span>LEVI</span></a>
+    <a href="{{ url_for('main.index') }}" class="logo hd text-2xl flex items-center gap-2 group" aria-label="Levi: bosh sahifa">
+      <svg class="logo-eyes transition-transform duration-300 group-hover:scale-105" width="48" height="18" viewBox="0 8 220 54" aria-hidden="true">
+        <defs>
+          <radialGradient id="h_eye" cx="50%" cy="60%" r="70%"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#38bdf8"/></radialGradient>
+          <filter id="h_glow" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="5"/></filter>
+        </defs>
+        <g filter="url(#h_glow)" opacity="0.85">
+          <path d="M10 14 L102 34 Q100 45 91 50 Q62 58 40 52 Q17 42 10 14 Z" fill="#38bdf8"/>
+          <path d="M210 14 L118 34 Q120 45 129 50 Q158 58 180 52 Q203 42 210 14 Z" fill="#38bdf8"/>
+        </g>
+        <path d="M10 14 L102 34 Q100 45 91 50 Q62 58 40 52 Q17 42 10 14 Z" fill="url(#h_eye)" stroke="#4f46e5" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M210 14 L118 34 Q120 45 129 50 Q158 58 180 52 Q203 42 210 14 Z" fill="url(#h_eye)" stroke="#4f46e5" stroke-width="2.5" stroke-linejoin="round"/>
+      </svg>
+      <span class="bg-gradient-to-r from-indigo-500 via-sky-500 to-cyan-400 bg-clip-text text-transparent font-black tracking-wide">LEVI</span>
+    </a>
     {% set ep = request.endpoint or '' %}{% set bp_ = nav_skill|default(request.blueprint or '') %}
     {% if current_user.is_authenticated %}
       {% set nav_links = [

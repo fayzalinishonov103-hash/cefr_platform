@@ -59,7 +59,17 @@
         <div class="bar"><i data-audio-bar style="width:0%"></i></div>
         <p class="text-xs" data-audio-note aria-live="polite"></p>
         {% else %}<p>Bu part uchun audio yuklanmagan. Administratorga xabar bering.</p>{% endif %}
-        {% if p.image_url %}<a href="{{ p.image_url }}" target="_blank" rel="noopener" title="Katta ochish"><img src="{{ p.image_url }}" alt="{{ p.title or 'Xarita' }}" class="max-w-full mx-auto border-2 border-black bg-white"></a><p class="text-[11px]" style="color:var(--mut)">Rasmni bosing: katta oynada ochiladi.</p>{% endif %}
+        {% if p.image_url %}
+        <div class="mt-3 p-3 rounded-xl border border-[var(--line)] bg-[var(--field)]">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold flex items-center gap-1.5">🗺️ {% if is_listening %}Part {{ p.number }} Xaritasi / Diagramma{% else %}Rasm / Diagramma{% endif %}</span>
+            <span class="text-[10px] text-[var(--mut)]">Katta ochish uchun bosing</span>
+          </div>
+          <a href="{{ p.image_url }}" target="_blank" rel="noopener" title="Katta oynada ochish" class="block overflow-hidden rounded-lg">
+            <img src="{{ p.image_url }}" alt="{{ p.title or 'Xarita' }}" class="max-w-full mx-auto border border-[var(--line)] rounded-lg bg-white shadow-sm hover:scale-[1.01] transition">
+          </a>
+        </div>
+        {% endif %}
       </div>
     </div>
     {% else %}

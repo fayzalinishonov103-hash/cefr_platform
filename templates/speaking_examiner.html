@@ -45,6 +45,33 @@
       </div>
     </div>
 
+    <!-- CEFR Speaking Part 2/3 Visual Stimulus Cue Card (Rasmlar) -->
+    <div class="p-4 rounded-xl border border-[var(--line)] bg-[var(--field)] space-y-3" id="visualCard">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-sky-400 flex items-center gap-1.5">
+          <span>📷</span> <span>CEFR VISUAL PROMPT (RASMLARNI TAQQOSLASH)</span>
+        </span>
+        <span class="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 font-mono font-bold">Original Format</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div class="p-3 rounded-lg border border-[var(--line)] bg-[var(--win)] text-center space-y-1">
+          <div class="h-20 rounded bg-gradient-to-br from-indigo-950/70 to-slate-900 flex flex-col items-center justify-center p-2 text-slate-300">
+            <span class="text-2xl mb-0.5">💻 ☕</span>
+            <span class="font-bold text-indigo-300">Picture 1: Solo Study & Digital Life</span>
+          </div>
+          <p class="text-[11px] font-medium" style="color:var(--mut)">Working remotely / individual digital study</p>
+        </div>
+        <div class="p-3 rounded-lg border border-[var(--line)] bg-[var(--win)] text-center space-y-1">
+          <div class="h-20 rounded bg-gradient-to-br from-emerald-950/70 to-slate-900 flex flex-col items-center justify-center p-2 text-slate-300">
+            <span class="text-2xl mb-0.5">👥 🏫</span>
+            <span class="font-bold text-emerald-300">Picture 2: Group Interaction</span>
+          </div>
+          <p class="text-[11px] font-medium" style="color:var(--mut)">Interactive classroom / face-to-face team</p>
+        </div>
+      </div>
+      <p class="text-[11px] italic" style="color:var(--mut)">💡 Maslahat: Har ikkala vaziyatning ijobiy va salbiy tomonlarini taqqoslab, oʻz nuqtai nazaringizni bildiring.</p>
+    </div>
+
     <!-- Active Turn Controls -->
     <div class="p-4 rounded-xl border border-slate-800 bg-slate-950/60 text-center space-y-4">
       <div id="statusIndicator" class="text-xs text-slate-400 font-bold">
@@ -79,13 +106,58 @@
   var recSeconds = 0;
   var lastQuestion = {{ question|tojson }};
 
+  // Natural English Accent Voice Selection (British/American Academic)
+  let examinerVoice = null;
+  function getBestEnglishVoice() {
+    if (!('speechSynthesis' in window)) return null;
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices || !voices.length) return null;
+    
+    // 1. Natural / Neural British English voices (highest quality)
+    const naturalGB = voices.find(v => (v.lang === "en-GB" || v.lang.startsWith("en-GB")) && 
+      (v.name.includes("Natural") || v.name.includes("Online") || v.name.includes("Google") || 
+       v.name.includes("Sonia") || v.name.includes("Ryan") || v.name.includes("Libby") || 
+       v.name.includes("Daniel") || v.name.includes("Oliver") || v.name.includes("George")));
+    if (naturalGB) return naturalGB;
+    
+    // 2. Any standard British English voice
+    const anyGB = voices.find(v => v.lang === "en-GB" || v.lang.startsWith("en-GB"));
+    if (anyGB) return anyGB;
+
+    // 3. Natural American English voices
+    const naturalUS = voices.find(v => (v.lang === "en-US" || v.lang.startsWith("en-US")) && 
+      (v.name.includes("Natural") || v.name.includes("Online") || v.name.includes("Google") || 
+       v.name.includes("Jenny") || v.name.includes("Guy") || v.name.includes("Aria") || v.name.includes("Samantha")));
+    if (naturalUS) return naturalUS;
+
+    // 4. Any English voice
+    return voices.find(v => v.lang && v.lang.startsWith("en")) || null;
+  }
+
+  function initVoices() {
+    if ('speechSynthesis' in window) {
+      examinerVoice = getBestEnglishVoice();
+      window.speechSynthesis.onvoiceschanged = function() {
+        examinerVoice = getBestEnglishVoice();
+      };
+    }
+  }
+  initVoices();
+
   // Text-To-Speech for Examiner
   function speakEnglish(text) {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       var u = new SpeechSynthesisUtterance(text);
-      u.lang = "en-GB";
-      u.rate = 0.95;
+      if (!examinerVoice) examinerVoice = getBestEnglishVoice();
+      if (examinerVoice) {
+        u.voice = examinerVoice;
+        u.lang = examinerVoice.lang || "en-GB";
+      } else {
+        u.lang = "en-GB";
+      }
+      u.rate = 0.92; // Aniq va tushunarli CEFR tezligi
+      u.pitch = 1.0;
       window.speechSynthesis.speak(u);
     }
   }
