@@ -205,7 +205,7 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
 {% endif %}
 <a class="skip" href="#top">Asosiy qismga oʻtish</a>
 <header class="bg-[var(--bg)]">
-  <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
+  <div class="{% block header_container %}max-w-6xl mx-auto px-4{% endblock %} py-4 flex items-center justify-between gap-3">
     <a href="{{ url_for('main.index') }}" class="logo hd text-2xl flex items-center gap-2" aria-label="Levi: bosh sahifa">
       <svg class="logo-eyes" width="46" height="15" viewBox="0 8 220 54" aria-hidden="true"><path d="M10 14 L102 34 Q100 45 91 50 Q62 58 40 52 Q17 42 10 14 Z" fill="#fff" stroke="#0a0a0a" stroke-width="6" stroke-linejoin="round"/><path d="M210 14 L118 34 Q120 45 129 50 Q158 58 180 52 Q203 42 210 14 Z" fill="#fff" stroke="#0a0a0a" stroke-width="6" stroke-linejoin="round"/></svg>
       <span>LEVI</span></a>
@@ -269,7 +269,7 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
 {% block ticker %}<div class="tick" aria-hidden="true"><div>READING • LISTENING • WRITING • SPEAKING • AI MASLAHAT • A1–C2 • READING • LISTENING • WRITING • SPEAKING • AI MASLAHAT • A1–C2 • READING • LISTENING • WRITING • SPEAKING • AI MASLAHAT • A1–C2 • READING • LISTENING • WRITING • SPEAKING • AI MASLAHAT • A1–C2 •</div></div>
 
 {% endblock %}
-<main id="top" class="max-w-6xl mx-auto px-4 py-8">
+<main id="top" class="{% block main_container %}max-w-6xl mx-auto px-4 py-8{% endblock %}">
 {% with messages = get_flashed_messages(with_categories=true) %}{% for cat, msg in messages %}
   <div class="win mb-5 px-4 py-3 text-sm" role="alert" style="{{ 'background:#fff0f0' if cat == 'error' else 'background:var(--lime);color:#0a0a0a' }}">{{ msg }}</div>
 {% endfor %}{% endwith %}
@@ -282,7 +282,7 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
 {% block content %}{% endblock %}
 </main>
 <footer class="border-t-2 border-black bg-black text-white mt-6">
-  <div class="max-w-6xl mx-auto px-4 py-6 text-[11px] flex flex-wrap justify-between gap-3">
+  <div class="{% block footer_container %}max-w-6xl mx-auto px-4{% endblock %} py-6 text-[11px] flex flex-wrap justify-between gap-3">
     <span>© 2026 Levi · <a class="underline" href="{{ url_for('onboarding.privacy') }}">Maxfiylik siyosati</a> · <a class="underline" href="{{ url_for('onboarding.terms') }}">Shartlar</a></span>
     <span class="flex flex-wrap gap-4"><a class="underline" href="{{ url_for('reading.tests') }}">Reading</a><a class="underline" href="{{ url_for('listening.tests') }}">Listening</a><a class="underline" href="{{ url_for('writing.tasks') }}">Writing</a><a class="underline" href="{{ url_for('speaking.tasks') }}">Speaking</a><a class="underline" href="{{ url_for('shadowing.videos') }}">Shadowing</a></span>
   </div>
