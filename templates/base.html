@@ -16,52 +16,64 @@
 <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 {% if request.endpoint != 'reading.take' and request.method == 'GET' %}<script>try{var f=/[?&]intro=1(&|$)/.test(location.search);if(f||(!sessionStorage.getItem("leviIntro")&&!matchMedia("(prefers-reduced-motion: reduce)").matches)){sessionStorage.setItem("leviIntro","1");document.documentElement.classList.add("intro")}}catch(e){}</script>{% endif %}
 <style>
-/* Modern EdTech SaaS Palette: Deep Midnight Navy, Electric Ice-Cyan, Rich Indigo */
+/* Modern High-End Obsidian & Indigo/Cyan Palette */
 :root{
-  --bg:#070d1e;
-  --lime:#38bdf8;
-  --ink:#0a0a0a;
+  --bg:#f8fafc;
   --win:#ffffff;
   --wtx:#0f172a;
   --mut:#64748b;
-  --pur:#2563eb;
-  --purt:#2563eb;
-  --line:#0f172a;
-  --field:#f8fafc;
-  --sh:#1e3a8a;
+  --line:#e2e8f0;
+  --field:#f1f5f9;
+  --sh:rgba(15,23,42,0.08);
   --paper:#ffffff;
   --ptx:#0f172a;
   --read-size:17px;
   --emerald:#10b981;
+  --lime:#4f46e5;
+  --pur:#6366f1;
+  --purt:#4f46e5;
+  --ink:#0f172a;
+  --primary-gradient:linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+  --btn-tx:#ffffff;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
-  padding-bottom:env(safe-area-inset-bottom,0px)
+  padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#040814;
-    --win:#0b1329;
+    --bg:#090d16;
+    --win:#0f1523;
     --wtx:#f8fafc;
     --mut:#94a3b8;
-    --line:#334155;
-    --field:#131f38;
-    --sh:#020617;
-    --paper:#0b1329;
+    --line:#1e293b;
+    --field:#0b101c;
+    --sh:rgba(0,0,0,0.45);
+    --paper:#0f1523;
+    --ptx:#f8fafc;
     --purt:#38bdf8;
-    --lime:#38bdf8;
+    --lime:#6366f1;
+    --pur:#4f46e5;
+    --ink:#f8fafc;
+    --primary-gradient:linear-gradient(135deg, #6366f1 0%, #38bdf8 100%);
+    --btn-tx:#ffffff;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#040814;
-  --win:#0b1329;
+  --bg:#090d16;
+  --win:#0f1523;
   --wtx:#f8fafc;
   --mut:#94a3b8;
-  --line:#334155;
-  --field:#131f38;
-  --sh:#020617;
-  --paper:#0b1329;
+  --line:#1e293b;
+  --field:#0b101c;
+  --sh:rgba(0,0,0,0.45);
+  --paper:#0f1523;
+  --ptx:#f8fafc;
   --purt:#38bdf8;
-  --lime:#38bdf8;
+  --lime:#6366f1;
+  --pur:#4f46e5;
+  --ink:#f8fafc;
+  --primary-gradient:linear-gradient(135deg, #6366f1 0%, #38bdf8 100%);
+  --btn-tx:#ffffff;
 }
 html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
 body{background:var(--bg);color:#fff;font-family:'Gilroy',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background-image:radial-gradient(circle at 20% 15%,rgba(37,99,235,.12) 0%,transparent 45%),radial-gradient(circle at 80% 80%,rgba(56,189,248,.08) 0%,transparent 50%)}
@@ -105,69 +117,73 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
 .i-skip{position:absolute;z-index:2;left:0;right:0;bottom:calc(22px + env(safe-area-inset-bottom,0px));text-align:center;font:12px "Space Mono",ui-monospace,monospace;color:#7fc8ff;opacity:0;animation:iHint 1s ease 1.2s forwards}
 @keyframes iHint{to{opacity:.38}}
 .hd{font-family:'Gilroy',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-weight:900;letter-spacing:-0.02em;line-height:1.05}
-.win{background:var(--win);color:var(--wtx);border:2px solid var(--line);border-radius:12px;box-shadow:5px 5px 0 var(--sh);transition:transform .2s ease,box-shadow .2s ease}
-.win:hover{box-shadow:7px 7px 0 var(--sh)}
-.wh{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:2px solid var(--line);font-size:11.5px;font-weight:700;letter-spacing:.05em;border-top-left-radius:10px;border-top-right-radius:10px;background:color-mix(in srgb,var(--win) 92%,var(--line) 8%)}
-.dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--line);background:var(--lime);display:inline-block}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;border:2px solid var(--ink);border-radius:10px;box-shadow:4px 4px 0 var(--ink);padding:.72rem 1.2rem;font-family:'Gilroy',sans-serif;font-weight:700;font-size:13px;color:var(--ink);background:var(--lime);transition:all .15s cubic-bezier(.4,0,.2,1);cursor:pointer}
-.btn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink);filter:brightness(1.05)}
-.btn.w{background:#fff;color:var(--ink)}.btn.p{background:var(--pur);color:#fff;border-color:var(--line);box-shadow:4px 4px 0 var(--line)}
-.btn:focus-visible,.chip:focus-visible{outline:3px solid #38bdf8;outline-offset:2px}
-.blk{background:#fff;color:var(--ink);padding:0 .4rem;border-radius:4px}
-.chip{border:2px solid var(--line);border-radius:8px;padding:.4rem .8rem;font-weight:700;background:var(--win);color:var(--wtx);cursor:pointer;transition:all .15s ease}
-.chip.on{background:var(--lime);color:var(--ink);border-color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
-.bar{height:10px;border-radius:6px;overflow:hidden;border:1.5px solid var(--line);background:var(--field)}.bar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--pur),var(--lime));transition:width .4s ease}
-.tick{background:var(--lime);color:var(--ink);border-block:2px solid var(--ink);overflow:hidden;white-space:nowrap;font-size:11px;font-weight:700}
+.win{background:var(--win);color:var(--wtx);border:1px solid var(--line);border-radius:16px;box-shadow:0 4px 20px -2px var(--sh);transition:transform .2s ease,box-shadow .2s ease}
+.win:hover{box-shadow:0 8px 30px -4px var(--sh)}
+.wh{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:11.5px;font-weight:700;letter-spacing:.05em;border-top-left-radius:15px;border-top-right-radius:15px;background:color-mix(in srgb,var(--win) 88%,var(--line) 12%)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--lime);display:inline-block;box-shadow:0 0 8px var(--lime)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;border:1px solid rgba(255,255,255,.15);border-radius:10px;box-shadow:0 4px 14px 0 rgba(79,70,229,.25);padding:.65rem 1.15rem;font-family:'Gilroy',sans-serif;font-weight:700;font-size:13px;color:#fff!important;background:var(--primary-gradient);transition:all .2s cubic-bezier(.4,0,.2,1);cursor:pointer;text-decoration:none}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px 0 rgba(79,70,229,.4);filter:brightness(1.08)}
+.btn.w{background:var(--field);color:var(--wtx)!important;border:1px solid var(--line);box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.btn.w:hover{background:color-mix(in srgb,var(--field) 80%,var(--pur) 20%);border-color:var(--pur)}
+.btn.p{background:var(--pur);color:#fff!important;border-color:rgba(255,255,255,.2)}
+.btn:focus-visible,.chip:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.blk{background:var(--field);color:var(--wtx);padding:0 .4rem;border-radius:4px}
+.chip{border:1px solid var(--line);border-radius:8px;padding:.4rem .8rem;font-weight:700;background:var(--win);color:var(--wtx);cursor:pointer;transition:all .15s ease}
+.chip.on{background:var(--primary-gradient);color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(79,70,229,.3)}
+.bar{height:8px;border-radius:6px;overflow:hidden;border:1px solid var(--line);background:var(--field)}.bar i{display:block;height:100%;border-radius:4px;background:var(--primary-gradient);transition:width .4s ease}
+.tick{background:var(--field);color:var(--wtx);border-block:1px solid var(--line);overflow:hidden;white-space:nowrap;font-size:11px;font-weight:700}
 .tick div{display:inline-block;padding:7px 0;animation:mq 28s linear infinite}
 @keyframes mq{to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){.tick div{animation:none}}
-.ic{width:36px;height:36px;border-radius:8px;border:2px solid var(--ink);background:var(--lime);color:var(--ink);display:grid;place-items:center;font-family:'Gilroy',sans-serif;font-weight:900;box-shadow:2px 2px 0 var(--ink)}
-.inp{width:100%;border:2px solid var(--line);border-radius:8px;background:var(--field);color:var(--wtx);padding:.65rem .8rem;font:inherit;font-size:inherit;transition:border-color .15s ease,box-shadow .15s ease}
-.inp:focus{outline:none;border-color:var(--pur);box-shadow:0 0 0 3px rgba(37,99,235,.25)}
-.ropt{display:flex;gap:.6rem;align-items:center;padding:.5rem .75rem;border:2px solid var(--line);margin-bottom:.4rem;cursor:pointer;line-height:1.45}
+.ic{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--win);color:var(--wtx);display:grid;place-items:center;font-family:'Gilroy',sans-serif;font-weight:900;box-shadow:0 2px 6px var(--sh)}
+.inp{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--field);color:var(--wtx);padding:.65rem .85rem;font:inherit;font-size:inherit;transition:border-color .15s ease,box-shadow .15s ease}
+.inp:focus{outline:none;border-color:var(--lime);box-shadow:0 0 0 3px rgba(79,70,229,.2)}
+.ropt{display:flex;gap:.6rem;align-items:center;padding:.6rem .85rem;border:1px solid var(--line);border-radius:10px;background:var(--win);margin-bottom:.4rem;cursor:pointer;line-height:1.45;transition:all .15s ease}
 .ropt:hover{background:var(--field)}
-.ropt:has(input:checked){background:var(--lime);color:#0a0a0a;border-color:#0a0a0a}.ropt input{accent-color:#0a0a0a}
-.warn{background:var(--lime);color:#0a0a0a}
+.ropt:has(input:checked){background:color-mix(in srgb,var(--lime) 15%,var(--win) 85%);color:var(--wtx);border-color:var(--lime)}.ropt input{accent-color:var(--lime)}
+.warn{background:var(--field);color:var(--wtx);border:1px solid var(--line)}
 .hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
 .pw-wrap{position:relative;display:block;margin-top:.25rem}.pw-wrap .inp{margin-top:0;padding-right:6.2rem}
-.pwt{position:absolute;right:6px;top:50%;transform:translateY(-50%);font:700 11px 'Gilroy',sans-serif;padding:.3rem .5rem;border:2px solid var(--line);background:var(--win);color:var(--wtx);cursor:pointer}
-.pwt:focus-visible{outline:3px solid var(--purt);outline-offset:1px}
-.pill{position:relative;display:inline-flex;align-items:center;border:2px solid var(--line);padding:.3rem .75rem;font-weight:700;font-size:12px;cursor:pointer;background:var(--field);color:var(--wtx);user-select:none}
+.pwt{position:absolute;right:6px;top:50%;transform:translateY(-50%);font:700 11px 'Gilroy',sans-serif;padding:.3rem .55rem;border:1px solid var(--line);border-radius:6px;background:var(--win);color:var(--wtx);cursor:pointer}
+.pwt:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
+.pill{position:relative;display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:.35rem .8rem;font-weight:700;font-size:12px;cursor:pointer;background:var(--field);color:var(--wtx);user-select:none;transition:all .15s ease}
 .pill input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
-.pill:has(input:checked){background:var(--lime);color:#0a0a0a;border-color:#0a0a0a}
-.pill:has(input:focus-visible){outline:3px solid var(--purt);outline-offset:2px}
+.pill:has(input:checked){background:var(--primary-gradient);color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(79,70,229,.3)}
+.pill:has(input:focus-visible){outline:2px solid var(--lime);outline-offset:2px}
 .pill:has(input:disabled){opacity:.4;cursor:not-allowed}
 /* any Tailwind "border-black" now follows the theme, so lines stay visible in dark mode */
 .border-black{border-color:var(--line)!important}
-.border-black\/20{border-color:color-mix(in srgb,var(--line) 25%,transparent)!important}
+.border-black\/20{border-color:color-mix(in srgb,var(--line) 30%,transparent)!important}
+.border-black\/10{border-color:color-mix(in srgb,var(--line) 15%,transparent)!important}
+.border-black\/30{border-color:color-mix(in srgb,var(--line) 45%,transparent)!important}
 /* readable long text */
 .read{font-family:'Gilroy',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.65}
 .passage{background:var(--paper);color:var(--ptx);font-family:"Source Serif 4",Georgia,serif;font-size:var(--read-size);line-height:1.75}
 .passage p{margin:0 0 .95em;max-width:68ch}.passage p:last-child{margin-bottom:0}.passage b{color:#1f63e0;margin-right:.3em}
 .win table{font-family:'Gilroy',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:14px}
-.skip{position:absolute;left:-999px;top:0;background:var(--lime);color:var(--ink);padding:.6rem 1rem;font-weight:700;z-index:100}.skip:focus{left:8px;top:8px}
+.skip{position:absolute;left:-999px;top:0;background:var(--lime);color:#fff;padding:.6rem 1rem;font-weight:700;z-index:100;border-radius:6px}.skip:focus{left:8px;top:8px}
 /* hero title: every line is its own box, so lines never overlap or cover each other */
 .hero-t{line-height:1.12;letter-spacing:-.01em}
 .hero-t .ln{display:block;width:fit-content;max-width:100%;margin-bottom:.12em}
 .hero-t .blk{display:block;width:fit-content;max-width:100%;padding:.04em .3em .02em;margin-bottom:.12em}
 .hero-t .lm{color:var(--lime)}
-.lead{font-family:'Gilroy',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.6;color:#fff;max-width:34rem}
+.lead{font-family:'Gilroy',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.6;color:var(--wtx);max-width:34rem}
 #toTop{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;display:none}
 #toTop.show{display:block}
-.ib{width:40px;height:40px;display:grid;place-items:center;border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);background:#fff;color:var(--ink);cursor:pointer;list-style:none;font-weight:700;transition:transform .1s,box-shadow .1s}
+.ib{width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--line);border-radius:10px;box-shadow:0 1px 4px var(--sh);background:var(--win);color:var(--wtx);cursor:pointer;list-style:none;font-weight:700;transition:transform .15s,box-shadow .15s,border-color .15s}
 .ib::-webkit-details-marker{display:none}
-.ib:hover{transform:translate(1px,1px);box-shadow:2px 2px 0 var(--ink)}
-.ib.on{background:var(--lime)}
-.ib:focus-visible{outline:3px solid #fff;outline-offset:2px}
-.pm{position:absolute;right:0;top:calc(100% + 8px);min-width:210px;z-index:50}
-.pm a,.pm button{display:block;width:100%;text-align:left;padding:.75rem .9rem;font-size:12px;font-weight:700;cursor:pointer}
+.ib:hover{transform:translateY(-1px);box-shadow:0 3px 8px var(--sh);border-color:var(--lime)}
+.ib.on{background:color-mix(in srgb,var(--lime) 15%,var(--win) 85%);border-color:var(--lime);color:var(--purt)}
+.ib:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.pm{position:absolute;right:0;top:calc(100% + 8px);min-width:220px;z-index:50;border-radius:14px;overflow:hidden;box-shadow:0 12px 30px -4px rgba(0,0,0,0.25)}
+.pm a,.pm button{display:block;width:100%;text-align:left;padding:.75rem .95rem;font-size:12px;font-weight:700;cursor:pointer;transition:background .15s ease}
 .pm a:hover,.pm button:hover{background:var(--field)}
 /* phone: bottom tab bar (thumb reach), bigger tap targets */
 .bnav{display:none}
 @media (max-width:767px){
-  .bnav{position:fixed;left:0;right:0;bottom:0;z-index:45;display:grid;grid-template-columns:repeat(5,1fr);background:var(--win);color:var(--wtx);border-top:2px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-  .bnav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:56px;font-size:10.5px;font-weight:700}
-  .bnav a[aria-current]{background:var(--lime);color:#0a0a0a}
+  .bnav{position:fixed;left:0;right:0;bottom:0;z-index:45;display:grid;grid-template-columns:repeat(5,1fr);background:var(--win);color:var(--wtx);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);box-shadow:0 -4px 16px var(--sh)}
+  .bnav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:56px;font-size:10.5px;font-weight:700;transition:all .15s ease}
+  .bnav a[aria-current]{background:color-mix(in srgb,var(--lime) 15%,var(--win) 85%);color:var(--purt)}
   .bnav.off{display:none}
   footer{padding-bottom:calc(60px + env(safe-area-inset-bottom,0px))}
   #toTop{bottom:calc(72px + env(safe-area-inset-bottom,0px))}
@@ -231,9 +247,15 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
           ('⚔️ BATTLE', url_for('battle.lobby'), bp_ == 'battle')
       ] %}
     {% endif %}
-    <nav class="hidden md:flex border-2 border-black bg-white text-black text-[11px] font-bold" aria-label="Asosiy menyu">
-      {% for label, href, on in nav_links %}<a class="px-3 py-2 {{ 'bg-black text-white' if on }}" href="{{ href }}"{% if on %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}
+    {% if request.endpoint != 'main.dashboard' %}
+    <nav class="hidden md:flex border border-[var(--line)] rounded-xl bg-[var(--win)] text-[var(--wtx)] text-[11px] font-bold overflow-hidden shadow-sm" aria-label="Asosiy menyu">
+      {% for label, href, on in nav_links %}<a class="px-3.5 py-2 transition {{ 'bg-[var(--line)] text-[var(--wtx)]' if on else 'hover:bg-[var(--field)]' }}" href="{{ href }}"{% if on %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}
     </nav>
+    {% else %}
+    <div class="hidden md:flex items-center gap-2 text-xs font-bold" style="color:var(--mut)">
+      <span class="px-3 py-1.5 rounded-lg border border-[var(--line)] bg-[var(--win)] text-[var(--wtx)] shadow-sm">📊 Boshqaruv Paneli</span>
+    </div>
+    {% endif %}
     <div class="flex items-center gap-2">
     <button type="button" id="themeBtn" class="ib" aria-label="Yorugʻ yoki qorongʻi rejim" title="Yorugʻ / qorongʻi rejim">◐</button>
     {% if current_user.is_authenticated %}
@@ -246,12 +268,12 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
       </summary>
       <div class="pm win">
-        <p class="px-3 pt-3 pb-2 text-[11px] border-b-2 border-black" style="color:var(--mut)">{{ current_user.name }}</p>
-        <a href="{{ url_for('listening.dictation') }}" class="text-emerald-400 font-bold">🎧 SMART DIKTANT</a>
+        <p class="px-3 pt-3 pb-2 text-[11px] border-b border-[var(--line)]" style="color:var(--mut)">{{ current_user.name }}</p>
+        <a href="{{ url_for('listening.dictation') }}" class="text-emerald-500 font-bold">🎧 SMART DIKTANT</a>
         <a href="{{ url_for('writing.c1_transform_view') }}" class="text-sky-500 font-bold">✨ C1 TRANSFORMATOR</a>
         <a href="{{ url_for('battle.lobby') }}" class="text-rose-500 font-bold">⚔️ 1v1 BATTLE DUEL</a>
         <a href="{{ url_for('skills.profile') }}">SKILLAR PROFILI</a>
-        <form method="post" action="{{ url_for('auth.logout') }}" class="border-t-2 border-black">
+        <form method="post" action="{{ url_for('auth.logout') }}" class="border-t border-[var(--line)]">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <button type="submit">CHIQISH</button>
         </form>
@@ -263,28 +285,32 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
     </div>
   </div>
 </header>
-<nav class="md:hidden border-y-2 border-black bg-white text-black text-[11px] font-bold overflow-x-auto whitespace-nowrap" aria-label="Mobil menyu">
-  {% for label, href, on in nav_links %}<a class="inline-block px-3 py-3 {{ 'bg-black text-white' if on }}" href="{{ href }}"{% if on %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}
+{% if request.endpoint != 'main.dashboard' %}
+<nav class="md:hidden border-y border-[var(--line)] bg-[var(--win)] text-[var(--wtx)] text-[11px] font-bold overflow-x-auto whitespace-nowrap shadow-sm" aria-label="Mobil menyu">
+  {% for label, href, on in nav_links %}<a class="inline-block px-3.5 py-2.5 transition {{ 'bg-[var(--line)] text-[var(--wtx)]' if on else '' }}" href="{{ href }}"{% if on %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}
 </nav>
-{% block ticker %}<div class="tick" aria-hidden="true"><div>READING • LISTENING • WRITING • SPEAKING • AI MASLAHAT • A1–C2 • READING • LISTENING • WRITING • SPEAKING • AI MASLAHAT • A1–C2 • READING • LISTENING • WRITING • SPEAKING • AI MASLAHAT • A1–C2 • READING • LISTENING • WRITING • SPEAKING • AI MASLAHAT • A1–C2 •</div></div>
-
-{% endblock %}
+{% else %}
+<nav class="hidden" aria-label="Mobil menyu">
+  {% for label, href, on in nav_links %}<a href="{{ href }}">{{ label }}</a>{% endfor %}
+</nav>
+{% endif %}
+{% block ticker %}{% if request.endpoint != 'main.dashboard' %}<div class="tick" aria-hidden="true"><div>READING • LISTENING • WRITING • SPEAKING • AI MASLAHAT • A1–C2 • READING • LISTENING • WRITING • SPEAKING • AI MASLAHAT • A1–C2 • READING • LISTENING • WRITING • SPEAKING • AI MASLAHAT • A1–C2 • READING • LISTENING • WRITING • SPEAKING • AI MASLAHAT • A1–C2 •</div></div>{% endif %}{% endblock %}
 <main id="top" class="{% block main_container %}max-w-6xl mx-auto px-4 py-8{% endblock %}">
 {% with messages = get_flashed_messages(with_categories=true) %}{% for cat, msg in messages %}
-  <div class="win mb-5 px-4 py-3 text-sm" role="alert" style="{{ 'background:#fff0f0' if cat == 'error' else 'background:var(--lime);color:#0a0a0a' }}">{{ msg }}</div>
+  <div class="win mb-5 px-4 py-3 text-sm" role="alert" style="{{ 'background:color-mix(in srgb, #ef4444 15%, var(--win) 85%);border-color:#ef4444;color:var(--wtx)' if cat == 'error' else 'background:var(--win);border-color:var(--lime);color:var(--wtx)' }}">{{ msg }}</div>
 {% endfor %}{% endwith %}
 {% if current_user.is_authenticated and not current_user.is_verified and bp_ != 'verify' %}
-  <div class="win mb-5 px-4 py-3 text-sm flex flex-wrap items-center justify-between gap-3" style="background:var(--lime);color:#0a0a0a"><span><b>Emailingizni tasdiqlang.</b> Writing, Speaking va AI maslahat uchun kerak.</span><a class="btn w !py-1 !text-[11px]" href="{{ url_for('verify.page') }}">KOD KIRITISH</a></div>
+  <div class="win mb-5 px-4 py-3 text-sm flex flex-wrap items-center justify-between gap-3" style="background:var(--win);border-color:var(--lime);color:var(--wtx)"><span><b>Emailingizni tasdiqlang.</b> Writing, Speaking va AI maslahat uchun kerak.</span><a class="btn w !py-1 !text-[11px]" href="{{ url_for('verify.page') }}">KOD KIRITISH</a></div>
 {% endif %}
 {% set _ex = open_exam() %}{% if _ex and bp_ != 'exam' %}
-  <div class="win mb-5 px-4 py-3 text-sm flex flex-wrap items-center justify-between gap-3" style="background:var(--lime);color:#0a0a0a"><span><b>Toʻliq imtihon davom etmoqda.</b> Tugatish uchun qolgan skillarni bajaring.</span><a class="btn !py-1 !text-[11px]" href="{{ url_for('exam.detail', session_id=_ex.id) }}">OCHISH</a></div>
+  <div class="win mb-5 px-4 py-3 text-sm flex flex-wrap items-center justify-between gap-3" style="background:var(--win);border-color:var(--lime);color:var(--wtx)"><span><b>Toʻliq imtihon davom etmoqda.</b> Tugatish uchun qolgan skillarni bajaring.</span><a class="btn !py-1 !text-[11px]" href="{{ url_for('exam.detail', session_id=_ex.id) }}">OCHISH</a></div>
 {% endif %}
 {% block content %}{% endblock %}
 </main>
-<footer class="border-t-2 border-black bg-black text-white mt-6">
-  <div class="{% block footer_container %}max-w-6xl mx-auto px-4{% endblock %} py-6 text-[11px] flex flex-wrap justify-between gap-3">
-    <span>© 2026 Levi · <a class="underline" href="{{ url_for('onboarding.privacy') }}">Maxfiylik siyosati</a> · <a class="underline" href="{{ url_for('onboarding.terms') }}">Shartlar</a></span>
-    <span class="flex flex-wrap gap-4"><a class="underline" href="{{ url_for('reading.tests') }}">Reading</a><a class="underline" href="{{ url_for('listening.tests') }}">Listening</a><a class="underline" href="{{ url_for('writing.tasks') }}">Writing</a><a class="underline" href="{{ url_for('speaking.tasks') }}">Speaking</a><a class="underline" href="{{ url_for('shadowing.videos') }}">Shadowing</a></span>
+<footer class="border-t border-[var(--line)] bg-[var(--win)] text-[var(--wtx)] mt-6">
+  <div class="{% block footer_container %}max-w-6xl mx-auto px-4{% endblock %} py-6 text-[11px] flex flex-wrap justify-between gap-3 text-[var(--mut)]">
+    <span>© 2026 Levi · <a class="underline hover:text-[var(--wtx)]" href="{{ url_for('onboarding.privacy') }}">Maxfiylik siyosati</a> · <a class="underline hover:text-[var(--wtx)]" href="{{ url_for('onboarding.terms') }}">Shartlar</a></span>
+    <span class="flex flex-wrap gap-4"><a class="underline hover:text-[var(--wtx)]" href="{{ url_for('reading.tests') }}">Reading</a><a class="underline hover:text-[var(--wtx)]" href="{{ url_for('listening.tests') }}">Listening</a><a class="underline hover:text-[var(--wtx)]" href="{{ url_for('writing.tasks') }}">Writing</a><a class="underline hover:text-[var(--wtx)]" href="{{ url_for('speaking.tasks') }}">Speaking</a><a class="underline hover:text-[var(--wtx)]" href="{{ url_for('shadowing.videos') }}">Shadowing</a></span>
   </div>
 </footer>
 

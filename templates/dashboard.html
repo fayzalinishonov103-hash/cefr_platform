@@ -16,7 +16,7 @@
     <!-- 1. Foydalanuvchi Kartasi & Darajasi -->
     <div class="win p-5 relative overflow-hidden">
       <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 text-navy-950 font-black text-xl flex items-center justify-center shadow-md">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 text-white font-black text-xl flex items-center justify-center shadow-md">
           {{ current_user.name[:1]|upper }}
         </div>
         <div class="overflow-hidden">
@@ -26,11 +26,11 @@
       </div>
 
       <!-- Daraja & Ball -->
-      <div class="mt-4 pt-4 border-t-2 border-black/10 flex items-center justify-between">
+      <div class="mt-4 pt-4 border-t border-[var(--line)] flex items-center justify-between">
         <div>
           <span class="text-[10px] uppercase font-mono font-bold tracking-wider" style="color:var(--mut)">Joriy Daraja</span>
           <div class="flex items-baseline gap-2">
-            <span class="hd text-3xl text-cyan-400">{{ skills_data.overall_level or current_user.current_level or "—" }}</span>
+            <span class="hd text-3xl text-indigo-600 dark:text-cyan-400">{{ skills_data.overall_level or current_user.current_level or "—" }}</span>
             {% if skills_data.overall %}
             <span class="text-xs font-mono font-semibold" style="color:var(--mut)">{{ skills_data.overall }}/75 ball</span>
             {% endif %}
@@ -39,7 +39,7 @@
 
         <div class="text-right">
           <span class="text-[10px] uppercase font-mono font-bold tracking-wider" style="color:var(--mut)">Seriya</span>
-          <p class="text-lg font-black text-amber-400 flex items-center justify-end gap-1">
+          <p class="text-lg font-black text-amber-500 dark:text-amber-400 flex items-center justify-end gap-1">
             <span>🔥</span> <span>{{ prog.streak }} kun</span>
           </p>
         </div>
@@ -62,39 +62,39 @@
         <span>TEZKOR VOSITALAR (1-CLICK)</span>
       </div>
       <div class="p-3 space-y-1.5 text-xs font-bold">
-        <a href="{{ url_for('exam.index') }}" class="flex items-center justify-between p-2.5 rounded-lg border-2 border-black hover:bg-black hover:text-white transition group">
+        <a href="{{ url_for('exam.index') }}" class="flex items-center justify-between p-2.5 rounded-xl border border-[var(--line)] bg-[var(--field)] hover:border-[var(--lime)] hover:bg-[var(--win)] transition-all group">
           <span class="flex items-center gap-2">
             <span>🎯</span> <span>Toʻliq Mock Imtihon</span>
           </span>
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-lime-400 text-black font-mono">Rasmiy</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 font-mono">Rasmiy</span>
         </a>
 
-        <a href="{{ url_for('listening.dictation') }}" class="flex items-center justify-between p-2.5 rounded-lg border-2 border-black hover:bg-black hover:text-white transition group">
+        <a href="{{ url_for('listening.dictation') }}" class="flex items-center justify-between p-2.5 rounded-xl border border-[var(--line)] bg-[var(--field)] hover:border-[var(--lime)] hover:bg-[var(--win)] transition-all group">
           <span class="flex items-center gap-2">
             <span>🎧</span> <span>Smart Audio Diktant</span>
           </span>
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-cyan-400 text-black font-mono">0 AI</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-mono">0 AI</span>
         </a>
 
-        <a href="{{ url_for('writing.c1_transform_view') }}" class="flex items-center justify-between p-2.5 rounded-lg border-2 border-black hover:bg-black hover:text-white transition group">
+        <a href="{{ url_for('writing.c1_transform_view') }}" class="flex items-center justify-between p-2.5 rounded-xl border border-[var(--line)] bg-[var(--field)] hover:border-[var(--lime)] hover:bg-[var(--win)] transition-all group">
           <span class="flex items-center gap-2">
             <span>✨</span> <span>C1 Insho Transformator</span>
           </span>
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-sky-400 text-black font-mono">AI Pro</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-500/20 font-mono">AI Pro</span>
         </a>
 
-        <a href="{{ url_for('speaking.examiner_view') }}" class="flex items-center justify-between p-2.5 rounded-lg border-2 border-black hover:bg-black hover:text-white transition group">
+        <a href="{{ url_for('speaking.examiner_view') }}" class="flex items-center justify-between p-2.5 rounded-xl border border-[var(--line)] bg-[var(--field)] hover:border-[var(--lime)] hover:bg-[var(--win)] transition-all group">
           <span class="flex items-center gap-2">
             <span>🎙️</span> <span>AI Speaking Examiner</span>
           </span>
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-400 text-black font-mono">Jonli</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/20 font-mono">Jonli</span>
         </a>
 
-        <a href="{{ url_for('battle.lobby') }}" class="flex items-center justify-between p-2.5 rounded-lg border-2 border-black hover:bg-black hover:text-white transition group">
+        <a href="{{ url_for('battle.lobby') }}" class="flex items-center justify-between p-2.5 rounded-xl border border-[var(--line)] bg-[var(--field)] hover:border-[var(--lime)] hover:bg-[var(--win)] transition-all group">
           <span class="flex items-center gap-2">
             <span>⚔️</span> <span>1v1 CEFR Battle Arena</span>
           </span>
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-400 text-black font-mono">Multiplayer</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/20 font-mono">Multiplayer</span>
         </a>
       </div>
     </div>
@@ -106,27 +106,27 @@
         <span>BOʻLIMLAR & OʻZLASHTIRISH</span>
       </div>
       <div class="p-3 grid grid-cols-2 gap-2 text-xs font-bold">
-        <a href="{{ url_for('reading.tests') }}" class="p-2.5 rounded-lg border-2 border-black text-center hover:bg-black hover:text-white transition">
+        <a href="{{ url_for('reading.tests') }}" class="p-2.5 rounded-xl border border-[var(--line)] bg-[var(--field)] hover:border-[var(--lime)] hover:bg-[var(--win)] text-center transition-all">
           📖 Reading
         </a>
-        <a href="{{ url_for('listening.tests') }}" class="p-2.5 rounded-lg border-2 border-black text-center hover:bg-black hover:text-white transition">
+        <a href="{{ url_for('listening.tests') }}" class="p-2.5 rounded-xl border border-[var(--line)] bg-[var(--field)] hover:border-[var(--lime)] hover:bg-[var(--win)] text-center transition-all">
           🎧 Listening
         </a>
-        <a href="{{ url_for('writing.tasks') }}" class="p-2.5 rounded-lg border-2 border-black text-center hover:bg-black hover:text-white transition">
+        <a href="{{ url_for('writing.tasks') }}" class="p-2.5 rounded-xl border border-[var(--line)] bg-[var(--field)] hover:border-[var(--lime)] hover:bg-[var(--win)] text-center transition-all">
           ✍️ Writing
         </a>
-        <a href="{{ url_for('speaking.tasks') }}" class="p-2.5 rounded-lg border-2 border-black text-center hover:bg-black hover:text-white transition">
+        <a href="{{ url_for('speaking.tasks') }}" class="p-2.5 rounded-xl border border-[var(--line)] bg-[var(--field)] hover:border-[var(--lime)] hover:bg-[var(--win)] text-center transition-all">
           🗣️ Speaking
         </a>
-        <a href="{{ url_for('mistakes.index') }}" class="p-2.5 rounded-lg border-2 border-black text-center hover:bg-black hover:text-white transition">
+        <a href="{{ url_for('mistakes.index') }}" class="p-2.5 rounded-xl border border-[var(--line)] bg-[var(--field)] hover:border-[var(--lime)] hover:bg-[var(--win)] text-center transition-all">
           📝 Xatolarim
         </a>
-        <a href="{{ url_for('vocab.index') }}" class="p-2.5 rounded-lg border-2 border-black text-center hover:bg-black hover:text-white transition">
+        <a href="{{ url_for('vocab.index') }}" class="p-2.5 rounded-xl border border-[var(--line)] bg-[var(--field)] hover:border-[var(--lime)] hover:bg-[var(--win)] text-center transition-all">
           📚 Lugʻatim
         </a>
       </div>
       <div class="px-3 pb-3">
-        <a href="{{ url_for('onboarding.edit') }}" class="block w-full py-2 text-center text-xs font-semibold rounded border border-black/30 hover:border-black transition" style="color:var(--mut)">
+        <a href="{{ url_for('onboarding.edit') }}" class="block w-full py-2.5 text-center text-xs font-semibold rounded-xl border border-[var(--line)] hover:border-[var(--lime)] hover:bg-[var(--field)] transition-all" style="color:var(--mut)">
           ⚙️ Reja va Maqsadni Yangilash
         </a>
       </div>
@@ -141,10 +141,10 @@
   <div class="flex-1 w-full min-w-0 space-y-5 text-left">
 
     <!-- Placement banner -->
-    <section class="win warn">
+    <section class="win border-l-4 border-l-cyan-500 bg-[var(--field)]">
       <div class="p-4 flex items-center justify-between gap-3 flex-wrap text-sm">
         {% if placement %}
-        <p>Daraja testi natijasi: <b>{{ placement.cefr_level }}</b>. <a class="underline" href="{{ url_for('placement.result', result_id=placement.id) }}">Mos mashqlar</a></p>
+        <p>Daraja testi natijasi: <b class="text-cyan-500">{{ placement.cefr_level }}</b>. <a class="underline" href="{{ url_for('placement.result', result_id=placement.id) }}">Mos mashqlar</a></p>
         <a class="btn w !py-2 !text-xs font-bold" href="{{ url_for('placement.intro') }}">QAYTA TOPSHIRISH</a>
         {% else %}
         <p><b>Darajangizni biling.</b> 8 daqiqalik test sizga mos mashqlarni tanlaydi.</p>
@@ -162,8 +162,8 @@
       <div class="p-5">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div class="space-y-1">
-            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-lime-400 text-black font-extrabold">Tavsiya etilgan mashq</span>
-            <h3 class="text-lg font-extrabold text-cyan-300 mt-1">{{ prog.next.text }}</h3>
+            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 font-extrabold">Tavsiya etilgan mashq</span>
+            <h3 class="text-lg font-extrabold text-indigo-600 dark:text-cyan-300 mt-1">{{ prog.next.text }}</h3>
             <p class="text-xs" style="color:var(--mut)">
               Har kuni uzluksiz 15 daqiqa mashq qilish CEFR imtihonida eng yuqori natijani beradi.
             </p>
@@ -182,13 +182,13 @@
         </div>
 
         <!-- 7 Kunlik Seriya Tracker -->
-        <div class="mt-5 pt-4 border-t-2 border-black/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="mt-5 pt-4 border-t border-[var(--line)] flex flex-wrap items-center justify-between gap-3 text-xs">
           <span class="text-[11px] font-mono" style="color:var(--mut)">SOʻNGGI 7 KUN</span>
           <div class="flex gap-2">
             {% for d in prog.week %}
             <div class="text-center text-[10px]">
-              <span class="block w-7 h-7 rounded border-2 border-black {{ 'ring-2 ring-cyan-400 ring-offset-1' if d.today }}" style="background:{{ 'var(--lime)' if d.done else 'transparent' }}" title="{{ d.label }}: {{ 'bajarilgan' if d.done else 'boʻsh' }}"></span>
-              <span class="mt-0.5 block font-mono font-bold">{{ d.label }}</span>
+              <span class="block w-7 h-7 rounded-lg border border-[var(--line)] {{ 'ring-2 ring-indigo-400 dark:ring-cyan-400 ring-offset-2 ring-offset-[var(--win)]' if d.today }}" style="background:{{ 'var(--lime)' if d.done else 'var(--field)' }}" title="{{ d.label }}: {{ 'bajarilgan' if d.done else 'boʻsh' }}"></span>
+              <span class="mt-1 block font-mono font-bold">{{ d.label }}</span>
             </div>
             {% endfor %}
           </div>
@@ -206,59 +206,59 @@
       <div class="p-4 grid sm:grid-cols-2 md:grid-cols-4 gap-3 text-sm">
         
         <!-- Reading -->
-        <div class="p-3.5 rounded-xl border-2 border-black/20 bg-black/5 flex flex-col justify-between">
+        <div class="p-4 rounded-2xl border border-[var(--line)] bg-[var(--field)] flex flex-col justify-between hover:border-cyan-500/40 transition-all shadow-sm">
           <div class="flex justify-between items-center">
             <span class="font-bold text-xs">📖 Reading</span>
-            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300">
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
               {{ skills_data.levels.reading or '—' }}
             </span>
           </div>
-          <p class="hd text-2xl mt-2 text-cyan-400">
+          <p class="hd text-2xl mt-3 text-cyan-500 dark:text-cyan-400">
             {{ skills_data.latest.reading if skills_data.latest.reading is not none else '—' }}<span class="text-xs font-mono font-normal text-slate-400">/75</span>
           </p>
-          <a href="{{ url_for('reading.tests') }}" class="text-[11px] mt-2 underline text-cyan-300 font-medium">Mashq qilish →</a>
+          <a href="{{ url_for('reading.tests') }}" class="text-[11px] mt-2 underline text-cyan-600 dark:text-cyan-400 font-medium">Mashq qilish →</a>
         </div>
 
         <!-- Listening -->
-        <div class="p-3.5 rounded-xl border-2 border-black/20 bg-black/5 flex flex-col justify-between">
+        <div class="p-4 rounded-2xl border border-[var(--line)] bg-[var(--field)] flex flex-col justify-between hover:border-blue-500/40 transition-all shadow-sm">
           <div class="flex justify-between items-center">
             <span class="font-bold text-xs">🎧 Listening</span>
-            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/20 text-blue-300">
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/20">
               {{ skills_data.levels.listening or '—' }}
             </span>
           </div>
-          <p class="hd text-2xl mt-2 text-blue-400">
+          <p class="hd text-2xl mt-3 text-blue-500 dark:text-blue-400">
             {{ skills_data.latest.listening if skills_data.latest.listening is not none else '—' }}<span class="text-xs font-mono font-normal text-slate-400">/75</span>
           </p>
-          <a href="{{ url_for('listening.dictation') }}" class="text-[11px] mt-2 underline text-blue-300 font-medium">Diktant qilish →</a>
+          <a href="{{ url_for('listening.dictation') }}" class="text-[11px] mt-2 underline text-blue-600 dark:text-blue-400 font-medium">Diktant qilish →</a>
         </div>
 
         <!-- Writing -->
-        <div class="p-3.5 rounded-xl border-2 border-black/20 bg-black/5 flex flex-col justify-between">
+        <div class="p-4 rounded-2xl border border-[var(--line)] bg-[var(--field)] flex flex-col justify-between hover:border-purple-500/40 transition-all shadow-sm">
           <div class="flex justify-between items-center">
             <span class="font-bold text-xs">✍️ Writing</span>
-            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/20 text-purple-300">
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/20">
               {{ skills_data.levels.writing or '—' }}
             </span>
           </div>
-          <p class="hd text-2xl mt-2 text-purple-400">
+          <p class="hd text-2xl mt-3 text-purple-500 dark:text-purple-400">
             {{ skills_data.latest.writing if skills_data.latest.writing is not none else '—' }}<span class="text-xs font-mono font-normal text-slate-400">/75</span>
           </p>
-          <a href="{{ url_for('writing.c1_transform_view') }}" class="text-[11px] mt-2 underline text-purple-300 font-medium">Transformator →</a>
+          <a href="{{ url_for('writing.c1_transform_view') }}" class="text-[11px] mt-2 underline text-purple-600 dark:text-purple-400 font-medium">Transformator →</a>
         </div>
 
         <!-- Speaking -->
-        <div class="p-3.5 rounded-xl border-2 border-black/20 bg-black/5 flex flex-col justify-between">
+        <div class="p-4 rounded-2xl border border-[var(--line)] bg-[var(--field)] flex flex-col justify-between hover:border-emerald-500/40 transition-all shadow-sm">
           <div class="flex justify-between items-center">
             <span class="font-bold text-xs">🗣️ Speaking</span>
-            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300">
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
               {{ skills_data.levels.speaking or '—' }}
             </span>
           </div>
-          <p class="hd text-2xl mt-2 text-emerald-400">
+          <p class="hd text-2xl mt-3 text-emerald-500 dark:text-emerald-400">
             {{ skills_data.latest.speaking if skills_data.latest.speaking is not none else '—' }}<span class="text-xs font-mono font-normal text-slate-400">/75</span>
           </p>
-          <a href="{{ url_for('speaking.examiner_view') }}" class="text-[11px] mt-2 underline text-emerald-300 font-medium">AI Examiner →</a>
+          <a href="{{ url_for('speaking.examiner_view') }}" class="text-[11px] mt-2 underline text-emerald-600 dark:text-emerald-400 font-medium">AI Examiner →</a>
         </div>
 
       </div>
@@ -273,7 +273,7 @@
       </div>
       <div class="p-4 flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <span class="text-[10px] font-mono uppercase font-bold text-amber-400">⚡ 5 Daqiqalik Mashq</span>
+          <span class="text-[10px] font-mono uppercase font-bold text-amber-500 dark:text-amber-400">⚡ 5 Daqiqalik Mashq</span>
           <h4 class="font-bold text-sm">
             {% if gam.daily and gam.daily.finished_at %}
             Bugungi challenge tugadi: {{ gam.daily.correct }}/{{ gam.daily.total }}
@@ -291,7 +291,7 @@
             <button class="btn !py-2 !text-xs font-bold" type="submit">BOSHLASH</button>
           </form>
           {% else %}
-          <span class="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/30">
+          <span class="px-3 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-mono text-xs font-bold border border-emerald-500/30">
             ✓ Topshirildi (+20 XP)
           </span>
           {% endif %}
@@ -309,18 +309,18 @@
         </div>
 
         <!-- Filter Tab Buttons -->
-        <div class="flex gap-1 text-[11px] font-bold">
-          <button type="button" onclick="filterFeed('all')" id="tab-all" class="px-2.5 py-1 rounded bg-black text-white feed-tab">Barchasi</button>
-          <button type="button" onclick="filterFeed('tests')" id="tab-tests" class="px-2.5 py-1 rounded border border-black/30 feed-tab">Testlar</button>
-          <button type="button" onclick="filterFeed('writing')" id="tab-writing" class="px-2.5 py-1 rounded border border-black/30 feed-tab">WRITING NATIJALARI</button>
-          <button type="button" onclick="filterFeed('speaking')" id="tab-speaking" class="px-2.5 py-1 rounded border border-black/30 feed-tab">SPEAKING NATIJALARI</button>
+        <div class="flex gap-1.5 text-[11px] font-bold">
+          <button type="button" onclick="filterFeed('all')" id="tab-all" class="px-3 py-1 rounded-lg bg-[var(--lime)] text-white shadow-sm feed-tab">Barchasi</button>
+          <button type="button" onclick="filterFeed('tests')" id="tab-tests" class="px-3 py-1 rounded-lg border border-[var(--line)] bg-[var(--field)] hover:bg-[var(--win)] transition feed-tab">Testlar</button>
+          <button type="button" onclick="filterFeed('writing')" id="tab-writing" class="px-3 py-1 rounded-lg border border-[var(--line)] bg-[var(--field)] hover:bg-[var(--win)] transition feed-tab">WRITING NATIJALARI</button>
+          <button type="button" onclick="filterFeed('speaking')" id="tab-speaking" class="px-3 py-1 rounded-lg border border-[var(--line)] bg-[var(--field)] hover:bg-[var(--win)] transition feed-tab">SPEAKING NATIJALARI</button>
         </div>
       </div>
 
       <div class="p-0 overflow-x-auto">
         <table class="w-full text-xs">
           <thead>
-            <tr class="text-left border-b-2 border-black/20 bg-black/5 text-[11px]">
+            <tr class="text-left border-b border-[var(--line)] bg-[var(--field)] text-[11px]">
               <th class="p-3">Sana</th>
               <th class="p-3">Boʻlim / Topshiriq</th>
               <th class="p-3">Ball</th>
@@ -331,35 +331,35 @@
           <tbody id="unified-feed">
             <!-- Reading & Listening Attempts -->
             {% for a in attempts %}
-            <tr class="border-b border-black/10 feed-row feed-tests">
+            <tr class="border-b border-[var(--line)] feed-row feed-tests hover:bg-[var(--field)]/40 transition">
               <td class="p-3 font-mono" style="color:var(--mut)">{{ a.finished_at.strftime('%d.%m.%Y') if a.finished_at else '—' }}</td>
               <td class="p-3 font-semibold">
-                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono mr-1.5 {{ 'bg-cyan-500/20 text-cyan-300' if a.test.skill == 'reading' else 'bg-blue-500/20 text-blue-300' }}">
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono mr-1.5 {{ 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20' if a.test.skill == 'reading' else 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/20' }}">
                   {{ a.test.skill|upper }}
                 </span>
                 {{ a.test.title }}
               </td>
               <td class="p-3 font-mono">{{ a.raw_score }}/{{ a.max_score }} <span class="text-[10px]" style="color:var(--mut)">({{ a.scaled_score }}/75)</span></td>
-              <td class="p-3 font-bold text-cyan-400">{{ a.cefr_level }}</td>
+              <td class="p-3 font-bold text-cyan-600 dark:text-cyan-400">{{ a.cefr_level }}</td>
               <td class="p-3 text-right space-x-2">
                 <a class="underline font-semibold" href="{{ url_for('reading.result', attempt_id=a.id) }}">Koʻrish</a>
-                <a class="px-2 py-1 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[10px] font-mono font-bold" href="{{ url_for('certificate.attempt_certificate', attempt_id=a.id) }}" target="_blank">📜 Sertifikat</a>
+                <a class="px-2.5 py-1 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 text-[10px] font-mono font-bold hover:bg-indigo-500/20 transition" href="{{ url_for('certificate.attempt_certificate', attempt_id=a.id) }}" target="_blank">📜 Sertifikat</a>
               </td>
             </tr>
             {% endfor %}
 
             <!-- Writing Attempts -->
             {% for w in writing %}
-            <tr class="border-b border-black/10 feed-row feed-writing">
+            <tr class="border-b border-[var(--line)] feed-row feed-writing hover:bg-[var(--field)]/40 transition">
               <td class="p-3 font-mono" style="color:var(--mut)">{{ w.created_at.strftime('%d.%m.%Y') }}</td>
               <td class="p-3 font-semibold">
-                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono mr-1.5 bg-purple-500/20 text-purple-300">
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono mr-1.5 bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/20">
                   WRITING NATIJALARI
                 </span>
                 {{ (w.feedback.get('title') if w.feedback else None) or "Insho topshirig'i" }}
               </td>
               <td class="p-3 font-mono">{{ w.scaled_score }}/75</td>
-              <td class="p-3 font-bold text-purple-400">{{ w.cefr_level }}</td>
+              <td class="p-3 font-bold text-purple-600 dark:text-purple-400">{{ w.cefr_level }}</td>
               <td class="p-3 text-right">
                 <a class="underline font-semibold" href="{{ url_for('writing.result', result_id=w.id) }}">Koʻrish</a>
               </td>
@@ -368,16 +368,16 @@
 
             <!-- Speaking Attempts -->
             {% for s in speaking %}
-            <tr class="border-b border-black/10 feed-row feed-speaking">
+            <tr class="border-b border-[var(--line)] feed-row feed-speaking hover:bg-[var(--field)]/40 transition">
               <td class="p-3 font-mono" style="color:var(--mut)">{{ s.created_at.strftime('%d.%m.%Y') }}</td>
               <td class="p-3 font-semibold">
-                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono mr-1.5 bg-emerald-500/20 text-emerald-300">
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono mr-1.5 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                   SPEAKING NATIJALARI
                 </span>
                 {{ (s.feedback.get('title') if s.feedback else None) or "Nutq javobi" }}
               </td>
               <td class="p-3 font-mono">{{ s.scaled_score }}/75</td>
-              <td class="p-3 font-bold text-emerald-400">{{ s.cefr_level }}</td>
+              <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400">{{ s.cefr_level }}</td>
               <td class="p-3 text-right">
                 <a class="underline font-semibold" href="{{ url_for('speaking.result', result_id=s.id) }}">Koʻrish</a>
               </td>
@@ -405,14 +405,14 @@ function filterFeed(kind) {
   const tabs = document.querySelectorAll('.feed-tab');
 
   tabs.forEach(t => {
-    t.classList.remove('bg-black', 'text-white');
-    t.classList.add('border', 'border-black/30');
+    t.classList.remove('bg-[var(--lime)]', 'text-white', 'shadow-sm');
+    t.classList.add('border', 'border-[var(--line)]', 'bg-[var(--field)]');
   });
 
   const activeTab = document.getElementById('tab-' + kind);
   if (activeTab) {
-    activeTab.classList.remove('border', 'border-black/30');
-    activeTab.classList.add('bg-black', 'text-white');
+    activeTab.classList.remove('border', 'border-[var(--line)]', 'bg-[var(--field)]');
+    activeTab.classList.add('bg-[var(--lime)]', 'text-white', 'shadow-sm');
   }
 
   rows.forEach(r => {
