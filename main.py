@@ -39,7 +39,10 @@ def dashboard():
     placement = (SkillResult.query.filter_by(user_id=current_user.id, skill="placement")
                  .order_by(SkillResult.created_at.desc(), SkillResult.id.desc()).first())
     ob_profile = onboarding.profile_of(current_user)
+    from skills import skills_profile
+    skills_data = skills_profile(current_user)
     return render_template("dashboard.html", attempts=attempts, writing=writing, speaking=speaking,
                            prog=dashboard_progress(current_user), placement=placement,
                            gam=gamify.summary(current_user), ob_profile=ob_profile,
-                           ob_line=onboarding.summary(ob_profile))
+                           ob_line=onboarding.summary(ob_profile),
+                           skills_data=skills_data)

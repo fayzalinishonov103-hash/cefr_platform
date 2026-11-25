@@ -208,14 +208,27 @@ html.intro.intro-skip body>*:not(#intro){animation:iShow .35s ease forwards}
       <svg class="logo-eyes" width="46" height="15" viewBox="0 8 220 54" aria-hidden="true"><path d="M10 14 L102 34 Q100 45 91 50 Q62 58 40 52 Q17 42 10 14 Z" fill="#fff" stroke="#0a0a0a" stroke-width="6" stroke-linejoin="round"/><path d="M210 14 L118 34 Q120 45 129 50 Q158 58 180 52 Q203 42 210 14 Z" fill="#fff" stroke="#0a0a0a" stroke-width="6" stroke-linejoin="round"/></svg>
       <span>LEVI</span></a>
     {% set ep = request.endpoint or '' %}{% set bp_ = nav_skill|default(request.blueprint or '') %}
-    {% set nav_links = [('ASOSIY', url_for('main.index'), ep == 'main.index'),
-        ('READING', url_for('reading.tests'), bp_ == 'reading'), ('LISTENING', url_for('listening.tests'), bp_ == 'listening' and ep != 'listening.dictation'),
-        ('🎧 DIKTANT', url_for('listening.dictation'), ep == 'listening.dictation'),
-        ('WRITING', url_for('writing.tasks'), bp_ == 'writing'), ('SPEAKING', url_for('speaking.tasks'), bp_ == 'speaking'),
-        ('⚔️ BATTLE', url_for('battle.lobby'), bp_ == 'battle'),
-        ('SHADOWING', url_for('shadowing.videos'), bp_ == 'shadowing')] %}
-    {% if current_user.is_authenticated %}{% set nav_links = nav_links + [('IMTIHON', url_for('exam.index'), bp_ == 'exam'), ('DASHBOARD', url_for('main.dashboard'), ep == 'main.dashboard')] %}{% endif %}
-    {% if current_user.is_authenticated and current_user.is_admin %}{% set nav_links = nav_links + [('ADMIN', url_for('admin.index'), bp_ == 'admin')] %}{% endif %}
+    {% if current_user.is_authenticated %}
+      {% set nav_links = [
+          ('📊 DASHBOARD', url_for('main.dashboard'), ep == 'main.dashboard'),
+          ('🎯 IMTIHON', url_for('exam.index'), bp_ == 'exam'),
+          ('READING', url_for('reading.tests'), bp_ == 'reading'),
+          ('LISTENING', url_for('listening.tests'), bp_ == 'listening'),
+          ('WRITING', url_for('writing.tasks'), bp_ == 'writing'),
+          ('SPEAKING', url_for('speaking.tasks'), bp_ == 'speaking'),
+          ('⚔️ BATTLE', url_for('battle.lobby'), bp_ == 'battle')
+      ] %}
+      {% if current_user.is_admin %}{% set nav_links = nav_links + [('ADMIN', url_for('admin.index'), bp_ == 'admin')] %}{% endif %}
+    {% else %}
+      {% set nav_links = [
+          ('ASOSIY', url_for('main.index'), ep == 'main.index'),
+          ('READING', url_for('reading.tests'), bp_ == 'reading'),
+          ('LISTENING', url_for('listening.tests'), bp_ == 'listening'),
+          ('WRITING', url_for('writing.tasks'), bp_ == 'writing'),
+          ('SPEAKING', url_for('speaking.tasks'), bp_ == 'speaking'),
+          ('⚔️ BATTLE', url_for('battle.lobby'), bp_ == 'battle')
+      ] %}
+    {% endif %}
     <nav class="hidden md:flex border-2 border-black bg-white text-black text-[11px] font-bold" aria-label="Asosiy menyu">
       {% for label, href, on in nav_links %}<a class="px-3 py-2 {{ 'bg-black text-white' if on }}" href="{{ href }}"{% if on %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}
     </nav>

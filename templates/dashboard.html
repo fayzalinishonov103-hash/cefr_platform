@@ -1,109 +1,425 @@
 {% extends "base.html" %}
-{% block title %}Dashboard — Levi{% endblock %}
+{% block title %}Dashboard — Levi CEFR{% endblock %}
+
 {% block content %}
-<div class="grid lg:grid-cols-12 gap-5">
-  <section class="lg:col-span-12 win warn">
-    <div class="p-4 flex items-center justify-between gap-3 flex-wrap text-sm">
-      {% if placement %}
-      <p>Daraja testi natijasi: <b>{{ placement.cefr_level }}</b>. <a class="underline" href="{{ url_for('placement.result', result_id=placement.id) }}">Mos mashqlar</a></p>
-      <a class="btn w !py-2 !text-xs" href="{{ url_for('placement.intro') }}">QAYTA TOPSHIRISH</a>
-      {% else %}
-      <p><b>Darajangizni biling.</b> 8 daqiqalik test sizga mos mashqlarni tanlaydi.</p>
-      <a class="btn w !py-2 !text-xs" href="{{ url_for('placement.intro') }}">DARAJANI ANIQLASH</a>
-      {% endif %}
-    </div>
-  </section>
-  {% if ob_line %}
-  <section class="lg:col-span-12 win"><div class="p-4 flex items-center justify-between gap-3 flex-wrap text-sm">
-    <p><b>Sizning rejangiz:</b> {{ ob_line }}</p>
-    <a class="btn w !py-2 !text-xs" href="{{ url_for('onboarding.edit') }}">OʻZGARTIRISH</a></div></section>
-  {% elif not ob_profile or (not ob_profile.completed_at and not ob_profile.skipped_at) %}
-  <section class="lg:col-span-12 win"><div class="p-4 flex items-center justify-between gap-3 flex-wrap text-sm">
-    <p><b>Rejani oʻzingizga moslang.</b> 3 ta qisqa savol, oʻtkazib yuborish mumkin.</p>
-    <a class="btn w !py-2 !text-xs" href="{{ url_for('onboarding.edit') }}">SAVOLLARGA JAVOB BERISH</a></div></section>
-  {% endif %}
-  <section class="lg:col-span-12 win">
-    <div class="wh"><span class="dot"></span><span class="dot"></span><span>BUGUNGI REJA</span></div>
-    <div class="p-5 grid md:grid-cols-12 gap-5 text-sm items-center">
-      <div class="md:col-span-3"><p class="text-[11px]" style="color:var(--mut)">KETMA-KET KUNLAR</p>
-        <p class="hd text-5xl">{{ prog.streak }}</p><p class="text-xs" style="color:var(--mut)">eng yaxshi: {{ prog.best }} · bugun: {{ prog.today }} ta mashq</p></div>
-      <div class="md:col-span-4"><p class="text-[11px] mb-2" style="color:var(--mut)">SOʻNGGI 7 KUN</p>
-        <div class="flex gap-2">{% for d in prog.week %}<div class="text-center text-[10px]"><span class="block w-8 h-8 border-2 border-black {{ 'ring-2 ring-offset-1' if d.today }}" style="background:{{ 'var(--lime)' if d.done else 'transparent' }}" aria-label="{{ d.label }}: {{ 'mashq bor' if d.done else 'mashq yoʻq' }}"></span>{{ d.label }}</div>{% endfor %}</div></div>
-      <div class="md:col-span-5"><p class="text-[11px]" style="color:var(--mut)">KEYINGI QADAM</p>
-        <p class="font-bold mt-1">{{ prog.next.text }}</p>
-        <div class="mt-3 flex gap-2 flex-wrap"><a class="btn !py-2 !text-xs" href="{{ url_for(prog.next.endpoint) }}">{{ prog.next.button }}</a>
-          {% if prog.vocab_due %}<a class="btn w !py-2 !text-xs" href="{{ url_for('vocab.review') }}">{{ prog.vocab_due }} TA SOʻZNI TAKRORLASH</a>{% endif %}</div></div>
-    </div>
-  </section>
-  <section class="lg:col-span-12 win">
-    <div class="wh"><span class="dot"></span><span>KUNLIK CHALLENGE VA XP</span><a class="btn !py-1 !text-[11px] ml-auto" href="{{ url_for('smart.home') }}">AQLLI MASHQ</a></div>
-    <div class="p-5 grid md:grid-cols-12 gap-5 text-sm items-center">
-      <div class="md:col-span-3"><p class="text-[11px]" style="color:var(--mut)">XP DARAJASI</p><p class="hd text-5xl">{{ gam.level }}</p>
-        <div class="bar mt-1"><i style="width:{{ gam.pct }}%"></i></div><p class="text-xs mt-1" style="color:var(--mut)">{{ gam.xp }} XP · keyingisiga {{ gam.to_next }}</p></div>
-      <div class="md:col-span-6">
-        {% if gam.daily and gam.daily.finished_at %}<p class="font-bold">Bugungi challenge tugadi: {{ gam.daily.correct }}/{{ gam.daily.total }}</p><p class="text-xs" style="color:var(--mut)">Ertaga yangi savollar. Seriyangizni uzmang.</p>
-        {% else %}<p class="font-bold">Bugungi 5 daqiqalik challenge sizni kutmoqda.</p><p class="text-xs" style="color:var(--mut)">Savollar zaif joylaringizga qarab tanlanadi.</p>{% endif %}
+<div class="grid lg:grid-cols-12 gap-6 items-start">
+
+  <!-- ============================================================== -->
+  <!-- CHAP PANEL (LEFT SIDEBAR): Foydalanuvchi & Tezkor Navigatsiya   -->
+  <!-- ============================================================== -->
+  <aside class="lg:col-span-4 space-y-4 lg:sticky lg:top-4">
+
+    <!-- 1. Foydalanuvchi Kartasi & Darajasi -->
+    <div class="win p-5 relative overflow-hidden">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 text-navy-950 font-black text-xl flex items-center justify-center shadow-md">
+          {{ current_user.name[:1]|upper }}
+        </div>
+        <div class="overflow-hidden">
+          <h2 class="font-bold text-base truncate">{{ current_user.name }}</h2>
+          <p class="text-xs truncate" style="color:var(--mut)">{{ current_user.email }}</p>
+        </div>
       </div>
-      <div class="md:col-span-3 flex gap-2 flex-wrap">
-        {% if not (gam.daily and gam.daily.finished_at) %}<form method="post" action="{{ url_for('smart.daily') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn !py-2 !text-xs" type="submit">{{ 'DAVOM ETISH' if gam.daily else 'BOSHLASH' }}</button></form>{% endif %}
-        <span class="chip">{{ gam.badges|length }} ta nishon</span>
+
+      <!-- Daraja & Ball -->
+      <div class="mt-4 pt-4 border-t-2 border-black/10 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] uppercase font-mono font-bold tracking-wider" style="color:var(--mut)">Joriy Daraja</span>
+          <div class="flex items-baseline gap-2">
+            <span class="hd text-3xl text-cyan-400">{{ skills_data.overall_level or current_user.current_level or "—" }}</span>
+            {% if skills_data.overall %}
+            <span class="text-xs font-mono font-semibold" style="color:var(--mut)">{{ skills_data.overall }}/75 ball</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="text-right">
+          <span class="text-[10px] uppercase font-mono font-bold tracking-wider" style="color:var(--mut)">Seriya</span>
+          <p class="text-lg font-black text-amber-400 flex items-center justify-end gap-1">
+            <span>🔥</span> <span>{{ prog.streak }} kun</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- XP Bar -->
+      <div class="mt-3">
+        <div class="flex justify-between text-[11px] font-mono mb-1">
+          <span>Lv {{ gam.level }}</span>
+          <span style="color:var(--mut)">{{ gam.xp }} XP · keyingisiga {{ gam.to_next }}</span>
+        </div>
+        <div class="bar"><i style="width:{{ gam.pct }}%"></i></div>
       </div>
     </div>
-  </section>
-  <section class="lg:col-span-4 win">
-    <div class="wh"><span class="dot"></span><span class="dot"></span><span>PROFIL</span></div>
-    <div class="p-4">
-      <p class="hd text-3xl">{{ current_user.name }}</p>
-      <p class="text-[11px] mt-4" style="color:var(--mut)">JORIY DARAJA</p>
-      <p class="hd text-5xl">{{ current_user.current_level or "—" }}</p>
-      <div class="mt-4 flex gap-2 flex-wrap"><a class="btn !py-2 !text-xs" href="{{ url_for('skills.profile') }}">SKILLAR PROFILI</a><a class="btn w !py-2 !text-xs" href="{{ url_for('vocab.index') }}">LUGʻAT</a><a class="btn w !py-2 !text-xs" href="{{ url_for('mistakes.index') }}">XATOLAR DAFTARI</a></div>
-      {% if not current_user.current_level %}<p class="text-xs mt-2" style="color:var(--mut)">Darajangiz birinchi testdan keyin chiqadi.</p>{% endif %}
+
+    <!-- 2. Tezkor Start Menyusi (Yuqori FIK vositalari) -->
+    <div class="win">
+      <div class="wh">
+        <span class="dot"></span><span class="dot"></span>
+        <span>TEZKOR VOSITALAR (1-CLICK)</span>
+      </div>
+      <div class="p-3 space-y-1.5 text-xs font-bold">
+        <a href="{{ url_for('exam.index') }}" class="flex items-center justify-between p-2.5 rounded-lg border-2 border-black hover:bg-black hover:text-white transition group">
+          <span class="flex items-center gap-2">
+            <span>🎯</span> <span>Toʻliq Mock Imtihon</span>
+          </span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-lime-400 text-black font-mono">Rasmiy</span>
+        </a>
+
+        <a href="{{ url_for('listening.dictation') }}" class="flex items-center justify-between p-2.5 rounded-lg border-2 border-black hover:bg-black hover:text-white transition group">
+          <span class="flex items-center gap-2">
+            <span>🎧</span> <span>Smart Audio Diktant</span>
+          </span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-cyan-400 text-black font-mono">0 AI</span>
+        </a>
+
+        <a href="{{ url_for('writing.c1_transform_view') }}" class="flex items-center justify-between p-2.5 rounded-lg border-2 border-black hover:bg-black hover:text-white transition group">
+          <span class="flex items-center gap-2">
+            <span>✨</span> <span>C1 Insho Transformator</span>
+          </span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-sky-400 text-black font-mono">AI Pro</span>
+        </a>
+
+        <a href="{{ url_for('speaking.examiner_view') }}" class="flex items-center justify-between p-2.5 rounded-lg border-2 border-black hover:bg-black hover:text-white transition group">
+          <span class="flex items-center gap-2">
+            <span>🎙️</span> <span>AI Speaking Examiner</span>
+          </span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-400 text-black font-mono">Jonli</span>
+        </a>
+
+        <a href="{{ url_for('battle.lobby') }}" class="flex items-center justify-between p-2.5 rounded-lg border-2 border-black hover:bg-black hover:text-white transition group">
+          <span class="flex items-center gap-2">
+            <span>⚔️</span> <span>1v1 CEFR Battle Arena</span>
+          </span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-400 text-black font-mono">Multiplayer</span>
+        </a>
+      </div>
     </div>
-  </section>
-  <section class="lg:col-span-8 win">
-    <div class="wh"><span class="dot"></span><span>OXIRGI NATIJALAR</span></div>
-    {% if attempts %}
-    <div class="overflow-x-auto"><table class="w-full text-xs">
-      <thead><tr class="text-left border-b-2 border-black"><th class="p-3">Sana</th><th class="p-3">Test</th><th class="p-3">Skill</th><th class="p-3">Ball</th><th class="p-3">Daraja</th><th class="p-3"></th></tr></thead>
-      <tbody>{% for a in attempts %}
-        <tr class="border-b border-black/20"><td class="p-3">{{ a.finished_at.strftime('%d.%m.%Y') if a.finished_at else '—' }}</td><td class="p-3">{{ a.test.title }}</td><td class="p-3">{{ a.test.skill|upper }}</td><td class="p-3">{{ a.raw_score }}/{{ a.max_score }}</td><td class="p-3 font-bold">{{ a.cefr_level }}</td><td class="p-3"><a class="underline" href="{{ url_for('reading.result', attempt_id=a.id) }}">Koʻrish</a></td></tr>
-      {% endfor %}</tbody>
-    </table></div>
-    {% else %}
-    <div class="p-6 text-sm">
-      <p class="font-bold">Hali test topshirmagansiz.</p>
-      <p class="mt-1" style="color:var(--mut)">Birinchi Reading testini boshlang, natija shu yerda koʻrinadi.</p>
-      <a href="{{ url_for('reading.tests') }}" class="btn mt-4">READING TESTI</a> <a href="{{ url_for('listening.tests') }}" class="btn w mt-4">LISTENING TESTI</a>
+
+    <!-- 3. Mashgʻulotlar & Shaxsiy Boʻlimlar -->
+    <div class="win">
+      <div class="wh">
+        <span class="dot"></span>
+        <span>BOʻLIMLAR & OʻZLASHTIRISH</span>
+      </div>
+      <div class="p-3 grid grid-cols-2 gap-2 text-xs font-bold">
+        <a href="{{ url_for('reading.tests') }}" class="p-2.5 rounded-lg border-2 border-black text-center hover:bg-black hover:text-white transition">
+          📖 Reading
+        </a>
+        <a href="{{ url_for('listening.tests') }}" class="p-2.5 rounded-lg border-2 border-black text-center hover:bg-black hover:text-white transition">
+          🎧 Listening
+        </a>
+        <a href="{{ url_for('writing.tasks') }}" class="p-2.5 rounded-lg border-2 border-black text-center hover:bg-black hover:text-white transition">
+          ✍️ Writing
+        </a>
+        <a href="{{ url_for('speaking.tasks') }}" class="p-2.5 rounded-lg border-2 border-black text-center hover:bg-black hover:text-white transition">
+          🗣️ Speaking
+        </a>
+        <a href="{{ url_for('mistakes.index') }}" class="p-2.5 rounded-lg border-2 border-black text-center hover:bg-black hover:text-white transition">
+          📝 Xatolarim
+        </a>
+        <a href="{{ url_for('vocab.index') }}" class="p-2.5 rounded-lg border-2 border-black text-center hover:bg-black hover:text-white transition">
+          📚 Lugʻatim
+        </a>
+      </div>
+      <div class="px-3 pb-3">
+        <a href="{{ url_for('onboarding.edit') }}" class="block w-full py-2 text-center text-xs font-semibold rounded border border-black/30 hover:border-black transition" style="color:var(--mut)">
+          ⚙️ Reja va Maqsadni Yangilash
+        </a>
+      </div>
     </div>
-    {% endif %}
-  </section>
-  <section class="lg:col-span-12 win">
-    <div class="wh"><span class="dot"></span><span>WRITING NATIJALARI</span>
-      <a href="{{ url_for('writing.tasks') }}" class="btn !py-1 !text-[11px] ml-auto">YANGI INSHO</a></div>
-    {% if writing %}
-    <div class="overflow-x-auto"><table class="w-full text-xs">
-      <thead><tr class="text-left border-b-2 border-black"><th class="p-3">Sana</th><th class="p-3">Topshiriq</th><th class="p-3">Ball</th><th class="p-3">Daraja</th><th class="p-3"></th></tr></thead>
-      <tbody>{% for w in writing %}<tr class="border-b border-black/20">
-        <td class="p-3">{{ w.created_at.strftime('%d.%m.%Y') }}</td><td class="p-3">{{ w.feedback.title }}</td>
-        <td class="p-3">{{ w.scaled_score }}/75</td><td class="p-3 font-bold">{{ w.cefr_level }}</td>
-        <td class="p-3"><a class="underline" href="{{ url_for('writing.result', result_id=w.id) }}">Koʻrish</a></td></tr>{% endfor %}</tbody>
-    </table></div>
-    {% else %}<div class="p-6 text-sm"><p class="font-bold">Hali insho yozmagansiz.</p>
-      <p class="mt-1" style="color:var(--mut)">Birinchi topshiriqni bajaring, AI baho va tavsiya beradi.</p></div>{% endif %}
-  </section>
-  <section class="lg:col-span-12 win">
-    <div class="wh"><span class="dot"></span><span>SPEAKING NATIJALARI</span>
-      <a href="{{ url_for('speaking.tasks') }}" class="btn !py-1 !text-[11px] ml-auto">YANGI JAVOB</a></div>
-    {% if speaking %}
-    <div class="overflow-x-auto"><table class="w-full text-xs">
-      <thead><tr class="text-left border-b-2 border-black"><th class="p-3">Sana</th><th class="p-3">Topshiriq</th><th class="p-3">Ball</th><th class="p-3">Daraja</th><th class="p-3"></th></tr></thead>
-      <tbody>{% for w in speaking %}<tr class="border-b border-black/20">
-        <td class="p-3">{{ w.created_at.strftime('%d.%m.%Y') }}</td><td class="p-3">{{ w.feedback.title }}</td>
-        <td class="p-3">{{ w.scaled_score }}/75</td><td class="p-3 font-bold">{{ w.cefr_level }}</td>
-        <td class="p-3"><a class="underline" href="{{ url_for('speaking.result', result_id=w.id) }}">Koʻrish</a></td></tr>{% endfor %}</tbody>
-    </table></div>
-    {% else %}<div class="p-6 text-sm"><p class="font-bold">Hali Speaking topshirmagansiz.</p>
-      <p class="mt-1" style="color:var(--mut)">Mikrofonga javob bering, AI baho va tavsiya beradi.</p></div>{% endif %}
-  </section>
+
+  </aside>
+
+
+  <!-- ============================================================== -->
+  <!-- ASOSIY ISH MAYDONI (MAIN CONTENT): Fokus & Natijalar           -->
+  <!-- ============================================================== -->
+  <main class="lg:col-span-8 space-y-5">
+
+    <!-- Placement banner -->
+    <section class="win warn">
+      <div class="p-4 flex items-center justify-between gap-3 flex-wrap text-sm">
+        {% if placement %}
+        <p>Daraja testi natijasi: <b>{{ placement.cefr_level }}</b>. <a class="underline" href="{{ url_for('placement.result', result_id=placement.id) }}">Mos mashqlar</a></p>
+        <a class="btn w !py-2 !text-xs font-bold" href="{{ url_for('placement.intro') }}">QAYTA TOPSHIRISH</a>
+        {% else %}
+        <p><b>Darajangizni biling.</b> 8 daqiqalik test sizga mos mashqlarni tanlaydi.</p>
+        <a class="btn w !py-2 !text-xs font-bold" href="{{ url_for('placement.intro') }}">DARAJANI ANIQLASH</a>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- 1. "Fokus Rejim" — BUGUNGI REJA -->
+    <section class="win relative overflow-hidden">
+      <div class="wh">
+        <span class="dot"></span><span class="dot"></span>
+        <span>BUGUNGI REJA</span>
+      </div>
+      <div class="p-5">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-lime-400 text-black font-extrabold">Tavsiya etilgan mashq</span>
+            <h3 class="text-lg font-extrabold text-cyan-300 mt-1">{{ prog.next.text }}</h3>
+            <p class="text-xs" style="color:var(--mut)">
+              Har kuni uzluksiz 15 daqiqa mashq qilish CEFR imtihonida eng yuqori natijani beradi.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <a class="btn !py-2.5 !px-5 text-sm font-black shadow-lg" href="{{ url_for(prog.next.endpoint) }}">
+              {{ prog.next.button }} →
+            </a>
+            {% if prog.vocab_due %}
+            <a class="btn w !py-2 !text-xs" href="{{ url_for('vocab.review') }}">
+              {{ prog.vocab_due }} TA SOʻZNI TAKRORLASH
+            </a>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- 7 Kunlik Seriya Tracker -->
+        <div class="mt-5 pt-4 border-t-2 border-black/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <span class="text-[11px] font-mono" style="color:var(--mut)">SOʻNGGI 7 KUN</span>
+          <div class="flex gap-2">
+            {% for d in prog.week %}
+            <div class="text-center text-[10px]">
+              <span class="block w-7 h-7 rounded border-2 border-black {{ 'ring-2 ring-cyan-400 ring-offset-1' if d.today }}" style="background:{{ 'var(--lime)' if d.done else 'transparent' }}" title="{{ d.label }}: {{ 'bajarilgan' if d.done else 'boʻsh' }}"></span>
+              <span class="mt-0.5 block font-mono font-bold">{{ d.label }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 4 Koʻnikma Balansi (CEFR 4-Skill Scorecard) -->
+    <section class="win">
+      <div class="wh">
+        <span class="dot"></span>
+        <span>4 TA SKILL BALANSI & METRIKA</span>
+        <a href="{{ url_for('skills.profile') }}" class="text-[11px] underline ml-auto font-bold" style="color:var(--purt)">Toʻliq Grafika →</a>
+      </div>
+      <div class="p-4 grid sm:grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+        
+        <!-- Reading -->
+        <div class="p-3.5 rounded-xl border-2 border-black/20 bg-black/5 flex flex-col justify-between">
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-xs">📖 Reading</span>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300">
+              {{ skills_data.levels.reading or '—' }}
+            </span>
+          </div>
+          <p class="hd text-2xl mt-2 text-cyan-400">
+            {{ skills_data.latest.reading if skills_data.latest.reading is not none else '—' }}<span class="text-xs font-mono font-normal text-slate-400">/75</span>
+          </p>
+          <a href="{{ url_for('reading.tests') }}" class="text-[11px] mt-2 underline text-cyan-300 font-medium">Mashq qilish →</a>
+        </div>
+
+        <!-- Listening -->
+        <div class="p-3.5 rounded-xl border-2 border-black/20 bg-black/5 flex flex-col justify-between">
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-xs">🎧 Listening</span>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/20 text-blue-300">
+              {{ skills_data.levels.listening or '—' }}
+            </span>
+          </div>
+          <p class="hd text-2xl mt-2 text-blue-400">
+            {{ skills_data.latest.listening if skills_data.latest.listening is not none else '—' }}<span class="text-xs font-mono font-normal text-slate-400">/75</span>
+          </p>
+          <a href="{{ url_for('listening.dictation') }}" class="text-[11px] mt-2 underline text-blue-300 font-medium">Diktant qilish →</a>
+        </div>
+
+        <!-- Writing -->
+        <div class="p-3.5 rounded-xl border-2 border-black/20 bg-black/5 flex flex-col justify-between">
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-xs">✍️ Writing</span>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/20 text-purple-300">
+              {{ skills_data.levels.writing or '—' }}
+            </span>
+          </div>
+          <p class="hd text-2xl mt-2 text-purple-400">
+            {{ skills_data.latest.writing if skills_data.latest.writing is not none else '—' }}<span class="text-xs font-mono font-normal text-slate-400">/75</span>
+          </p>
+          <a href="{{ url_for('writing.c1_transform_view') }}" class="text-[11px] mt-2 underline text-purple-300 font-medium">Transformator →</a>
+        </div>
+
+        <!-- Speaking -->
+        <div class="p-3.5 rounded-xl border-2 border-black/20 bg-black/5 flex flex-col justify-between">
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-xs">🗣️ Speaking</span>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300">
+              {{ skills_data.levels.speaking or '—' }}
+            </span>
+          </div>
+          <p class="hd text-2xl mt-2 text-emerald-400">
+            {{ skills_data.latest.speaking if skills_data.latest.speaking is not none else '—' }}<span class="text-xs font-mono font-normal text-slate-400">/75</span>
+          </p>
+          <a href="{{ url_for('speaking.examiner_view') }}" class="text-[11px] mt-2 underline text-emerald-300 font-medium">AI Examiner →</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. KUNLIK CHALLENGE VA XP -->
+    <section class="win">
+      <div class="wh">
+        <span class="dot"></span>
+        <span>KUNLIK CHALLENGE VA XP</span>
+        <a class="btn !py-1 !text-[11px] ml-auto font-bold" href="{{ url_for('smart.home') }}">AQLLI MASHQ</a>
+      </div>
+      <div class="p-4 flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <span class="text-[10px] font-mono uppercase font-bold text-amber-400">⚡ 5 Daqiqalik Mashq</span>
+          <h4 class="font-bold text-sm">
+            {% if gam.daily and gam.daily.finished_at %}
+            Bugungi challenge tugadi: {{ gam.daily.correct }}/{{ gam.daily.total }}
+            {% else %}
+            Bugungi 5 daqiqalik challenge sizni kutmoqda.
+            {% endif %}
+          </h4>
+          <p class="text-xs" style="color:var(--mut)">Savollar zaif joylaringizga qarab tanlanadi.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          {% if not (gam.daily and gam.daily.finished_at) %}
+          <form method="post" action="{{ url_for('smart.daily') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn !py-2 !text-xs font-bold" type="submit">BOSHLASH</button>
+          </form>
+          {% else %}
+          <span class="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/30">
+            ✓ Topshirildi (+20 XP)
+          </span>
+          {% endif %}
+          <span class="chip font-mono text-xs font-bold">{{ gam.badges|length }} ta nishon</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Yagona Natijalar Tarixi (OXIRGI NATIJALAR, WRITING NATIJALARI, SPEAKING NATIJALARI) -->
+    <section class="win">
+      <div class="wh flex items-center justify-between flex-wrap gap-2">
+        <div class="flex items-center gap-2">
+          <span class="dot"></span>
+          <span>OXIRGI NATIJALAR</span>
+        </div>
+
+        <!-- Filter Tab Buttons -->
+        <div class="flex gap-1 text-[11px] font-bold">
+          <button type="button" onclick="filterFeed('all')" id="tab-all" class="px-2.5 py-1 rounded bg-black text-white feed-tab">Barchasi</button>
+          <button type="button" onclick="filterFeed('tests')" id="tab-tests" class="px-2.5 py-1 rounded border border-black/30 feed-tab">Testlar</button>
+          <button type="button" onclick="filterFeed('writing')" id="tab-writing" class="px-2.5 py-1 rounded border border-black/30 feed-tab">WRITING NATIJALARI</button>
+          <button type="button" onclick="filterFeed('speaking')" id="tab-speaking" class="px-2.5 py-1 rounded border border-black/30 feed-tab">SPEAKING NATIJALARI</button>
+        </div>
+      </div>
+
+      <div class="p-0 overflow-x-auto">
+        <table class="w-full text-xs">
+          <thead>
+            <tr class="text-left border-b-2 border-black/20 bg-black/5 text-[11px]">
+              <th class="p-3">Sana</th>
+              <th class="p-3">Boʻlim / Topshiriq</th>
+              <th class="p-3">Ball</th>
+              <th class="p-3">Daraja</th>
+              <th class="p-3 text-right">Amal</th>
+            </tr>
+          </thead>
+          <tbody id="unified-feed">
+            <!-- Reading & Listening Attempts -->
+            {% for a in attempts %}
+            <tr class="border-b border-black/10 feed-row feed-tests">
+              <td class="p-3 font-mono" style="color:var(--mut)">{{ a.finished_at.strftime('%d.%m.%Y') if a.finished_at else '—' }}</td>
+              <td class="p-3 font-semibold">
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono mr-1.5 {{ 'bg-cyan-500/20 text-cyan-300' if a.test.skill == 'reading' else 'bg-blue-500/20 text-blue-300' }}">
+                  {{ a.test.skill|upper }}
+                </span>
+                {{ a.test.title }}
+              </td>
+              <td class="p-3 font-mono">{{ a.raw_score }}/{{ a.max_score }} <span class="text-[10px]" style="color:var(--mut)">({{ a.scaled_score }}/75)</span></td>
+              <td class="p-3 font-bold text-cyan-400">{{ a.cefr_level }}</td>
+              <td class="p-3 text-right space-x-2">
+                <a class="underline font-semibold" href="{{ url_for('reading.result', attempt_id=a.id) }}">Koʻrish</a>
+                <a class="px-2 py-1 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[10px] font-mono font-bold" href="{{ url_for('certificate.attempt_certificate', attempt_id=a.id) }}" target="_blank">📜 Sertifikat</a>
+              </td>
+            </tr>
+            {% endfor %}
+
+            <!-- Writing Attempts -->
+            {% for w in writing %}
+            <tr class="border-b border-black/10 feed-row feed-writing">
+              <td class="p-3 font-mono" style="color:var(--mut)">{{ w.created_at.strftime('%d.%m.%Y') }}</td>
+              <td class="p-3 font-semibold">
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono mr-1.5 bg-purple-500/20 text-purple-300">
+                  WRITING NATIJALARI
+                </span>
+                {{ (w.feedback.get('title') if w.feedback else None) or "Insho topshirig'i" }}
+              </td>
+              <td class="p-3 font-mono">{{ w.scaled_score }}/75</td>
+              <td class="p-3 font-bold text-purple-400">{{ w.cefr_level }}</td>
+              <td class="p-3 text-right">
+                <a class="underline font-semibold" href="{{ url_for('writing.result', result_id=w.id) }}">Koʻrish</a>
+              </td>
+            </tr>
+            {% endfor %}
+
+            <!-- Speaking Attempts -->
+            {% for s in speaking %}
+            <tr class="border-b border-black/10 feed-row feed-speaking">
+              <td class="p-3 font-mono" style="color:var(--mut)">{{ s.created_at.strftime('%d.%m.%Y') }}</td>
+              <td class="p-3 font-semibold">
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono mr-1.5 bg-emerald-500/20 text-emerald-300">
+                  SPEAKING NATIJALARI
+                </span>
+                {{ (s.feedback.get('title') if s.feedback else None) or "Nutq javobi" }}
+              </td>
+              <td class="p-3 font-mono">{{ s.scaled_score }}/75</td>
+              <td class="p-3 font-bold text-emerald-400">{{ s.cefr_level }}</td>
+              <td class="p-3 text-right">
+                <a class="underline font-semibold" href="{{ url_for('speaking.result', result_id=s.id) }}">Koʻrish</a>
+              </td>
+            </tr>
+            {% endfor %}
+
+            {% if not attempts and not writing and not speaking %}
+            <tr>
+              <td colspan="5" class="p-8 text-center text-sm" style="color:var(--mut)">
+                Hali mashgʻulotlar tarixi yoʻq. Yuqoridagi <b>Fokus</b> orqali birinchi mashqni boshlang!
+              </td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
 </div>
+
+<script>
+function filterFeed(kind) {
+  const rows = document.querySelectorAll('.feed-row');
+  const tabs = document.querySelectorAll('.feed-tab');
+
+  tabs.forEach(t => {
+    t.classList.remove('bg-black', 'text-white');
+    t.classList.add('border', 'border-black/30');
+  });
+
+  const activeTab = document.getElementById('tab-' + kind);
+  if (activeTab) {
+    activeTab.classList.remove('border', 'border-black/30');
+    activeTab.classList.add('bg-black', 'text-white');
+  }
+
+  rows.forEach(r => {
+    if (kind === 'all') {
+      r.style.display = '';
+    } else if (r.classList.contains('feed-' + kind)) {
+      r.style.display = '';
+    } else {
+      r.style.display = 'none';
+    }
+  });
+}
+</script>
 {% endblock %}
