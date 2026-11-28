@@ -91,3 +91,19 @@ def test_login_throttle(client):
     assert client.post("/login", data={"email": "stud@x.uz", "password": "wrong"}).status_code == 429
     assert client.post("/login", data={"email": "stud@x.uz", "password": "password123"}).status_code == 429   # locked for this key
     assert client.post("/login", data={"email": "admin@x.uz", "password": "password123"}).status_code == 302   # others unaffected
+
+
+def test_examiner_respond_fallback(client, monkeypatch):
+    login(client)
+    monkeypatch.setattr(speaking, "transcribe", lambda d, n: "I really enjoy reading books and exploring new technologies in my leisure time.")
+    monkeypatch.setattr(speaking, "ask_grader", lambda s, u: "This is non-json plain text response from AI")
+    
+    r = client.post("/speaking/examiner/respond", data={"audio": (io.BytesIO(b"\x1aE\xdf\xa3" + b"0" * 5000), "turn.webm", "audio/webm"),
+                                                        "last_question": "Tell me about your hobbies."},
+                    content_type="multipart/form-data")
+    assert r.status_code == 200
+    data = r.get_json()
+    assert data["ok"] is True
+    assert "Thank you" in data["examiner_reply"]
+    assert "Javobingizni misollar bilan boyiting" in data["fluency_tip"]
+

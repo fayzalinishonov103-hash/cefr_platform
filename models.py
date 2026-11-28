@@ -64,6 +64,7 @@ class User(UserMixin, db.Model):
 
 class Test(db.Model):
     """A full test for one skill (e.g. one Reading test with 5 parts)."""
+    __test__ = False
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
     skill = db.Column(db.String(20), nullable=False, index=True)  # reading/listening/writing/speaking

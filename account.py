@@ -6,7 +6,8 @@ from flask_login import login_required, current_user, logout_user, login_user
 import security
 from extensions import db
 from models import (User, Attempt, HintLog, SkillResult, VocabWord, ShadowMark, UsageLog, AuthAttempt, ExamSession,
-                    MistakeFixed, PracticeSet, PracticeLog, XpEvent, Badge, LeaderboardMember, UserProfile)
+                    MistakeFixed, PracticeSet, PracticeLog, XpEvent, Badge, LeaderboardMember, UserProfile,
+                    BattleMatch)
 
 bp = Blueprint("account", __name__)
 DELETE_WORD = "OCHIRISH"
@@ -83,6 +84,9 @@ def settings():
                 UsageLog.query.filter_by(user_id=uid).delete(synchronize_session=False)
                 for model in (PracticeSet, PracticeLog, XpEvent, Badge, LeaderboardMember, UserProfile):
                     model.query.filter_by(user_id=uid).delete(synchronize_session=False)
+                BattleMatch.query.filter(
+                    (BattleMatch.player1_id == uid) | (BattleMatch.player2_id == uid)
+                ).delete(synchronize_session=False)
                 user = db.session.get(User, uid)
                 AuthAttempt.query.filter_by(email=user.email).delete(synchronize_session=False)
                 logout_user()

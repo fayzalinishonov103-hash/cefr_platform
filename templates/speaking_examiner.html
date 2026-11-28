@@ -4,24 +4,24 @@
 <div class="max-w-3xl mx-auto space-y-6">
 
   <!-- Header Banner -->
-  <div class="win p-6 bg-gradient-to-r from-sky-950/40 via-slate-900 to-indigo-950/40 border-sky-400/40">
+  <div class="win p-6">
     <div class="wh mb-3"><span class="dot !bg-sky-400"></span><span class="dot !bg-emerald-400"></span><span>REAL-TIME INTERACTIVE SPEAKING · AI EXAMINER</span></div>
     
-    <div class="flex flex-wrap items-center justify-between gap-4">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div>
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sky-500/10 text-sky-400 border border-sky-400/30 mb-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sky-500/10 text-sky-500 border border-sky-400/30 mb-2">
           <span>🎙️ Jonli Savol-Javob & Qoʻshimcha Savollar</span>
         </div>
-        <h1 class="hd text-3xl sm:text-4xl text-white">JONLI AI IMTIHONCHI</h1>
-        <p class="text-xs text-slate-300 mt-1 max-w-lg leading-relaxed">
+        <h1 class="hd text-3xl sm:text-4xl" style="color:var(--wtx)">JONLI AI IMTIHONCHI</h1>
+        <p class="text-xs mt-1 max-w-lg leading-relaxed" style="color:var(--mut)">
           Xuddi haqiqiy CEFR imtihonchisi kabi jonli savol beradi, javobingizni tinglaydi va aytgan fikringizdan kelib chiqib qoʻshimcha savollar (follow-up) beradi.
         </p>
       </div>
 
-      <div class="text-right p-3 rounded-xl border border-slate-700 bg-slate-900/60">
-        <p class="text-[10px] font-bold text-slate-400 uppercase">Bugungi Kvota</p>
-        <p class="hd text-3xl text-sky-400">{{ remaining }}/{{ limit }}</p>
-        <p class="text-[10px] text-slate-400">seans qoldi</p>
+      <div class="text-right p-3 rounded-xl border field">
+        <p class="text-[10px] font-bold uppercase" style="color:var(--mut)">Bugungi Kvota</p>
+        <p class="hd text-3xl text-sky-500">{{ remaining }}/{{ limit }}</p>
+        <p class="text-[10px]" style="color:var(--mut)">seans qoldi</p>
       </div>
     </div>
   </div>
@@ -32,13 +32,13 @@
     <div class="space-y-4 max-h-[460px] overflow-y-auto pr-2" id="chatStream">
       <!-- Initial Examiner Greeting -->
       <div class="flex items-start gap-3">
-        <div class="w-10 h-10 rounded-full bg-indigo-600/30 border-2 border-indigo-400 flex items-center justify-center text-lg flex-shrink-0">
+        <div class="w-10 h-10 rounded-full bg-indigo-500/20 border-2 border-indigo-400 flex items-center justify-center text-lg flex-shrink-0">
           🇬🇧
         </div>
-        <div class="p-4 rounded-2xl rounded-tl-none bg-slate-800/80 border border-slate-700 text-slate-100 text-sm font-sans leading-relaxed shadow-md max-w-xl">
+        <div class="p-4 rounded-2xl rounded-tl-none field shadow-md max-w-xl text-sm leading-relaxed" style="color:var(--wtx)">
           <div class="flex items-center justify-between mb-1">
-            <span class="text-[11px] font-bold text-indigo-400">Examiner David</span>
-            <button type="button" class="text-xs text-sky-400 hover:text-sky-300 underline font-semibold play-btn" data-text="{{ question }}">🔊 Ovozda eshitish</button>
+            <span class="text-[11px] font-bold text-indigo-500">Examiner David</span>
+            <button type="button" class="text-xs text-sky-500 hover:underline font-semibold play-btn" data-text="{{ question }}">🔊 Ovozda eshitish</button>
           </div>
           <p id="currentQuestionText">{{ question }}</p>
         </div>
@@ -46,25 +46,25 @@
     </div>
 
     <!-- CEFR Speaking Part 2/3 Visual Stimulus Cue Card (Rasmlar) -->
-    <div class="p-4 rounded-xl border border-[var(--line)] bg-[var(--field)] space-y-3" id="visualCard">
+    <div class="p-4 rounded-xl border field space-y-3" id="visualCard">
       <div class="flex items-center justify-between">
-        <span class="text-xs font-bold text-sky-400 flex items-center gap-1.5">
+        <span class="text-xs font-bold text-sky-500 flex items-center gap-1.5">
           <span>📷</span> <span>CEFR VISUAL PROMPT (RASMLARNI TAQQOSLASH)</span>
         </span>
-        <span class="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 font-mono font-bold">Original Format</span>
+        <span class="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-500 font-mono font-bold">Original Format</span>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-        <div class="p-3 rounded-lg border border-[var(--line)] bg-[var(--win)] text-center space-y-1">
-          <div class="h-20 rounded bg-gradient-to-br from-indigo-950/70 to-slate-900 flex flex-col items-center justify-center p-2 text-slate-300">
+        <div class="p-3 rounded-lg border field text-center space-y-1">
+          <div class="h-20 rounded field flex flex-col items-center justify-center p-2">
             <span class="text-2xl mb-0.5">💻 ☕</span>
-            <span class="font-bold text-indigo-300">Picture 1: Solo Study & Digital Life</span>
+            <span class="font-bold text-indigo-500">Picture 1: Solo Study & Digital Life</span>
           </div>
           <p class="text-[11px] font-medium" style="color:var(--mut)">Working remotely / individual digital study</p>
         </div>
-        <div class="p-3 rounded-lg border border-[var(--line)] bg-[var(--win)] text-center space-y-1">
-          <div class="h-20 rounded bg-gradient-to-br from-emerald-950/70 to-slate-900 flex flex-col items-center justify-center p-2 text-slate-300">
+        <div class="p-3 rounded-lg border field text-center space-y-1">
+          <div class="h-20 rounded field flex flex-col items-center justify-center p-2">
             <span class="text-2xl mb-0.5">👥 🏫</span>
-            <span class="font-bold text-emerald-300">Picture 2: Group Interaction</span>
+            <span class="font-bold text-emerald-500">Picture 2: Group Interaction</span>
           </div>
           <p class="text-[11px] font-medium" style="color:var(--mut)">Interactive classroom / face-to-face team</p>
         </div>
@@ -73,18 +73,18 @@
     </div>
 
     <!-- Active Turn Controls -->
-    <div class="p-4 rounded-xl border border-slate-800 bg-slate-950/60 text-center space-y-4">
-      <div id="statusIndicator" class="text-xs text-slate-400 font-bold">
+    <div class="p-4 rounded-xl border field text-center space-y-4">
+      <div id="statusIndicator" class="text-xs font-bold" style="color:var(--mut)">
         Mikrofon tugmasini bosing va ingliz tilida javob bering (30–60 soniya)
       </div>
 
       <div class="flex items-center justify-center gap-4">
-        <button type="button" id="recordBtn" class="w-16 h-16 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-rose-950/50 transition transform hover:scale-105" title="Ovoz yozish">
+        <button type="button" id="recordBtn" class="w-16 h-16 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center text-2xl shadow-lg transition transform hover:scale-105" title="Ovoz yozish">
           🎤
         </button>
       </div>
 
-      <div class="flex items-center justify-center gap-2 text-xs font-mono text-slate-400" id="recordTimer">
+      <div class="flex items-center justify-center gap-2 text-xs font-mono" style="color:var(--mut)" id="recordTimer">
         <span>00:00</span>
       </div>
     </div>
@@ -162,41 +162,49 @@
     }
   }
 
-  // Play initial examiner greeting
+  // Audio play delegate for buttons
   document.addEventListener("click", function(e) {
-    if (e.target && e.target.classList.contains("play-btn")) {
-      speakEnglish(e.target.getAttribute("data-text") || "");
+    var btn = e.target.closest(".play-btn");
+    if (btn) {
+      var txt = btn.getAttribute("data-text");
+      if (txt) speakEnglish(txt);
     }
   });
 
-  // Microphone Handling
-  if (recordBtn) {
-    recordBtn.addEventListener("click", function() {
-      if (!isRecording) {
-        startRecording();
-      } else {
-        stopRecording();
-      }
-    });
-  }
+  // Microphone recording
+  recordBtn.addEventListener("click", function() {
+    if (!isRecording) {
+      startRecording();
+    } else {
+      stopRecording();
+    }
+  });
 
   function startRecording() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert("Brauzeringiz audio yozishni qoʻllab-quvvatlamaydi.");
+      return;
+    }
+
     navigator.mediaDevices.getUserMedia({ audio: true }).then(function(s) {
-      audioChunks = [];
       mediaRecorder = new MediaRecorder(s);
+      audioChunks = [];
       mediaRecorder.ondataavailable = function(e) {
         if (e.data.size > 0) audioChunks.push(e.data);
       };
-      mediaRecorder.onstop = sendAudioTurn;
+      mediaRecorder.onstop = function() {
+        s.getTracks().forEach(function(t) { t.stop(); });
+        sendAudioTurn();
+      };
+
       mediaRecorder.start();
       isRecording = true;
       recordBtn.classList.add("animate-pulse", "!bg-emerald-500");
-      recordBtn.innerHTML = "⏹️";
-      statusText.textContent = "Ovozingiz yozilmoqda... Javob tugagach tugmani bosing.";
-      statusText.className = "text-xs text-emerald-400 font-bold";
+      recordBtn.innerHTML = "⏹";
+      statusText.textContent = "Siz gapirmoqdasiz... Tugatgach, toʻxtatish tugmasini bosing.";
+      statusText.className = "text-xs text-emerald-500 font-bold";
 
       recSeconds = 0;
-      clearInterval(recTimer);
       recTimer = setInterval(function() {
         recSeconds++;
         var m = Math.floor(recSeconds / 60);
@@ -217,7 +225,7 @@
       recordBtn.disabled = true;
       clearInterval(recTimer);
       statusText.textContent = "AI imtihonchi javobingizni tahlil qilmoqda...";
-      statusText.className = "text-xs text-sky-400 font-bold animate-pulse";
+      statusText.className = "text-xs text-sky-500 font-bold animate-pulse";
     }
   }
 
@@ -239,7 +247,7 @@
 
       if (res.error) {
         statusText.textContent = res.error;
-        statusText.className = "text-xs text-rose-400 font-bold";
+        statusText.className = "text-xs text-rose-500 font-bold";
         return;
       }
 
@@ -257,33 +265,34 @@
         lastQuestion = res.examiner_reply;
         speakEnglish(res.examiner_reply);
         statusText.textContent = "Examiner savolini eshiting va keyingi javobingizni bering.";
-        statusText.className = "text-xs text-slate-400 font-bold";
+        statusText.className = "text-xs font-bold";
+        statusText.style.color = "var(--mut)";
       }, 700);
 
     }).catch(function(err) {
       recordBtn.disabled = false;
       recordBtn.innerHTML = "🎤";
       statusText.textContent = "Aloqada xatolik yuz berdi. Qayta urinib koʻring.";
-      statusText.className = "text-xs text-rose-400 font-bold";
+      statusText.className = "text-xs text-rose-500 font-bold";
     });
   }
 
   function addStudentBubble(text) {
     var d = document.createElement("div");
     d.className = "flex items-start gap-3 justify-end";
-    d.innerHTML = '<div class="p-4 rounded-2xl rounded-tr-none bg-sky-950/40 border border-sky-400/30 text-sky-100 text-sm font-sans leading-relaxed shadow-md max-w-xl text-right">' +
-                  '<span class="text-[11px] font-bold text-sky-400 block mb-1">Sizning javobingiz</span><p>' + escapeHtml(text) + '</p></div>' +
-                  '<div class="w-10 h-10 rounded-full bg-sky-500/20 border-2 border-sky-400 flex items-center justify-center font-bold text-sky-300 flex-shrink-0">U</div>';
+    d.innerHTML = '<div class="p-4 rounded-2xl rounded-tr-none bg-sky-500/10 border border-sky-400/30 text-sm leading-relaxed shadow-md max-w-xl text-right" style="color:var(--wtx)">' +
+                  '<span class="text-[11px] font-bold text-sky-500 block mb-1">Sizning javobingiz</span><p>' + escapeHtml(text) + '</p></div>' +
+                  '<div class="w-10 h-10 rounded-full bg-sky-500/20 border-2 border-sky-400 flex items-center justify-center font-bold text-sky-500 flex-shrink-0">U</div>';
     stream.appendChild(d);
     stream.scrollTop = stream.scrollHeight;
   }
 
   function addCoachingBubble(tip, vocab) {
     var d = document.createElement("div");
-    d.className = "p-3 rounded-xl bg-slate-900 border border-amber-500/30 text-xs font-sans text-slate-300 space-y-1 mx-12";
-    var h = '<div class="flex items-center gap-1.5 text-amber-400 font-bold">💡 Tezkor Tahlil:</div>';
+    d.className = "p-3 rounded-xl win border border-amber-500/30 text-xs text-[var(--wtx)] space-y-1 mx-12";
+    var h = '<div class="flex items-center gap-1.5 text-amber-500 font-bold">💡 Tezkor Tahlil:</div>';
     if (tip) h += '<p><b>Ravonlik:</b> ' + escapeHtml(tip) + '</p>';
-    if (vocab && vocab.phrase) h += '<p><b>C1 Iborasi:</b> <span class="text-sky-400 font-bold">' + escapeHtml(vocab.phrase) + '</span> (' + escapeHtml(vocab.uzbek || '') + ')</p>';
+    if (vocab && vocab.phrase) h += '<p><b>C1 Iborasi:</b> <span class="text-sky-500 font-bold">' + escapeHtml(vocab.phrase) + '</span> (' + escapeHtml(vocab.uzbek || '') + ')</p>';
     d.innerHTML = h;
     stream.appendChild(d);
     stream.scrollTop = stream.scrollHeight;
@@ -292,10 +301,10 @@
   function addExaminerBubble(text) {
     var d = document.createElement("div");
     d.className = "flex items-start gap-3";
-    d.innerHTML = '<div class="w-10 h-10 rounded-full bg-indigo-600/30 border-2 border-indigo-400 flex items-center justify-center text-lg flex-shrink-0">🇬🇧</div>' +
-                  '<div class="p-4 rounded-2xl rounded-tl-none bg-slate-800/80 border border-slate-700 text-slate-100 text-sm font-sans leading-relaxed shadow-md max-w-xl">' +
-                  '<div class="flex items-center justify-between mb-1"><span class="text-[11px] font-bold text-indigo-400">Examiner David</span>' +
-                  '<button type="button" class="text-xs text-sky-400 hover:text-sky-300 underline font-semibold play-btn" data-text="' + escapeHtml(text) + '">🔊 Ovozda eshitish</button></div>' +
+    d.innerHTML = '<div class="w-10 h-10 rounded-full bg-indigo-500/20 border-2 border-indigo-400 flex items-center justify-center text-lg flex-shrink-0">🇬🇧</div>' +
+                  '<div class="p-4 rounded-2xl rounded-tl-none field shadow-md max-w-xl text-sm leading-relaxed" style="color:var(--wtx)">' +
+                  '<div class="flex items-center justify-between mb-1"><span class="text-[11px] font-bold text-indigo-500">Examiner David</span>' +
+                  '<button type="button" class="text-xs text-sky-500 hover:underline font-semibold play-btn" data-text="' + escapeHtml(text) + '">🔊 Ovozda eshitish</button></div>' +
                   '<p>' + escapeHtml(text) + '</p></div>';
     stream.appendChild(d);
     stream.scrollTop = stream.scrollHeight;

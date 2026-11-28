@@ -109,14 +109,21 @@ def test_forgot_is_throttled_but_looks_the_same(client):
 def test_delete_account_removes_shadow_marks(app):
     c = app.test_client(); login(c)
     with app.app_context():
+        from models import BattleMatch
         v = ShadowVideo(youtube_id="dQw4w9WgXcQ", title="V"); db.session.add(v); db.session.flush()
         uid = User.query.filter_by(email="stud@x.uz").first().id
+        admin_id = User.query.filter_by(email="admin@x.uz").first().id
+        bm = BattleMatch(code="TEST1", player1_id=uid, player2_id=admin_id, status="finished")
+        db.session.add(bm)
         db.session.add_all([ShadowMark(user_id=uid, video_id=v.id, kind="seen"), UsageLog(user_id=uid, kind="hint")])
         db.session.commit()
-    c.post("/settings", data={"action": "delete", "confirm": "OCHIRISH", "password": "password123"})
+    r = c.post("/settings", data={"action": "delete", "confirm": "OCHIRISH", "password": "password123"})
+    assert r.status_code == 302
     with app.app_context():
+        from models import BattleMatch
         assert User.query.filter_by(email="stud@x.uz").count() == 0
         assert ShadowMark.query.count() == 0 and UsageLog.query.count() == 0
+        assert BattleMatch.query.count() == 0
 
 
 def test_security_headers(client):

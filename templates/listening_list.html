@@ -4,32 +4,35 @@
 <section class="win max-w-2xl mx-auto">
   <div class="wh"><span class="dot"></span><span class="dot"></span><span>LISTENING TESTLARI</span></div>
   <div class="p-5 space-y-4 text-sm">
-    <div class="p-4 rounded-xl bg-gradient-to-r from-navy-900 to-indigo-950 border border-cyan-500/30 flex flex-wrap items-center justify-between gap-3 shadow-lg">
+    <div class="field p-4 rounded-xl flex flex-wrap items-center justify-between gap-3 shadow-md border" style="border-color:var(--line)">
       <div>
-        <p class="font-bold text-cyan-300 flex items-center gap-2">
+        <p class="font-bold text-cyan-500 flex items-center gap-2">
           <span>🎧 SMART AUDIO DIKTANT</span>
-          <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 uppercase">Yangi</span>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-500 border border-cyan-500/30 uppercase">Yangi</span>
         </p>
-        <p class="text-xs text-slate-300 mt-1">Ingliz tili jonli nutqidagi tushib qoladigan va birikib ketadigan tovushlarni eshitib yozish mashqi.</p>
+        <p class="text-xs mt-1" style="color:var(--mut)">Ingliz tili jonli nutqidagi tushib qoladigan va birikib ketadigan tovushlarni eshitib yozish mashqi.</p>
       </div>
-      <a class="btn" style="background:linear-gradient(135deg, #06b6d4, #3b82f6);color:#fff;border-color:#0891b2;font-weight:700;" href="{{ url_for('listening.dictation') }}">DIKTANTNI BOSHLASH</a>
+      <a class="btn lime font-bold" href="{{ url_for('listening.dictation') }}">DIKTANTNI BOSHLASH</a>
     </div>
 
     <p class="text-xs" style="color:var(--mut)">Quloqchin taqing. Har bir part audiosi cheklangan marta eshittiriladi, pauza yoʻq.</p>
     {% for t, count in items %}
-    <div class="border-2 border-black p-4 flex flex-wrap items-center justify-between gap-3">
-      <div><p class="font-bold">{{ t.title }}</p>
-        <p class="text-xs mt-1" style="color:var(--mut)">{{ t.parts|length }} part · {{ count }} savol · {{ t.duration_min }} daqiqa</p></div>
+    <div class="field p-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border" style="border-color:var(--line)">
+      <div>
+        <p class="font-bold" style="color:var(--wtx)">{{ t.title }}</p>
+        <p class="text-xs mt-1" style="color:var(--mut)">{{ t.parts|length }} part · {{ count }} savol · {{ t.duration_min }} daqiqa</p>
+      </div>
       {% if current_user.is_authenticated %}
       <form method="post" action="{{ url_for('listening.start', test_id=t.id) }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <button class="btn" type="submit">BOSHLASH</button></form>
+        <button class="btn" type="submit">BOSHLASH</button>
+      </form>
       {% else %}
       <a class="btn" href="{{ url_for('auth.login', next=url_for('listening.tests')) }}">KIRISH</a>
       {% endif %}
     </div>
     {% else %}
-    <p>Hozircha Listening testi yoʻq. Administrator <b>Admin → + LISTENING</b> orqali audio bilan test qoʻshadi.</p>
+    <p style="color:var(--mut)">Hozircha Listening testi yoʻq. Administrator <b>Admin → + LISTENING</b> orqali audio bilan test qoʻshadi.</p>
     {% endfor %}
   </div>
 </section>

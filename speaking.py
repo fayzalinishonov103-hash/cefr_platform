@@ -218,7 +218,7 @@ def examiner_respond():
     user_prompt = f"PREVIOUS QUESTION:\n{context}\n\nCANDIDATE ANSWER:\n<speech>\n{transcript}\n</speech>"
     try:
         reply = ask_grader(EXAMINER_SYSTEM, user_prompt)
-        res = parse_json(reply)
+        res = parse_json(reply) or {}
     except Exception:
         log.exception("Examiner AI failed")
         return jsonify(error="AI hozir javob bermadi. Qayta urinib koʻring."), 502

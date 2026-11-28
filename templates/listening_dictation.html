@@ -5,40 +5,40 @@
 <div class="max-w-4xl mx-auto space-y-6">
 
   <!-- Header Banner -->
-  <div class="bg-gradient-to-r from-navy-900 via-navy-800 to-navy-900 border border-navy-700/80 rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+  <div class="win p-6 sm:p-8 relative overflow-hidden rounded-2xl">
     <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 mb-2">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-cyan-500/10 text-cyan-500 border border-cyan-500/30 mb-2">
           <span>🎧 ZERO-COST AI SMART TRAINER</span>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight" style="color:var(--wtx)">
           Smart Audio Diktant
         </h1>
-        <p class="text-sm text-slate-300 mt-1 max-w-xl">
+        <p class="text-sm mt-1 max-w-xl" style="color:var(--mut)">
           Ingliz tili jonli nutqidagi tushib qoladigan va birikib ketadigan tovushlarni (Connected Speech, Elision, Assimilation) eshitib yozish orqali Listening ballingizni oshiring.
         </p>
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
-        <div class="bg-navy-950/80 border border-navy-700 rounded-xl px-4 py-2 text-center">
-          <p class="text-[10px] uppercase font-mono text-slate-400">Jami mashqlar</p>
-          <p class="text-xl font-extrabold text-cyan-400">{{ total_phrases }} ta</p>
+        <div class="field px-4 py-2 text-center rounded-xl">
+          <p class="text-[10px] uppercase font-mono" style="color:var(--mut)">Jami mashqlar</p>
+          <p class="text-xl font-extrabold text-cyan-500">{{ total_phrases }} ta</p>
         </div>
-        <div class="bg-navy-950/80 border border-navy-700 rounded-xl px-4 py-2 text-center">
-          <p class="text-[10px] uppercase font-mono text-slate-400">Har biriga</p>
-          <p class="text-xl font-extrabold text-emerald-400">+10 XP</p>
+        <div class="field px-4 py-2 text-center rounded-xl">
+          <p class="text-[10px] uppercase font-mono" style="color:var(--mut)">Har biriga</p>
+          <p class="text-xl font-extrabold text-emerald-500">+10 XP</p>
         </div>
       </div>
     </div>
 
     <!-- Level Filter Tabs -->
-    <div class="flex flex-wrap gap-2 mt-6 pt-4 border-t border-navy-700/60">
-      <a href="{{ url_for('listening.dictation', level='all') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition {{ 'bg-cyan-500 text-navy-950 font-extrabold shadow-md' if active_level == 'ALL' else 'bg-navy-950/70 text-slate-300 hover:bg-navy-700 border border-navy-700' }}">
+    <div class="flex flex-wrap gap-2 mt-6 pt-4 border-t" style="border-color:var(--line)">
+      <a href="{{ url_for('listening.dictation', level='all') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition {{ 'btn lime' if active_level == 'ALL' else 'field' }}" style="{{ 'color:var(--mut)' if active_level != 'ALL' else '' }}">
         Barchasi ({{ total_phrases }})
       </a>
       {% for lvl in ['A2', 'B1', 'B2', 'C1'] %}
-      <a href="{{ url_for('listening.dictation', level=lvl) }}" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition {{ 'bg-cyan-500 text-navy-950 font-extrabold shadow-md' if active_level == lvl else 'bg-navy-950/70 text-slate-300 hover:bg-navy-700 border border-navy-700' }}">
+      <a href="{{ url_for('listening.dictation', level=lvl) }}" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition {{ 'btn lime' if active_level == lvl else 'field' }}" style="{{ 'color:var(--mut)' if active_level != lvl else '' }}">
         {{ lvl }} Daraja
       </a>
       {% endfor %}
@@ -48,63 +48,63 @@
   <!-- Dictation Cards List -->
   <div class="space-y-5" id="dictation-container">
     {% for p in phrases %}
-    <div class="bg-card-bg border border-navy-700/80 rounded-2xl p-5 sm:p-6 shadow-lg transition hover:border-cyan-500/40 dictation-card" data-phrase-id="{{ p.id }}" data-target="{{ p.text }}">
+    <div class="win p-5 sm:p-6 shadow-md transition dictation-card rounded-2xl" data-phrase-id="{{ p.id }}" data-target="{{ p.text }}">
       <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
         <div class="flex items-center gap-2">
           <span class="px-2.5 py-0.5 rounded text-xs font-mono font-bold uppercase
-            {{ 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' if p.level == 'A2'
-               else 'bg-blue-500/20 text-blue-300 border border-blue-500/40' if p.level == 'B1'
-               else 'bg-amber-500/20 text-amber-300 border border-amber-500/40' if p.level == 'B2'
-               else 'bg-purple-500/20 text-purple-300 border border-purple-500/40' }}">
+            {{ 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/40' if p.level == 'A2'
+               else 'bg-blue-500/20 text-blue-500 border border-blue-500/40' if p.level == 'B1'
+               else 'bg-amber-500/20 text-amber-500 border border-amber-500/40' if p.level == 'B2'
+               else 'bg-purple-500/20 text-purple-500 border border-purple-500/40' }}">
             {{ p.level }}
           </span>
-          <span class="text-xs text-slate-400 font-medium">#{{ p.id }} · {{ p.topic }}</span>
+          <span class="text-xs font-medium" style="color:var(--mut)">#{{ p.id }} · {{ p.topic }}</span>
         </div>
-        <span class="text-[11px] font-mono text-cyan-400/80 bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-800/40">
+        <span class="text-[11px] font-mono text-cyan-500 field px-2 py-0.5 rounded">
           {{ p.feature }}
         </span>
       </div>
 
       <!-- Controls & Audio Player -->
-      <div class="bg-navy-950/60 border border-navy-800 rounded-xl p-4 mb-4 flex flex-wrap items-center justify-between gap-3">
+      <div class="field p-4 mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl">
         <div class="flex items-center gap-3">
-          <button type="button" onclick="playAudio({{ p.id }}, 1.0)" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-navy-950 font-bold text-sm shadow-md transition transform active:scale-95">
+          <button type="button" onclick="playAudio({{ p.id }}, 1.0)" class="btn lime inline-flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm shadow-md transition transform active:scale-95">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>
             <span>Eshitish (1.0x)</span>
           </button>
 
-          <button type="button" onclick="playAudio({{ p.id }}, 0.8)" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-navy-800 hover:bg-navy-700 text-slate-200 font-semibold text-xs border border-navy-700 transition">
+          <button type="button" onclick="playAudio({{ p.id }}, 0.8)" class="btn inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold">
             <span>🐢 Sekin (0.8x)</span>
           </button>
         </div>
 
-        <div class="text-xs text-slate-400 flex items-center gap-2">
-          <span>Tinglashlar: <b id="count-{{ p.id }}" class="text-cyan-300">0</b></span>
+        <div class="text-xs flex items-center gap-2" style="color:var(--mut)">
+          <span>Tinglashlar: <b id="count-{{ p.id }}" class="text-cyan-500">0</b></span>
         </div>
       </div>
 
       <!-- Input and Submit Form -->
       <form onsubmit="checkDictation(event, {{ p.id }})" class="space-y-3">
         <div>
-          <label for="input-{{ p.id }}" class="block text-xs font-semibold text-slate-300 mb-1">
+          <label for="input-{{ p.id }}" class="block text-xs font-semibold mb-1" style="color:var(--mut)">
             Eshitgan jumlani yozing:
           </label>
-          <input type="text" id="input-{{ p.id }}" placeholder="Eshitgan jumlani to'liq yozing..." autocomplete="off" autocorrect="off" spellcheck="false" class="w-full px-4 py-3 bg-navy-950 border border-navy-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 text-sm font-medium transition shadow-inner">
+          <input type="text" id="input-{{ p.id }}" placeholder="Eshitgan jumlani to'liq yozing..." autocomplete="off" autocorrect="off" spellcheck="false" class="inp w-full px-4 py-3 text-sm font-medium">
         </div>
 
         <div class="flex items-center justify-between gap-3">
-          <button type="submit" id="btn-{{ p.id }}" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg transition">
+          <button type="submit" id="btn-{{ p.id }}" class="btn lime px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg transition">
             Tekshirish
           </button>
 
-          <button type="button" onclick="revealHint({{ p.id }})" class="text-xs text-slate-400 hover:text-cyan-300 underline underline-offset-4 transition">
+          <button type="button" onclick="revealHint({{ p.id }})" class="text-xs underline underline-offset-4 transition" style="color:var(--mut)">
             Maslahat olish
           </button>
         </div>
       </form>
 
       <!-- Feedback / Result Area -->
-      <div id="result-{{ p.id }}" class="hidden mt-4 pt-4 border-t border-navy-700/60 space-y-3"></div>
+      <div id="result-{{ p.id }}" class="hidden mt-4 pt-4 border-t space-y-3" style="border-color:var(--line)"></div>
     </div>
     {% endfor %}
   </div>
@@ -197,29 +197,29 @@ async function checkDictation(e, id) {
     let diffHtml = "";
 
     // Target breakdown
-    diffHtml += `<div class="p-3.5 rounded-xl ${data.is_passed ? 'bg-emerald-950/40 border border-emerald-500/40' : 'bg-rose-950/40 border border-rose-500/40'}">`;
+    diffHtml += `<div class="p-3.5 rounded-xl border ${data.is_passed ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-rose-500/10 border-rose-500/30'}">`;
     diffHtml += `<div class="flex items-center justify-between mb-2">
-      <span class="text-xs font-bold ${data.is_passed ? 'text-emerald-300' : 'text-rose-300'}">
+      <span class="text-xs font-bold ${data.is_passed ? 'text-emerald-500' : 'text-rose-500'}">
         ${data.is_passed ? '✓ Ajoyib natija!' : '⚠ Xatolar mavjud'} (${data.accuracy}% aniqlik)
       </span>
-      ${data.xp_awarded > 0 ? `<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-xs font-bold font-mono">+${data.xp_awarded} XP olindi! 🎉</span>` : ''}
+      ${data.xp_awarded > 0 ? `<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-500 text-xs font-bold font-mono">+${data.xp_awarded} XP olindi! 🎉</span>` : ''}
     </div>`;
 
-    diffHtml += `<div class="text-xs text-slate-300 mb-1">To'g'ri jumla tahlili:</div>`;
-    diffHtml += `<div class="flex flex-wrap gap-1.5 p-2.5 bg-navy-950/80 rounded-lg font-mono text-sm">`;
+    diffHtml += `<div class="text-xs mb-1" style="color:var(--mut)">To'g'ri jumla tahlili:</div>`;
+    diffHtml += `<div class="flex flex-wrap gap-1.5 p-2.5 field rounded-lg font-mono text-sm">`;
     data.target_tokens.forEach(t => {
       if (t.status === 'ok') {
-        diffHtml += `<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">${t.word}</span>`;
+        diffHtml += `<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-500 border border-emerald-500/40">${t.word}</span>`;
       } else {
-        diffHtml += `<span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 line-through" title="Tushirib qoldirilgan">${t.word}</span>`;
+        diffHtml += `<span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-500 border border-rose-500/40 line-through" title="Tushirib qoldirilgan">${t.word}</span>`;
       }
     });
     diffHtml += `</div>`;
 
-    diffHtml += `<div class="mt-3 p-3 bg-navy-900/90 rounded-lg text-xs space-y-1">
-      <p><span class="text-cyan-400 font-semibold font-mono">IPA Fonetika:</span> <span class="font-mono text-slate-200">${data.phonetic}</span></p>
-      <p><span class="text-cyan-400 font-semibold">Bog'lanish qoidasi:</span> <span class="text-slate-300">${data.feature}</span></p>
-      <p class="text-slate-300 pt-1 border-t border-navy-800"><b class="text-cyan-300">Tushuntirish:</b> ${data.explanation_uz}</p>
+    diffHtml += `<div class="mt-3 p-3 field rounded-lg text-xs space-y-1">
+      <p><span class="text-cyan-500 font-semibold font-mono">IPA Fonetika:</span> <span class="font-mono" style="color:var(--wtx)">${data.phonetic}</span></p>
+      <p><span class="text-cyan-500 font-semibold">Bog'lanish qoidasi:</span> <span style="color:var(--mut)">${data.feature}</span></p>
+      <p class="pt-1 border-t" style="border-color:var(--line); color:var(--mut)"><b class="text-cyan-500">Tushuntirish:</b> ${data.explanation_uz}</p>
     </div>`;
 
     diffHtml += `</div>`;
