@@ -40,7 +40,7 @@ def synthesize_examiner_audio(text: str) -> str:
         filename = f"ex_{h}.mp3"
         filepath = os.path.join(EXAMINER_AUDIO_DIR, filename)
         if not os.path.exists(filepath):
-            mp3_data = openai_tts("fable", text)
+            mp3_data = openai_tts("onyx", text)
             with open(filepath, "wb") as f:
                 f.write(mp3_data)
         return f"/static/audio/examiner/{filename}"

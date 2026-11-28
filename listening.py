@@ -116,7 +116,7 @@ def dictation_audio(phrase_id: int):
         try:
             os.makedirs(DICTATION_AUDIO_DIR, exist_ok=True)
             from generator import openai_tts
-            mp3_data = openai_tts("fable", phrase["text"])
+            mp3_data = openai_tts("onyx", phrase["text"])
             with open(filepath, "wb") as f:
                 f.write(mp3_data)
         except Exception:

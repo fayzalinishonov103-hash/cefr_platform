@@ -118,7 +118,7 @@ const phraseData = {
     text: {{ p.text|tojson }},
     phonetic: {{ p.phonetic|tojson }},
     uz: {{ p.explanation_uz|tojson }},
-    audio: "{{ url_for('static', filename='audio/dictation/phrase_' ~ p.id ~ '.mp3') }}"
+    audio: "{{ url_for('static', filename='audio/dictation/phrase_' ~ p.id ~ '.mp3') }}?v=3"
   },
   {% endfor %}
 };
