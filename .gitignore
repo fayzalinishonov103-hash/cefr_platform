@@ -8,5 +8,7 @@ __pycache__/
 .idea/
 .vscode/
 .DS_Store
-static/audio/
+static/audio/*
+!static/audio/dictation/
+!static/audio/examiner/
 static/maps/

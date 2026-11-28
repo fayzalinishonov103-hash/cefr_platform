@@ -58,3 +58,9 @@ def test_dictation_routes(tmp_path):
         assert data["ok"] is True
         assert data["accuracy"] == 100
         assert data["is_passed"] is True
+
+        # Audio route
+        resp_audio = client.get(f"/listening/dictation/audio/{p1['id']}")
+        assert resp_audio.status_code == 302
+        assert "phrase_1.mp3" in resp_audio.headers["Location"]
+

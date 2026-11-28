@@ -1,5 +1,6 @@
 """Listening tests and Smart Audio Dictation trainer (connected speech)."""
 import difflib
+import os
 import re
 from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, abort, request, jsonify
@@ -100,6 +101,27 @@ def dictation():
                            phrases=filtered,
                            active_level=level_filter,
                            total_phrases=len(phrases))
+
+
+DICTATION_AUDIO_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "audio", "dictation")
+
+
+@bp.route("/listening/dictation/audio/<int:phrase_id>")
+def dictation_audio(phrase_id: int):
+    phrase = get_phrase_by_id(phrase_id)
+    if not phrase:
+        abort(404)
+    filepath = os.path.join(DICTATION_AUDIO_DIR, f"phrase_{phrase_id}.mp3")
+    if not os.path.exists(filepath):
+        try:
+            os.makedirs(DICTATION_AUDIO_DIR, exist_ok=True)
+            from generator import openai_tts
+            mp3_data = openai_tts("fable", phrase["text"])
+            with open(filepath, "wb") as f:
+                f.write(mp3_data)
+        except Exception:
+            return jsonify(error="Audio hozir mavjud emas"), 503
+    return redirect(url_for("static", filename=f"audio/dictation/phrase_{phrase_id}.mp3"))
 
 
 @bp.route("/listening/dictation/check", methods=["POST"])

@@ -114,11 +114,17 @@
 const CSRF_TOKEN = "{{ csrf_token() }}";
 const phraseData = {
   {% for p in phrases %}
-  {{ p.id }}: { text: {{ p.text|tojson }}, phonetic: {{ p.phonetic|tojson }}, uz: {{ p.explanation_uz|tojson }} },
+  {{ p.id }}: {
+    text: {{ p.text|tojson }},
+    phonetic: {{ p.phonetic|tojson }},
+    uz: {{ p.explanation_uz|tojson }},
+    audio: "{{ url_for('static', filename='audio/dictation/phrase_' ~ p.id ~ '.mp3') }}"
+  },
   {% endfor %}
 };
 
 const playCounts = {};
+let currentDictationAudio = null;
 
 function playAudio(id, rate) {
   const item = phraseData[id];
@@ -128,18 +134,37 @@ function playAudio(id, rate) {
   const countEl = document.getElementById("count-" + id);
   if (countEl) countEl.innerText = playCounts[id];
 
+  if (currentDictationAudio) {
+    currentDictationAudio.pause();
+    currentDictationAudio = null;
+  }
+
+  // Play studio British English native audio
+  if (item.audio) {
+    const audio = new Audio(item.audio);
+    audio.playbackRate = rate || 1.0;
+    currentDictationAudio = audio;
+    audio.play().catch(function() {
+      playSynthFallback(item.text, rate);
+    });
+    return;
+  }
+
+  playSynthFallback(item.text, rate);
+}
+
+function playSynthFallback(text, rate) {
   if (!("speechSynthesis" in window)) {
     alert("Brauzeringiz nutq sintezini qo'llab-quvvatlamaydi.");
     return;
   }
 
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(item.text);
+  const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = "en-GB";
   utterance.rate = rate || 1.0;
   utterance.pitch = 1.0;
 
-  // Prefer natural English voices (British/American high-fidelity)
   const voices = window.speechSynthesis.getVoices();
   const naturalEn = voices.find(v => (v.lang === "en-GB" || v.lang.startsWith("en-GB")) && 
                      (v.name.includes("Natural") || v.name.includes("Online") || v.name.includes("Google") || v.name.includes("Sonia") || v.name.includes("Ryan") || v.name.includes("Libby")))

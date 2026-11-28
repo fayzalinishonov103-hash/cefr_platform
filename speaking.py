@@ -7,23 +7,46 @@ Design notes:
     levels are validated and capped (off-topic / too short) and mapped to points on the SERVER.
   * Daily limit per user. A failed AI call never costs the student a daily attempt.
 """
+import hashlib
 import logging
 import os
 from datetime import datetime, timedelta, timezone
 
-from flask import Blueprint, render_template, request, jsonify, url_for, abort, current_app
+from flask import Blueprint, render_template, request, jsonify, url_for, abort, current_app, redirect
 from flask_login import login_required, current_user
 
 from ai_hint import NoApiKey
 import gamify
 import security
 from extensions import db
+from generator import openai_tts
 from importer import parse_json
 from models import SpeakingPrompt, SkillResult
 from writing import ask_grader, normalize_grade
 
 bp = Blueprint("speaking", __name__)
 log = logging.getLogger(__name__)
+
+EXAMINER_AUDIO_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "audio", "examiner")
+
+
+def synthesize_examiner_audio(text: str) -> str:
+    """Generate or retrieve cached studio-grade British TTS audio for Examiner David."""
+    if not text:
+        return ""
+    try:
+        os.makedirs(EXAMINER_AUDIO_DIR, exist_ok=True)
+        h = hashlib.md5(text.strip().lower().encode("utf-8")).hexdigest()
+        filename = f"ex_{h}.mp3"
+        filepath = os.path.join(EXAMINER_AUDIO_DIR, filename)
+        if not os.path.exists(filepath):
+            mp3_data = openai_tts("fable", text)
+            with open(filepath, "wb") as f:
+                f.write(mp3_data)
+        return f"/static/audio/examiner/{filename}"
+    except Exception:
+        log.exception("Examiner TTS audio generation failed")
+        return ""
 
 PART_LABELS = {1: "Part 1 · Savollarga javob", 2: "Part 2 · Monolog", 3: "Part 3 · Munozara"}
 CRITERIA = [("task_achievement", "Topshiriqni bajarish"), ("fluency", "Ravonlik va izchillik"),
@@ -188,7 +211,20 @@ def examiner_view():
     limit = current_app.config.get("SPEAKING_EXAMINER_PER_DAY", 1)
     remaining = security.ai_remaining(current_user.id, "speaking_examiner", limit)
     initial_question = "Good afternoon! Welcome to the speaking interview. Could you tell me a little bit about yourself and what you enjoy doing in your free time?"
-    return render_template("speaking_examiner.html", question=initial_question, limit=limit, remaining=remaining)
+    initial_audio_url = synthesize_examiner_audio(initial_question)
+    return render_template("speaking_examiner.html", question=initial_question, initial_audio_url=initial_audio_url,
+                           limit=limit, remaining=remaining)
+
+
+@bp.route("/speaking/examiner/tts")
+def examiner_tts():
+    text = request.args.get("text", "").strip()
+    if not text or len(text) > 600:
+        return jsonify(error="Yaroqsiz matn"), 400
+    audio_url = synthesize_examiner_audio(text)
+    if audio_url:
+        return jsonify(ok=True, audio_url=audio_url)
+    return jsonify(ok=False, error="Audio hozir mavjud emas"), 503
 
 
 @bp.route("/speaking/examiner/respond", methods=["POST"])
@@ -223,8 +259,12 @@ def examiner_respond():
         log.exception("Examiner AI failed")
         return jsonify(error="AI hozir javob bermadi. Qayta urinib koʻring."), 502
 
+    reply_text = res.get("examiner_reply", "Thank you. Let us move on to discuss technology.")
+    audio_url = synthesize_examiner_audio(reply_text)
+
     return jsonify(ok=True, transcript=transcript,
-                   examiner_reply=res.get("examiner_reply", "Thank you. Let us move on to discuss technology."),
+                   examiner_reply=reply_text,
+                   audio_url=audio_url,
                    fluency_tip=res.get("fluency_tip", "Javobingizni misollar bilan boyiting."),
                    vocabulary_boost=res.get("vocabulary_boost", {}))
 

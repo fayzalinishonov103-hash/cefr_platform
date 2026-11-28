@@ -107,3 +107,12 @@ def test_examiner_respond_fallback(client, monkeypatch):
     assert "Thank you" in data["examiner_reply"]
     assert "Javobingizni misollar bilan boyiting" in data["fluency_tip"]
 
+
+def test_examiner_tts_endpoint(client, monkeypatch):
+    monkeypatch.setattr(speaking, "synthesize_examiner_audio", lambda txt: "/static/audio/examiner/test.mp3")
+    r = client.get("/speaking/examiner/tts?text=Hello+world")
+    assert r.status_code == 200
+    assert r.get_json()["ok"] is True
+    assert "/static/audio/examiner/test.mp3" in r.get_json()["audio_url"]
+
+

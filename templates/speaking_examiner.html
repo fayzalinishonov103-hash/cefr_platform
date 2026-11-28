@@ -38,7 +38,7 @@
         <div class="p-4 rounded-2xl rounded-tl-none field shadow-md max-w-xl text-sm leading-relaxed" style="color:var(--wtx)">
           <div class="flex items-center justify-between mb-1">
             <span class="text-[11px] font-bold text-indigo-500">Examiner David</span>
-            <button type="button" class="text-xs text-sky-500 hover:underline font-semibold play-btn" data-text="{{ question }}">🔊 Ovozda eshitish</button>
+            <button type="button" class="text-xs text-sky-500 hover:underline font-semibold play-btn" data-text="{{ question }}" data-audio="{{ initial_audio_url or '' }}">🔊 Ovozda eshitish</button>
           </div>
           <p id="currentQuestionText">{{ question }}</p>
         </div>
@@ -106,7 +106,37 @@
   var recSeconds = 0;
   var lastQuestion = {{ question|tojson }};
 
-  // Natural English Accent Voice Selection (British/American Academic)
+  // Natural British Studio Audio + Web Speech Fallback
+  var currentAudio = null;
+  function playExaminerVoice(text, audioUrl) {
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
+    if (audioUrl) {
+      currentAudio = new Audio(audioUrl);
+      currentAudio.play().catch(function() {
+        speakFallback(text);
+      });
+      return;
+    }
+    // Fetch high-fidelity studio British audio from server
+    fetch("{{ url_for('speaking.examiner_tts') }}?text=" + encodeURIComponent(text))
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.ok && data.audio_url) {
+          currentAudio = new Audio(data.audio_url);
+          currentAudio.play().catch(function() { speakFallback(text); });
+        } else {
+          speakFallback(text);
+        }
+      })
+      .catch(function() {
+        speakFallback(text);
+      });
+  }
+
+  // Fallback speech synthesis
   let examinerVoice = null;
   function getBestEnglishVoice() {
     if (!('speechSynthesis' in window)) return null;
@@ -144,8 +174,7 @@
   }
   initVoices();
 
-  // Text-To-Speech for Examiner
-  function speakEnglish(text) {
+  function speakFallback(text) {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       var u = new SpeechSynthesisUtterance(text);
@@ -156,7 +185,7 @@
       } else {
         u.lang = "en-GB";
       }
-      u.rate = 0.92; // Aniq va tushunarli CEFR tezligi
+      u.rate = 0.92;
       u.pitch = 1.0;
       window.speechSynthesis.speak(u);
     }
@@ -167,7 +196,8 @@
     var btn = e.target.closest(".play-btn");
     if (btn) {
       var txt = btn.getAttribute("data-text");
-      if (txt) speakEnglish(txt);
+      var aud = btn.getAttribute("data-audio");
+      if (txt || aud) playExaminerVoice(txt, aud);
     }
   });
 
@@ -261,9 +291,9 @@
 
       // Add Examiner follow-up
       setTimeout(function() {
-        addExaminerBubble(res.examiner_reply);
+        addExaminerBubble(res.examiner_reply, res.audio_url);
         lastQuestion = res.examiner_reply;
-        speakEnglish(res.examiner_reply);
+        playExaminerVoice(res.examiner_reply, res.audio_url);
         statusText.textContent = "Examiner savolini eshiting va keyingi javobingizni bering.";
         statusText.className = "text-xs font-bold";
         statusText.style.color = "var(--mut)";
@@ -298,13 +328,13 @@
     stream.scrollTop = stream.scrollHeight;
   }
 
-  function addExaminerBubble(text) {
+  function addExaminerBubble(text, audioUrl) {
     var d = document.createElement("div");
     d.className = "flex items-start gap-3";
     d.innerHTML = '<div class="w-10 h-10 rounded-full bg-indigo-500/20 border-2 border-indigo-400 flex items-center justify-center text-lg flex-shrink-0">🇬🇧</div>' +
                   '<div class="p-4 rounded-2xl rounded-tl-none field shadow-md max-w-xl text-sm leading-relaxed" style="color:var(--wtx)">' +
                   '<div class="flex items-center justify-between mb-1"><span class="text-[11px] font-bold text-indigo-500">Examiner David</span>' +
-                  '<button type="button" class="text-xs text-sky-500 hover:underline font-semibold play-btn" data-text="' + escapeHtml(text) + '">🔊 Ovozda eshitish</button></div>' +
+                  '<button type="button" class="text-xs text-sky-500 hover:underline font-semibold play-btn" data-text="' + escapeHtml(text) + '" data-audio="' + escapeHtml(audioUrl || '') + '">🔊 Ovozda eshitish</button></div>' +
                   '<p>' + escapeHtml(text) + '</p></div>';
     stream.appendChild(d);
     stream.scrollTop = stream.scrollHeight;
